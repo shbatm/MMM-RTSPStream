@@ -6,42 +6,70 @@
  */
 
 var NodeHelper = require("node_helper");
+var Stream = require('node-rtsp-stream-es6');
+var request = require('request');
 
 module.exports = NodeHelper.create({
 
-	// Override socketNotificationReceived method.
+    config: {},
 
-	/* socketNotificationReceived(notification, payload)
-	 * This method is called when a socket notification arrives.
-	 *
-	 * argument notification string - The identifier of the noitication.
-	 * argument payload mixed - The payload of the notification.
-	 */
-	socketNotificationReceived: function(notification, payload) {
-		if (notification === "MMM-RTSPStream-NOTIFICATION_TEST") {
-			console.log("Working notification system. Notification:", notification, "payload: ", payload);
-			// Send notification
-			this.sendNotificationTest(this.anotherFunction()); //Is possible send objects :)
-		}
-	},
+    streams: {},
 
-	// Example function send notification test
-	sendNotificationTest: function(payload) {
-		this.sendSocketNotification("MMM-RTSPStream-NOTIFICATION_TEST", payload);
-	},
+    start: function() {
+        this.started = false;
+        this.config = {};
+    },
 
-	// this you can create extra routes for your module
-	extraRoutes: function() {
-		var self = this;
-		this.expressApp.get("/MMM-RTSPStream/extra_route", function(req, res) {
-			// call another function
-			values = self.anotherFunction();
-			res.send(values);
-		});
-	},
+    startListener: function(name) {
+        streams[name] = new Stream(this.config.name); 
+        streams[name].startListener();
+    },
 
-	// Test another function
-	anotherFunction: function() {
-		return {date: new Date()};
-	}
+    getData: function(name) {
+        // console.log("Getting data for "+name);
+        var self = this;
+        
+        var snapUrl = this.config[name].snapshotUrl;
+
+        if (!snapUrl) {
+            console.log("No snapshotUrl given for " + this.config[name].name);
+            return;
+        }
+                
+        request({
+            url: snapUrl,
+            method: 'GET',
+        }, function (error, response, body) {
+            // console.log("Received response for "+this.callerName);
+            if (!error && response.statusCode == 200) {
+                self.sendSocketNotification("DATA_" + this.callerName, body);
+            } else if (response.statusCode === 401) {
+                self.sendSocketNotification("DATA_ERROR_" + this.callerName, error);
+                console.error(self.name, error);
+            } else {
+                console.error(self.name, "Could not load data.");
+            }
+        }.bind({callerName:name})
+        );
+        setTimeout(function() { self.getData(name); }, this.config[name].snapshotRefresh * 1000);
+    },
+
+    // Override socketNotificationReceived method.
+
+    /* socketNotificationReceived(notification, payload)
+     * This method is called when a socket notification arrives.
+     *
+     * argument notification string - The identifier of the noitication.
+     * argument payload mixed - The payload of the notification.
+     */
+    socketNotificationReceived: function(notification, payload) {
+        var self = this;
+        if (notification === 'CONFIG') {
+            if (!(payload.name in self.config)) {
+                self.config[payload.name] = payload;
+                self.startListener(payload.name);
+                self.sendSocketNotification("STARTED", payload.name);
+            }
+        }
+    },
 });

@@ -8,3 +8,19 @@
  * Custom here your css module
  *
  */
+.MMM-RTSPStream .wrapper {
+
+}
+
+.MMM-RTSPStream .wrapper br {
+  clear: both;
+}
+
+.MMM-RTSPStream .canvas {
+  width: 352px;
+  height: 240px;
+  line-height: 240px;
+  border: 1px solid white;
+  float: left;
+  text-align: center;
+}
