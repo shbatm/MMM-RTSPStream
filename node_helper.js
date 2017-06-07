@@ -25,6 +25,11 @@ module.exports = NodeHelper.create({
         streams[name].startListener();
     },
 
+
+    /* FUTURE: Allow ability to make calls for the snapshots from the node_helper
+     * Instead of grabbing the image directly from the browser.
+     * This function is not currently used.
+     */
     getData: function(name) {
         // console.log("Getting data for "+name);
         var self = this;
