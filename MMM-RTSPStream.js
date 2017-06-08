@@ -32,7 +32,7 @@ Module.register("MMM-RTSPStream", {
         },            
         // MMM-KeyBindings mapping.
         keyBindingsMode: "DEFAULT",
-        keyBindings: { Play: "MediaPlayPause" }
+        keyBindings: { Play: "MediaPlayPause", Previous: "MediaPreviousTrack", Next: "MediaNextTrack", Select: "Enter" }
     },
 
     requiresVersion: "2.1.0", // Required version of MagicMirror
@@ -61,8 +61,6 @@ Module.register("MMM-RTSPStream", {
                 self.sendSocketNotification('CONFIG', { name: key, config: self.config[key] });
             }
         });
-
-        console.log(`${this.name}: start() called.`, this.streams);
     },
 
     /* Setup Key Bindings for the MMM-KeyBindings module */
@@ -70,12 +68,9 @@ Module.register("MMM-RTSPStream", {
         this.currentKeyPressMode = this.config.keyBindingsMode;
         this.reverseKeyMap = {};
         Object.keys(this.config.keyBindings).forEach(key => this.reverseKeyMap[this.config.keyBindings[key]] = key);
-
-        console.log(`${this.name}: setupKeyBindings() called.`, this.reverseKeyMap);
     },
 
     setupStreamRotation: function() {
-        console.log(`${this.name}: setupStreamRotation() called. autoStart:${this.config.autoStart}`);
         this.playing = this.config.autoStart;
 
         // Reference to function for manual transitions (TODO: FUTURE)
@@ -84,23 +79,34 @@ Module.register("MMM-RTSPStream", {
         // Call the first stream
         this.manualTransition();
 
-        if (this.config.rotateStreams && Object.keys(this.streams).length > 1) {
+        if (this.config.rotateStreams && Object.keys(this.streams).length > 1 && this.config.rotateStreamTimeout > 0) {
             // We set a timer to cause the stream rotation
             this.transitionTimer = setInterval(this.manualTransition, this.config.rotateStreamTimeout * 1000);
-            console.log(`${this.name}: transitionTimer setup.`, this.config.rotateStreamTimeout * 1000);
         }
     },
 
-    rotateStream: function () {
+    rotateStream: function (goToIndex=-1, goDirection=0) {
         var k = Object.keys(this.streams);
+        var resetCurrentIndex = k.length;
         var lastStream = this.currentStream;
-        if (this.currentIndex < (k.length - 1)) {
-            this.currentIndex ++;
-            this.currentStream = k[this.currentIndex];
-        } else {
-            this.currentIndex = 0;
-            this.currentStream = k[0];
+
+        // Update the current index
+        if (goToIndex === -1) {                             // Go to a specific slide?
+            if (goDirection === 0) {
+                this.currentIndex += 1;                     // Normal Transition, Increment by 1
+            } else {
+                this.currentIndex += goDirection;           // Told to go a specific direction
+            }
+            if (this.currentIndex >= resetCurrentIndex) {   // Wrap-around back to beginning
+                this.currentIndex = 0;
+            } else if (this.currentIndex < 0) {
+                this.currentIndex = resetCurrentIndex - 1;  // Went too far backwards, wrap-around to end
+            }
+        } else if (goToIndex >= 0 && goToIndex < resetCurrentIndex) {
+            this.currentIndex = goToIndex;                  // Go to a specific slide if in range
         }
+
+        this.currentStream = k[this.currentIndex];
 
         if (this.playing) {
             if (lastStream) { this.stopStream(lastStream); }
@@ -109,14 +115,14 @@ Module.register("MMM-RTSPStream", {
             if (lastStream) { this.sendSocketNotification("SNAPSHOT_STOP", lastStream); }
             this.playSnapshots(this.currentStream);
         }
-
-        console.log(`${Math.floor(Date.now() / 1000)}: ${this.name}: rotateStream() called.`, lastStream, this.currentStream);
     },
 
     restartTimer: function () {
-        // Restart the timer
-        clearInterval(this.transitionTimer);
-        this.transitionTimer = setInterval(this.manualTransition, this.config.rotateStreamTimeout * 1000);
+        if (this.config.rotateStreams && Object.keys(this.streams).length > 1 && this.config.rotateStreamTimeout > 0) {
+            // Restart the timer
+            clearInterval(this.transitionTimer);
+            this.transitionTimer = setInterval(this.manualTransition, this.config.rotateStreamTimeout * 1000);
+        }
     },
 
     /* suspend()
@@ -146,7 +152,6 @@ Module.register("MMM-RTSPStream", {
     },
 
     playBtnCallback: function (s) {
-        console.log(`${this.name}: playBtnCallback() called for ${s}`);
         if (this.config.rotateStreams) {
             if (this.playing) {
                 this.stopStream(this.currentStream);
@@ -181,8 +186,6 @@ Module.register("MMM-RTSPStream", {
             wrapper.innerHTML = "Error loading data...";
             return wrapper;
         }
-
-        console.log(`${this.name}: getDom() called. Loaded: ${this.loaded}; Suspended: ${this.suspended}`);
 
         if (this.loaded && !this.suspended) {
             wrapper.style.cssText = `width: ${this.config.moduleWidth}px; height:${this.config.moduleHeight}px`;
@@ -307,12 +310,10 @@ Module.register("MMM-RTSPStream", {
             this.streams[s].playing = true;
             this.playStream(s);
             this.sendSocketNotification("SNAPSHOT_STOP", s);
-        });    
-        console.log(`${this.name}: playAll() called.`);
+        });
     },
 
     stopStream: function(stream) {
-        console.log(`${this.name}: stopStream() called. stream: ${stream}`, this.currentPlayers);
         if (stream in this.currentPlayers) {
             this.currentPlayers[stream].destroy();
             delete this.currentPlayers[stream];
@@ -324,7 +325,6 @@ Module.register("MMM-RTSPStream", {
     },
 
     stopAllStreams: function(startSnapshots=true) {
-        console.log(`${this.name}: stopAllStreams() called. currentPlayers: ${this.currentPlayers}`);
         this.playing = false;
         Object.keys(this.currentPlayers).forEach(key => this.currentPlayers[key].destroy());
         this.currentPlayers = {};
@@ -365,11 +365,62 @@ Module.register("MMM-RTSPStream", {
                         this.sendSocketNotification("SNAPSHOT_STOP", this.currentStream);
                         this.playStream(this.currentStream);
                     }
-                } else { 
+                } else if (!this.selectedStream) { 
                     if (this.playing) { this.stopAllStreams(); } else { this.playAll(); }
+                } else {
+                    if (this.streams[this.selectedStream].playing) {
+                        this.stopStream(this.selectedStream);
+                        this.playSnapshots(this.selectedStream);
+                    } else {
+                        this.sendSocketNotification("SNAPSHOT_STOP", this.selectedStream);
+                        this.playStream(this.selectedStream);
+                    }
+                }
+            }
+           if (payload.KeyName === this.config.keyBindings.Next) {
+                if (this.config.rotateStreams) {
+                    this.manualTransition(undefined, 1);
+                    this.restartTimer();
+                } else {
+                    this.selectStream(1);
+                }
+            }
+            else if (payload.KeyName === this.config.keyBindings.Previous) {
+                if (this.config.rotateStreams) {
+                    this.manualTransition(undefined, -1);
+                    this.restartTimer();
+                } else {
+                    this.selectStream(-1);
                 }
             }
         }
+    },
+
+    selectedStream: '',
+
+    selectStream: function(direction=1) {
+        console.log("SelectStream called with direction " + direction);
+        var k = Object.keys(this.streams);
+        if (!this.selectedStream) {
+            this.selectedStream = k[0];
+        } else {
+            var i = k.indexOf(this.selectedStream);
+            var newI = i + direction;
+            if (newI >= k.length) {
+                newI = 0;
+            } else if (newI < 0) {
+                newI = k.length - 1;
+            }
+            this.selectedStream = k[newI];
+        }
+        console.log(this.selectedStream);
+        k.forEach(s => {
+            if (s !== this.selectedStream) {
+                document.getElementById("iw_" + s).style.cssText = "";
+            } else {
+                document.getElementById("iw_" + s).style.cssText = "border-color: red;";
+            }
+        });
     },
 
     // socketNotificationReceived from helper
