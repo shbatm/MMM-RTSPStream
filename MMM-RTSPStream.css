@@ -9,7 +9,11 @@
  *
  */
 .MMM-RTSPStream .wrapper {
-
+  position: relative;
+  left: 50%;
+  vertical-align: middle;
+  -webkit-transform: translateX(-50%); /*translateX(-30px);*/
+  transform: translateX(-50%); /* translateX(-30px);*/
 }
 
 .MMM-RTSPStream .wrapper br {
@@ -17,16 +21,24 @@
 }
 
 .MMM-RTSPStream .innerWrapper {
-  width: 382px; /* Video width + 2*border + 2*padding */
-  height: 240px;
-  line-height: 240px;
+  position: relative;
+  width: 352px; /* Video width + 2*border + 2*padding */
+  height: 242px;
   border: 1px solid white;
   float: left;
   text-align: center;
-  padding: 15px;
+  margin: 15px;
 }
 
 .MMM-RTSPStream .canvas {
+  position: absolute;
+  z-index: 1;
+  left: 50%;
+  top: 50%;
+  width: 352px;
+  height: 240px;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
 	width: 100%
 	height: 100%;
 }
@@ -34,36 +46,47 @@
 /* Next and Previous arrow */
 .MMM-RTSPStream .control {
   z-index: 55;
-  opacity: 0.0;
-  display: none;
+  /*opacity: 0.0;*/
+  display: inline-block;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  line-height: 50%;
+  width: 100%;
+  height: 100%;
+  position: absolute;
   left: 50%;
   top: 50%;
   vertical-align: middle;
   -webkit-transform: translate(-50%, -50%);
   transform: translate(-50%, -50%);
 }
-}
+
 
 /* Show button when you hover near */
 .MMM-RTSPStream .control:hover label {
-  opacity: 0.2;
+  opacity: 0.6;
   cursor: pointer !important;
 }
 
-.MMM-RTSPStream .control label:hover {
+.MMM-RTSPStream .control:hover {
   opacity: 0.6;
+  cursor: pointer !important;
 }
 
 .MMM-RTSPStream .control label {
-  z-index: 10;
+  z-index: 100;
   display: block;
   text-align: center;
   line-height: 50px;
-  position: relative;
   width: 100px;
   height: 100px;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
   font-size: 100px;
   color: #FFF;
-  cursor: pointer !important;
   opacity: 0.0;
 }

@@ -14,12 +14,13 @@ Module.register("MMM-RTSPStream", {
         rotateStreams: true,
         rotateStreamTimeout: 10,  // Seconds
         showSnapWhenPaused: true,
-        moduleWidth: 354,         // Set to mutiples of the camera widths to display side by side
-        moduleHeight: 240,        // 
+        moduleWidth: 384,         // Width = (Stream Width + 30px margin + 2px border) * # of Streams Wide
+        moduleHeight: 272,        // Height = (Stream Height + 30px margin + 2px border) * # of Streams Tall
         animationSpeed: 1500,
         stream1: {
-            name: 'Driveway Camera',
+            name: 'BigBuckBunny Test',
             url: 'rtsp://184.72.239.149/vod/mp4:BigBuckBunny_115k.mov',
+            snapshotType: 'url', // 'url' or 'file'
             snapshotUrl: '',
             snapshotRefresh: 10, // Seconds
             frameRate: "30",
@@ -38,11 +39,13 @@ Module.register("MMM-RTSPStream", {
 
     currentPlayers: {},
 
-    playStream: false,
+    playing: false,
 
     currentIndex: -1,
 
-    streams: [],
+    currentStream: '',
+
+    streams: {},
 
     start: function() {
         var self = this;
@@ -53,9 +56,9 @@ Module.register("MMM-RTSPStream", {
         this.setupKeyBindings();
 
         Object.keys(this.config).filter(key => key.startsWith("stream")).forEach((key) => { 
-            self.streams.push(key);
-            if (self.config[key].url) {
-                self.sendSocketNotification('CONFIG', self.config[key]);
+            self.streams[key] = { playing: false };
+            if (self.config[key].url || self.config[key].snapshotUrl) {
+                self.sendSocketNotification('CONFIG', { name: key, config: self.config[key] });
             }
         });
 
@@ -72,16 +75,16 @@ Module.register("MMM-RTSPStream", {
     },
 
     setupStreamRotation: function() {
+        console.log(`${this.name}: setupStreamRotation() called. autoStart:${this.config.autoStart}`);
+        this.playing = this.config.autoStart;
+
         // Reference to function for manual transitions (TODO: FUTURE)
         this.manualTransition = this.rotateStream.bind(this);
 
         // Call the first stream
         this.manualTransition();
 
-
-        console.log(`${this.name}: setupStreamRotation() called.`);
-
-        if (this.config.rotateStreams && this.streams.length > 1) {
+        if (this.config.rotateStreams && Object.keys(this.streams).length > 1) {
             // We set a timer to cause the stream rotation
             this.transitionTimer = setInterval(this.manualTransition, this.config.rotateStreamTimeout * 1000);
             console.log(`${this.name}: transitionTimer setup.`, this.config.rotateStreamTimeout * 1000);
@@ -89,13 +92,25 @@ Module.register("MMM-RTSPStream", {
     },
 
     rotateStream: function () {
-        if (this.currentIndex < (this.streams.length - 1)) {
+        var k = Object.keys(this.streams);
+        var lastStream = this.currentStream;
+        if (this.currentIndex < (k.length - 1)) {
             this.currentIndex ++;
+            this.currentStream = k[this.currentIndex];
         } else {
             this.currentIndex = 0;
+            this.currentStream = k[0];
         }
-        console.log(`${this.name}: rotateStream() called.`, this.currentIndex);
-        this.updateDom();
+
+        if (this.playing) {
+            if (lastStream) { this.stopStream(lastStream); }
+            this.playStream(this.currentStream);
+        } else {
+            if (lastStream) { this.sendSocketNotification("SNAPSHOT_STOP", lastStream); }
+            this.playSnapshots(this.currentStream);
+        }
+
+        console.log(`${Math.floor(Date.now() / 1000)}: ${this.name}: rotateStream() called.`, lastStream, this.currentStream);
     },
 
     restartTimer: function () {
@@ -110,10 +125,7 @@ Module.register("MMM-RTSPStream", {
     suspend: function () {
         console.log(`${this.name} is suspended...`);
         this.suspended = true;
-        if (typeof this.transitionTimer !== "undefined") {
-            clearInterval(this.transitionTimer);
-        }
-        this.stopAllStreams();
+        this.stopAllStreams(false);
     },
 
     /* resume()
@@ -122,14 +134,37 @@ Module.register("MMM-RTSPStream", {
     resume: function () {
         console.log(`${this.name} has resumed...`);
         this.suspended = false;
-        this.setupStreamRotation();
+        if (this.loaded) { 
+            if (this.config.rotateStreams) {
+                this.setupStreamRotation();
+            } else if (this.config.autoStart) {
+                this.playAll();
+            } else {
+                Object.keys(this.streams).forEach(s => this.playSnapshots(s));
+            }
+        }
     },
 
-    playBtnCallback: function () {
-        console.log(`${this.name}: playBtnCallback() called. this.playStream: ${this.playStream}`);
-        if (this.playStream) { this.pause(); } else { this.play(); }
+    playBtnCallback: function (s) {
+        console.log(`${this.name}: playBtnCallback() called for ${s}`);
+        if (this.config.rotateStreams) {
+            if (this.playing) {
+                this.stopStream(this.currentStream);
+                this.playSnapshots(this.currentStream);
+            } else {
+                this.sendSocketNotification("SNAPSHOT_STOP", this.currentStream);
+                this.playStream(this.currentStream);
+            }
+        } else { 
+            if (this.streams[s].playing) { 
+                this.stopStream(s);
+                this.playSnapshots(s);
+            } else { 
+                this.sendSocketNotification("SNAPSHOT_STOP", s);
+                this.playStream(s);
+            }
+        }
     },
-
 
     getDom: function() {
         var self = this;
@@ -154,70 +189,36 @@ Module.register("MMM-RTSPStream", {
             wrapper.className = "MMM-RTSPStream wrapper";
 
             if (this.config.rotateStreams) {
-                console.log(`${this.name}: getDom--Clearing streams.`, this.currentPlayers, this.config);
-                // Clear out old timers and streams
-                Object.keys(this.streams).forEach((key) => { 
-                    if (key !== this.streams[this.currentIndex]) {
-                        if (typeof this.config[key].snapshotTimer !== "undefined") {
-                            clearInterval(this.config[key].snapshotTimer);
-                            this.config[key].snapshotTimer = undefined;
-                        } else if (key in this.currentPlayers) {
-                            this.stopStream(key);
-                        }
-                    }
+                iw = this.getInnerWrapper('');
+                iw.appendChild(this.getCanvas(''));
+                iw.appendChild(this.getPlayPauseBtn(''));
+                wrapper.appendChild(iw);
+            } else {
+                Object.keys(this.streams).forEach(stream => {
+                    iw = this.getInnerWrapper(stream);
+                    iw.appendChild(this.getCanvas(stream));
+                    iw.appendChild(this.getPlayPauseBtn(stream));
+                    wrapper.appendChild(iw);
                 });
             }
-
-            var iw;
-            if (this.playStream) {
-                // Load the canvas and play the stream
-                if (this.config.rotateStreams) {
-                    if (!(this.streams[this.currentIndex] in this.currentPlayers)) {
-                        iw = this.getInnerWrapper(this.streams[this.currentIndex]);
-                        iw.appendChild(this.getStream(this.streams[this.currentIndex]));
-                        iw.appendChild(this.getPlayPauseBtn());
-                        wrapper.appendChild(iw);
-                    }
-                } else {
-                    this.streams.forEach((stream) => {
-                        var iw = this.getInnerWrapper(stream);
-                        iw.appendChild(this.getStream(stream));
-                        iw.appendChild(this.getPlayPauseBtn());
-                        wrapper.appendChild(iw);
-                        wrapper.appendChild(document.createElement("br"));
-                    });
-                }
-            } else if (this.showSnapWhenPaused) {
-                if (this.config.rotateStreams) {
-                    iw = this.getInnerWrapper(this.streams[this.currentIndex]);
-                    iw.appendChild(this.getSnapshot(this.streams[this.currentIndex]));
-                    iw.appendChild(this.getPlayPauseBtn());
-                    wrapper.appendChild(iw);
-                } else {
-                    this.streams.forEach((stream) => {
-                        var iw = this.getInnerWrapper(stream);
-                        iw.appendChild(this.getSnapshot(stream));
-                        iw.appendChild(this.getPlayPauseBtn());
-                        wrapper.appendChild(iw);
-                        wrapper.appendChild(document.createElement("br"));
-                    });
-                }
-
-                // TODO: Add setInterval for snapshot (will need separate function)
-                // TODO: Add filters (invert colors)
-            } else {
-                // Show a placeholder
-                wrapper.innerHTML = "Nothing to Show...";
-            }
+            wrapper.appendChild(document.createElement("br"));
         }
         return wrapper;
     },
-
+   
     getCanvasSize: function(streamConfig) {
         var s = '';
         if (typeof streamConfig.width !== "undefined") { s += "width: " + streamConfig.width + "px; "; }
         if (typeof streamConfig.height !== "undefined") { s += "height: " + streamConfig.height + "px; line-height: " + streamConfig.height + ";"; }
         return s;
+    },
+
+    getCanvas: function(stream) {
+        var canvas = document.createElement("canvas");
+        canvas.id = "canvas_" + stream;
+        canvas.className = "MMM-RTSPStream canvas";
+        if (stream) { canvas.cssText = this.getCanvasSize(this.config[stream]); }
+        return canvas;
     },
 
     getInnerWrapper: function(stream) {
@@ -227,97 +228,125 @@ Module.register("MMM-RTSPStream", {
         return innerWrapper;
     },
 
-    getStream: function(stream) {
-        var canvas = document.createElement("canvas");
-        canvas.id = "canvas_" + stream;
-        canvas.cssText = this.getCanvasSize(this.config[stream]);
-        var sUrl = `ws://${document.location.hostname}:${this.config[stream].port}`;
-        var player = new JSMpeg.Player(sUrl, {canvas: canvas}); 
-        this.currentPlayers[stream] = player;
-        return canvas;
-    },
+    getPlayPauseBtn: function(stream, force_visible=false) {
+        var self = this;
 
-    getSnapshot: function(stream) {
-        // Show the snapshot instead of the stream
-        var snapUrl = this.config[stream].snapshotUrl;
-        if (snapUrl) {
-            var img = document.createElement("img");
-            img.id = "snapshot_" + stream;
-            img.src = snapUrl;
-            img.className = "MMM-RTSPStream canvas";
-            img.style.cssText = this.getCanvasSize(this.config[stream]);
-            this.config[stream].snapshotTimer = setInterval(function() {
-                document.getElementById("snapshot_" + stream).src = snapUrl;
-            }.bind({stream:stream, url:snapUrl}) , this.config[stream].snapshotRefresh * 1000);
-            return img;
-        } else {
-            var pHolder = document.createElement("div");
-            pHolder.className = "MMM-RTSPStream canvas";
-            pHolder.style.cssText = this.getCanvasSize(this.config[stream]);
-            pHolder.innerHTML = "No snapshot URL!";
-        }
-    },
-
-    getPlayPauseBtn: function(stream) {
-        function makeOnClickHandler() {
+        function makeOnClickHandler(s) {
             return function () {
-                self.playBtnCallback();
+                self.playBtnCallback(s);
             };
         }
 
         var playBtnWrapper = document.createElement("div");
         playBtnWrapper.className = "control";
+        playBtnWrapper.onclick = makeOnClickHandler(stream);
+        playBtnWrapper.id = "playBtnWrapper_" + stream;
 
         var playBtnLabel = document.createElement("label");
-        playBtnLabel.id = "playBtn" + stream;
-        if (this.playStream) {
-            playBtnLabel.innerHTML = '<i class="fa fa-pause-circle"></i>';
-            playBtnLabel.onclick = makeOnClickHandler();
-        } else {
-            playBtnLabel.innerHTML = '<i class="fa fa-play-circle"></i>';
-            playBtnLabel.onclick = makeOnClickHandler();
-        }
+        playBtnLabel.id = "playBtnLabel_" + stream;
+        playBtnLabel.innerHTML = '<i class="fa fa-play-circle"></i>';
         playBtnWrapper.appendChild(playBtnLabel);
         return playBtnWrapper;
     },
 
-    play: function () {
-        this.playStream = true;
-        this.updateDom(self.config.animationSpeed);
-        console.log(`${this.name}: play() called. PlayStream: ${this.playStream}`);
+    playStream: function(stream) {
+        var canvasId = (this.config.rotateStreams) ? "canvas_" : "canvas_" + stream;
+        var canvas = document.getElementById(canvasId);
+        var ctx = canvas.getContext("2d");
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        if (stream in this.currentPlayers) {
+            this.currentPlayers[stream].destroy();
+        }
+        var sUrl = `ws://${document.location.hostname}:${this.config[stream].port}`;
+        var player = new JSMpeg.Player(sUrl, {canvas: canvas}); 
+        this.currentPlayers[stream] = player;
+        this.streams[stream].playing = true;
+        this.playing = true;
+        this.updatePlayPauseBtn(stream);
     },
 
-    pause: function() {
-        this.playStream = false;
-        this.stopAllStreams();
-        console.log(`${this.name}: pause() called. PlayStream: ${this.playStream}`);
+    playSnapshots: function(stream) {
+        // Show the snapshot instead of the stream
+        var snapUrl = this.config[stream].snapshotUrl;
+        var canvasId = (this.config.rotateStreams) ? "canvas_" : "canvas_" + stream;
+        var canvas = document.getElementById(canvasId);
+        var ctx = canvas.getContext("2d");
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        if (snapUrl && this.config.showSnapWhenPaused) {
+            this.sendSocketNotification("SNAPSHOT_START", stream);
+            this.updatePlayPauseBtn(stream);
+        } else {
+            this.updatePlayPauseBtn(stream, true);
+            ctx.font = "16px Roboto Condensed";
+            ctx.fillStyle = "white";
+            ctx.fillText(this.config[stream].name,10,25);
+        }
+    },
+
+    updatePlayPauseBtn(stream, force_visible=false) {
+        var buttonId = (this.config.rotateStreams) ? "playBtnLabel_" : "playBtnLabel_" + stream;
+        var button = document.getElementById(buttonId);
+        if (stream !== '' && this.streams[stream].playing) {
+            button.innerHTML = '<i class="fa fa-pause-circle"></i>';
+        } else {
+            button.innerHTML = '<i class="fa fa-play-circle"></i>';
+        }
+
+        if (force_visible) {
+            button.style.cssText = "opacity: 0.6;";
+            button.parentElement.style.cssText = "opacity: 1;";
+        } else {
+            button.style.cssText = '';
+            button.parentElement.style.cssText = '';
+        }
+    },
+
+    playAll: function () {
+        this.playing = true;
+        Object.keys(this.streams).forEach(s => {
+            this.streams[s].playing = true;
+            this.playStream(s);
+            this.sendSocketNotification("SNAPSHOT_STOP", s);
+        });    
+        console.log(`${this.name}: playAll() called.`);
     },
 
     stopStream: function(stream) {
-
-        console.log(`${this.name}: stopStream() called. stream: ${stream}`);
+        console.log(`${this.name}: stopStream() called. stream: ${stream}`, this.currentPlayers);
         if (stream in this.currentPlayers) {
             this.currentPlayers[stream].destroy();
             delete this.currentPlayers[stream];
         }
+        this.streams[stream].playing = false;
+        if (Object.keys(this.currentPlayers).length === 0) {
+            this.playing = false;
+        }
     },
 
-    stopAllStreams: function() {
+    stopAllStreams: function(startSnapshots=true) {
         console.log(`${this.name}: stopAllStreams() called. currentPlayers: ${this.currentPlayers}`);
+        this.playing = false;
         Object.keys(this.currentPlayers).forEach(key => this.currentPlayers[key].destroy());
         this.currentPlayers = {};
-        this.updateDom();
+        Object.keys(this.streams).forEach(s => {
+            this.streams[s].playing = false;
+            if (startSnapshots) { this.playSnapshots(s); }
+            this.updatePlayPauseBtn(s);
+        });
     },
 
     getScripts: function() {
         return ['jsmpeg.min.js'];
     },
 
+    getStyles: function() {
+        return [`${this.name}.css`, 'font-awesome.css'];
+    },
+
     notificationReceived: function (notification, payload, sender) {
         if (notification === 'DOM_OBJECTS_CREATED') {
 
         }
-
         // Handle KEYPRESS events from the MMM-KeyBindings Module
         if (notification === "KEYPRESS_MODE_CHANGED") {
             this.currentKeyPressMode = payload;
@@ -328,29 +357,41 @@ Module.register("MMM-RTSPStream", {
         if (notification === "KEYPRESS" && (this.currentKeyPressMode === this.config.keyBindingsMode) && 
                 payload.KeyName in this.reverseKeyMap) {
             if (payload.KeyName === this.config.keyBindings.Play) {
-                if (this.playStream) { this.pause(); } else { this.play(); }
+                if (this.config.rotateStreams) {
+                    if (this.playing) {
+                        this.stopStream(this.currentStream);
+                        this.playSnapshots(this.currentStream);
+                    } else {
+                        this.sendSocketNotification("SNAPSHOT_STOP", this.currentStream);
+                        this.playStream(this.currentStream);
+                    }
+                } else { 
+                    if (this.playing) { this.stopAllStreams(); } else { this.playAll(); }
+                }
             }
         }
     },
 
-    // processData: function(data) {
-    //     var self = this;
-    //     this.dataRequest = data;
-    //     if (this.loaded === false) { self.updateDom(self.config.animationSpeed) ; }
-    //     this.loaded = true;
-
-    //     // the data if load
-    //     // send notification to helper
-    //     this.sendSocketNotification("MMM-RTSPStream-NOTIFICATION_TEST", data);
-    // },
-
     // socketNotificationReceived from helper
     socketNotificationReceived: function (notification, payload) {
         if (notification === "STARTED") {
-            if (!this.loaded) { this.loaded = true; }
-            if (this.config.autoStart) { 
-                this.playStream = true;
-                this.resume(); 
+            if (!this.loaded) { 
+                this.loaded = true;
+                this.suspended = false;
+                this.updateDom(this.config.animationSpeed);
+                setTimeout(() => this.resume(), 1000);
+            }
+        }
+        if (notification === "SNAPSHOT") {
+            if (payload.image) {
+                var canvasId = (this.config.rotateStreams) ? "canvas_" : "canvas_" + payload.name;
+                var canvas = document.getElementById(canvasId);
+                var ctx = canvas.getContext('2d');
+                var img = new Image();
+                img.onload = () => {
+                  ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                };
+                img.src = payload.buffer;
             }
         }
     },

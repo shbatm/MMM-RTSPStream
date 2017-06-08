@@ -5,10 +5,17 @@
   "main": "MMM-RTSPStream.js",
   "author": "shbatm",
   "license": "MIT",
-  "scripts": { "test" : "node test_server.js" },
+  "scripts": {
+    "test": "node test_server.js"
+  },
   "dependencies": {
+    "datauri": "^1.0.5",
     "node-rtsp-stream-es6": "github:shbatm/node-rtsp-stream-es6",
     "ws": "^3.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shbatm/MMM-RTSPStream.git"
   },
   "devDependencies": {
     "grunt": "latest",
