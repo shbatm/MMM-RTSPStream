@@ -220,13 +220,14 @@ Module.register("MMM-RTSPStream", {
         var canvas = document.createElement("canvas");
         canvas.id = "canvas_" + stream;
         canvas.className = "MMM-RTSPStream canvas";
-        if (stream) { canvas.cssText = this.getCanvasSize(this.config[stream]); }
+        // if (stream) { canvas.cssText = this.getCanvasSize(this.config[stream]); }
         return canvas;
     },
 
     getInnerWrapper: function(stream) {
         var innerWrapper = document.createElement("div");
         innerWrapper.className = "MMM-RTSPStream innerWrapper";
+        if (stream) { innerWrapper.style.cssText = this.getCanvasSize(this.config[stream]); }
         innerWrapper.id = "iw_" + stream;
         return innerWrapper;
     },
@@ -289,6 +290,11 @@ Module.register("MMM-RTSPStream", {
     updatePlayPauseBtn(stream, force_visible=false) {
         var buttonId = (this.config.rotateStreams) ? "playBtnLabel_" : "playBtnLabel_" + stream;
         var button = document.getElementById(buttonId);
+        if (!button) {
+            // If not ready yet, retry in 1 second.
+            setTimeout(() => this.updatePlayPauseBtn(stream, force_visible), 1000);
+            return;
+        }
         if (stream !== '' && this.streams[stream].playing) {
             button.innerHTML = '<i class="fa fa-pause-circle"></i>';
         } else {
@@ -330,7 +336,11 @@ Module.register("MMM-RTSPStream", {
         this.currentPlayers = {};
         Object.keys(this.streams).forEach(s => {
             this.streams[s].playing = false;
-            if (startSnapshots) { this.playSnapshots(s); }
+            if (startSnapshots) { 
+                this.playSnapshots(s); 
+            } else {
+                this.sendSocketNotification("SNAPSHOT_STOP", s);
+            }
             this.updatePlayPauseBtn(s);
         });
     },
@@ -355,7 +365,7 @@ Module.register("MMM-RTSPStream", {
         //  console.log(payload);
         // }
         if (notification === "KEYPRESS" && (this.currentKeyPressMode === this.config.keyBindingsMode) && 
-                payload.KeyName in this.reverseKeyMap) {
+                payload.KeyName in this.reverseKeyMap && !this.suspended) {
             if (payload.KeyName === this.config.keyBindings.Play) {
                 if (this.config.rotateStreams) {
                     if (this.playing) {
@@ -399,7 +409,6 @@ Module.register("MMM-RTSPStream", {
     selectedStream: '',
 
     selectStream: function(direction=1) {
-        console.log("SelectStream called with direction " + direction);
         var k = Object.keys(this.streams);
         if (!this.selectedStream) {
             this.selectedStream = k[0];
@@ -413,12 +422,12 @@ Module.register("MMM-RTSPStream", {
             }
             this.selectedStream = k[newI];
         }
-        console.log(this.selectedStream);
         k.forEach(s => {
             if (s !== this.selectedStream) {
-                document.getElementById("iw_" + s).style.cssText = "";
+                var iw = document.getElementById("iw_" + s)
+                iw.style.cssText = iw.style.cssText.replace("border-color: red;", "");
             } else {
-                document.getElementById("iw_" + s).style.cssText = "border-color: red;";
+                document.getElementById("iw_" + s).style.cssText += "border-color: red;";
             }
         });
     },

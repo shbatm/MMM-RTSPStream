@@ -12,6 +12,7 @@
   position: relative;
   left: 50%;
   vertical-align: middle;
+  text-align: center;
   -webkit-transform: translateX(-50%); /*translateX(-30px);*/
   transform: translateX(-50%); /* translateX(-30px);*/
 }
@@ -25,7 +26,8 @@
   width: 352px; /* Video width + 2*border + 2*padding */
   height: 242px;
   border: 1px solid white;
-  float: left;
+  /*float: left;*/
+  display: inline-block;
   text-align: center;
   margin: 15px;
 }
@@ -35,12 +37,12 @@
   z-index: 1;
   left: 50%;
   top: 50%;
-  width: 352px;
-  height: 240px;
+  /*width: 352px;
+  height: 240px;*/
   -webkit-transform: translate(-50%, -50%);
   transform: translate(-50%, -50%);
-	width: 100%
-	height: 100%;
+    width: 100%;
+    height: 100%;
 }
 
 /* Next and Previous arrow */
@@ -54,9 +56,6 @@
   line-height: 50%;
   width: 100%;
   height: 100%;
-  position: absolute;
-  left: 50%;
-  top: 50%;
   vertical-align: middle;
   -webkit-transform: translate(-50%, -50%);
   transform: translate(-50%, -50%);
