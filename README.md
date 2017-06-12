@@ -52,7 +52,7 @@ var config = {
     modules: [
         {
             module: 'MMM-RTSPStream',
-            postion: 'middle_center',
+            position: 'middle_center',
             config: {
                 autoStart: true,
                 rotateStreams: false,
