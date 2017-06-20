@@ -6,7 +6,8 @@
   "author": "shbatm",
   "license": "MIT",
   "scripts": {
-    "test": "node test_server.js"
+    "test": "node test_server.js",
+    "update": "npm install github:shbatm/node-rtsp-stream-es6"
   },
   "dependencies": {
     "datauri": "^1.0.5",
@@ -18,6 +19,7 @@
     "url": "git+https://github.com/shbatm/MMM-RTSPStream.git"
   },
   "devDependencies": {
+    "stylelint": "latest",
     "grunt": "latest",
     "grunt-eslint": "latest",
     "grunt-jsonlint": "latest",

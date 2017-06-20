@@ -49,7 +49,7 @@ npm install
 ```shell
 cd ~/MagicMirror/modules/MMM-RTSPStream
 git pull
-npm install node-rtsp-stream-es6
+npm run-script update
 ```
 
 ## Using the module
