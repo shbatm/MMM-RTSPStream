@@ -23,6 +23,7 @@ Module.register("MMM-RTSPStream", {
             snapshotType: 'url', // 'url' or 'file'
             snapshotUrl: '',
             snapshotRefresh: 10, // Seconds
+            protocol: "tcp",     // 'tcp' or 'udp'
             frameRate: "30",
             port: 9999,
             width: undefined,
