@@ -57,10 +57,9 @@ module.exports = NodeHelper.create({
                 method: 'GET',
                 encoding: null,
             }, function (error, response, body) {
-                // console.log("Received response for "+this.callerName);
-                if (!error && response.statusCode == 200) {
+                if (!error && typeof response !== "undefined" && response.statusCode == 200) {
                     self.sendSocketNotification("SNAPSHOT", { name: this.callerName, image: true, buffer: 'data:image/jpeg;base64,' + body.toString('base64') });
-                } else if (response.statusCode === 401) {
+                } else if (error || response.statusCode === 401) {
                     self.sendSocketNotification("DATA_ERROR_" + this.callerName, error);
                     console.error(self.name, error);
                 } else {
