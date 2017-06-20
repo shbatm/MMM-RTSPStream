@@ -44,6 +44,14 @@ cd MMM-RTSPStream
 npm install
 ```
 
+## Updating after a Module Update:
+
+```shell
+cd ~/MagicMirror/modules/MMM-RTSPStream
+git pull
+npm run-script update
+```
+
 ## Using the module
 
 To use this module, add the following configuration block to the modules array in the `config/config.js` file:
@@ -109,6 +117,7 @@ config: {
 |----------------- |-----------
 | `name`           | *Required* The name of the individual stream. Will be displayed when paused if snapshots are turned off.
 | `url`            | The url of the RTSP stream. See [this list](https://github.com/shbatm/MMM-RTSPStream/wiki/Stream-URLs-for-Various-Cameras) for paths for some common security cameras. Also see below for how to test for a valid url<br>Username and password should be passed in the url if required: `rtsp://<username>:<password>@<hostname>:<port>/<path>`<br>*Default:* A test stream at `'rtsp://184.72.239.149/vod/mp4:BigBuckBunny_115k.mov'`,
+| `protocol`       | Protocol to use for receiving RTSP stream<br>*Default:* `"tcp"`, valid options: `"tcp"` or `"udp"`.
 | `snapshotUrl`    | A string with the path to the camera snapshot. This can either be a url to camera itself (if supported) or a file path to where the snapshot is stored every X seconds by the camera. Leave blank to show just the stream title when paused.<br>Username and password should be passed in the url if required: `http://<username>:<password>@<hostname>:<port>/<path>`
 | `snapshotType`   | The type of snapshot path given<br>*Values:* `url` or `file`<br>*Default:* `url`
 | `snapshotRefresh` | How often to refresh the snapshot image (in sec).<br>*Default:* 10 (seconds)
@@ -151,6 +160,8 @@ keyBindings: {
 ## To-do
 
 * Add better touchscreen support (use an OnTouch method to play/pause instead of OnClick).
+* Reduce lag time / delay on live camera streams
+* Add option to use `omxplayer` to display a full screen live view on local machine.
 
 ## Experimentation
 
