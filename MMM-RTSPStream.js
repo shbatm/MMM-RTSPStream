@@ -17,7 +17,7 @@ Module.register("MMM-RTSPStream", {
         moduleWidth: 384,         // Width = (Stream Width + 30px margin + 2px border) * # of Streams Wide
         moduleHeight: 272,        // Height = (Stream Height + 30px margin + 2px border) * # of Streams Tall
         animationSpeed: 1500,
-        player: 'omx',            // OMX or FFMPEG
+        player: 'ffmpeg',            // OMX or FFMPEG
         stream1: {
             name: 'BigBuckBunny Test',
             url: 'rtsp://184.72.239.149/vod/mp4:BigBuckBunny_115k.mov',

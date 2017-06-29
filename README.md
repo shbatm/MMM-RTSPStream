@@ -19,9 +19,10 @@ This module will show a live RTSP video stream and/or periodic snapshots on the 
 
 ### Dependencies:
 
-* Video flow: Camera RTSP Stream → `ffmpeg` pre-processor → MM module's `node_helper.js` (via `node-rtsp-stream-es6`) → Web Socket (`ws`) → MagicMirror² (via `jsmpeg`)
-* Requires `jsmpeg` for front-end display of stream.
-* Requires `node-rtsp-stream-es6` Node.js module and `ffmpeg` for backend.
+* Video flow using `player: 'ffmpeg'`: Camera RTSP Stream → `ffmpeg` pre-processor → MM module's `node_helper.js` (via `node-rtsp-stream-es6`) → Web Socket (`ws`) → MagicMirror² (via `jsmpeg`)
+    - Requires `jsmpeg` for front-end display of stream.
+    - Requires `node-rtsp-stream-es6` Node.js module and `ffmpeg` for backend.
+* Alternate for local display only (`player: 'omx'` config option): Use `omxplayer` to overlay the video stream directly on the screen.
 
 ## Screenshot:
 
@@ -68,6 +69,7 @@ var config = {
                 showSnapWhenPaused: false,
                 moduleWidth: 354,
                 moduleHeight: 240,
+                player: 'ffmpeg',     
                 stream1: {
                     name: 'BigBuckBunny Test Stream',
                     url: 'rtsp://184.72.239.149/vod/mp4:BigBuckBunny_115k.mov',
@@ -89,6 +91,7 @@ var config = {
 | `autoStart`      | Start the stream(s) automatically<br>*Default:* `true`
 | `rotateStreams`  | `true`: Rotate through all streams in a single window<br>`false`: Display an individual window for each stream<br>*Default:* `true`
 | `rotateStreamTimeout` | Time (in sec) to show each stream when `rotateStreams` is `true`.<br>*Default:* `10`
+| `player`         | Which player to use: `ffmpeg` or `omx`.<br>*Default:* `ffmpeg`
 | `showSnapWhenPaused` | Whether or not to show snapshots when the stream(s) is paused.<br>*Default:* `true`
 | `moduleWidth` | Width in `px` of the module.<br>*Note:* When `rotateStreams` is `false` and multiple streams are used, adjust this value to adjust the number of streams shown side by side. E.G. to show 2 streams side by side, this value should be `= 2*(Stream Width + 2*1px (border) + 2*15px (margin))`<br>*Default:* `354px`
 | `moduleHeight` | Similar (but less critical) to `moduleWidth`. Adjust to the number of streams high to ensure other modules clear.<br>*Default:* `240px`
