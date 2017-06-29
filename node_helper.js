@@ -9,10 +9,10 @@
 var NodeHelper = require("node_helper");
 var Stream = require('node-rtsp-stream-es6');
 var request = require('request');
-var fs = require('fs');
+const fs = require('fs');
 const DataURI = require('datauri');
 const datauri = new DataURI();
-const exec = require("child_process").exec;
+const psTree = require('ps-tree');
 const child_process = require('child_process');
 
 module.exports = NodeHelper.create({
@@ -76,30 +76,26 @@ module.exports = NodeHelper.create({
     },
 
     getOmxplayer: function(payload) {
+        console.log(`Starting stream ${payload.name}`);
         var self = this;
-        var opts = { detached: false };
+        var opts = { detached: false,  stdio: 'ignore' };
 
         var omxCmd = `omxplayer`;
-        var args = ["--avdict", "rtsp_transport:tcp", "--live", "--refresh", "--video_queue", "4", "--fps", "30", "--win",
-                         payload.box.left, payload.box.top, payload.box.right, payload.box.bottom, this.config[payload.name].url];
-        this.omxStream[name] = child_process.spawn(omxCmd, args, opts);
+
+        var args = ["--live", "--video_queue", "4", "--fps", "30", "--win",
+                         `${payload.box.left}, ${payload.box.top}, ${payload.box.right}, ${payload.box.bottom}`, 
+                         this.config[payload.name].url];
+        if (this.config[payload.name].protocol !== "udp") {
+            args.unshift("--avdict", "rtsp_transport:tcp");
+        }
+        this.omxStream[payload.name] = child_process.spawn(omxCmd, args, opts);
     },
 
     stopOmxplayer: function(name) {
-        this.omxStream[name].kill('SIGINT');
+        console.log(`Stopping stream ${name}`);
+        console.log(this.omxStream[name].pid);
+        this.kill(this.omxStream[name].pid);
         delete this.omxStream[name]; 
-    },
-
-    checkForExecError: function(error, stdout, stderr) {
-        if (stderr) {
-            console.log('stderr: "' + stderr + '"');
-            return 1;
-        }
-        if (error !== null) {
-            console.log('exec error: ' + error);
-            return 1;
-        }
-        return 0;
     },
 
     // Override socketNotificationReceived method.
@@ -134,7 +130,30 @@ module.exports = NodeHelper.create({
             this.getOmxplayer(payload);
         }
         if (notification === "STOP_OMXSTREAM") {
-            this.getOmxplayer(payload);
+            this.stopOmxplayer(payload);
+        }
+    },
+
+    kill: function (pid, signal, callback) {
+        signal   = signal || 'SIGKILL';
+        callback = callback || function () {};
+        var killTree = true;
+        if(killTree) {
+            psTree(pid, function (err, children) {
+                [pid].concat(
+                    children.map(function (p) {
+                        return p.PID;
+                    })
+                ).forEach(function (tpid) {
+                    try { process.kill(tpid, signal); }
+                    catch (ex) { }
+                });
+                callback();
+            });
+        } else {
+            try { process.kill(pid, signal); }
+            catch (ex) { }
+            callback();
         }
     },
 });

@@ -17,6 +17,7 @@ Module.register("MMM-RTSPStream", {
         moduleWidth: 384,         // Width = (Stream Width + 30px margin + 2px border) * # of Streams Wide
         moduleHeight: 272,        // Height = (Stream Height + 30px margin + 2px border) * # of Streams Tall
         animationSpeed: 1500,
+        player: 'omx',            // OMX or FFMPEG
         stream1: {
             name: 'BigBuckBunny Test',
             url: 'rtsp://184.72.239.149/vod/mp4:BigBuckBunny_115k.mov',
@@ -229,6 +230,7 @@ Module.register("MMM-RTSPStream", {
         var innerWrapper = document.createElement("div");
         innerWrapper.className = "MMM-RTSPStream innerWrapper";
         if (stream) { innerWrapper.style.cssText = this.getCanvasSize(this.config[stream]); }
+        else { innerWrapper.style.cssText = this.getCanvasSize(this.config.stream1); }
         innerWrapper.id = "iw_" + stream;
         return innerWrapper;
     },
@@ -257,17 +259,31 @@ Module.register("MMM-RTSPStream", {
     playStream: function(stream) {
         var canvasId = (this.config.rotateStreams) ? "canvas_" : "canvas_" + stream;
         var canvas = document.getElementById(canvasId);
-        var rect = canvas.getBoundingClientRect();
-        console.log(rect.top, rect.right, rect.bottom, rect.left);
         var ctx = canvas.getContext("2d");
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        /*if (stream in this.currentPlayers) {
-            this.currentPlayers[stream].destroy();
+
+        if (this.config.player === "omx") {
+            if (this.streams[stream].playing) {
+                this.stopStream(stream);
+            }
+            var rect = canvas.getBoundingClientRect();
+            this.sendSocketNotification("PLAY_OMXSTREAM", 
+                {   name: stream, 
+                    box: {
+                        top: rect.top + 47,       // Compensate for Margins 
+                        right: rect.right + 47,   // Compensate for Margins
+                        bottom: rect.bottom + 47, // Compensate for Margins
+                        left: rect.left + 47      // Compensate for Margins
+                    }
+                });
+        } else {
+            if (stream in this.currentPlayers) {
+                this.currentPlayers[stream].destroy();
+            }
+            var sUrl = `ws://${document.location.hostname}:${this.config[stream].port}`;
+            var player = new JSMpeg.Player(sUrl, {canvas: canvas}); 
+            this.currentPlayers[stream] = player;
         }
-        var sUrl = `ws://${document.location.hostname}:${this.config[stream].port}`;
-        var player = new JSMpeg.Player(sUrl, {canvas: canvas}); 
-        this.currentPlayers[stream] = player;*/
-        this.sendSocketNotification("PLAY_OMXSTREAM", { name: stream, box: rect });
         this.streams[stream].playing = true;
         this.playing = true;
         this.updatePlayPauseBtn(stream);
@@ -317,30 +333,32 @@ Module.register("MMM-RTSPStream", {
     playAll: function () {
         this.playing = true;
         Object.keys(this.streams).forEach(s => {
-            this.streams[s].playing = true;
             this.playStream(s);
             this.sendSocketNotification("SNAPSHOT_STOP", s);
         });
     },
 
     stopStream: function(stream) {
-        if (stream in this.currentPlayers) {
-            // this.currentPlayers[stream].destroy();
-            this.sendSocketNotification("STOP_OMXSTREAM", stream);
-            delete this.currentPlayers[stream];
+        if (this.config.player === "omx") {
+            if (this.streams[stream].playing) {
+                this.sendSocketNotification("STOP_OMXSTREAM", stream);
+            }
+        } else {
+            if (stream in this.currentPlayers) {
+                this.currentPlayers[stream].destroy();
+                delete this.currentPlayers[stream];
+            }
         }
         this.streams[stream].playing = false;
-        if (Object.keys(this.currentPlayers).length === 0) {
+        if (Object.keys(this.streams).filter(s => { return s.playing; }).length === 0) {
             this.playing = false;
         }
     },
 
     stopAllStreams: function(startSnapshots=true) {
         this.playing = false;
-        Object.keys(this.currentPlayers).forEach(key => this.currentPlayers[key].destroy());
-        this.currentPlayers = {};
         Object.keys(this.streams).forEach(s => {
-            this.streams[s].playing = false;
+            this.stopStream(s);
             if (startSnapshots) { 
                 this.playSnapshots(s); 
             } else {
@@ -429,7 +447,7 @@ Module.register("MMM-RTSPStream", {
         }
         k.forEach(s => {
             if (s !== this.selectedStream) {
-                var iw = document.getElementById("iw_" + s)
+                var iw = document.getElementById("iw_" + s);
                 iw.style.cssText = iw.style.cssText.replace("border-color: red;", "");
             } else {
                 document.getElementById("iw_" + s).style.cssText += "border-color: red;";
