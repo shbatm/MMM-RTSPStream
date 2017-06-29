@@ -257,14 +257,17 @@ Module.register("MMM-RTSPStream", {
     playStream: function(stream) {
         var canvasId = (this.config.rotateStreams) ? "canvas_" : "canvas_" + stream;
         var canvas = document.getElementById(canvasId);
+        var rect = canvas.getBoundingClientRect();
+        console.log(rect.top, rect.right, rect.bottom, rect.left);
         var ctx = canvas.getContext("2d");
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        if (stream in this.currentPlayers) {
+        /*if (stream in this.currentPlayers) {
             this.currentPlayers[stream].destroy();
         }
         var sUrl = `ws://${document.location.hostname}:${this.config[stream].port}`;
         var player = new JSMpeg.Player(sUrl, {canvas: canvas}); 
-        this.currentPlayers[stream] = player;
+        this.currentPlayers[stream] = player;*/
+        this.sendSocketNotification("PLAY_OMXSTREAM", { name: stream, box: rect });
         this.streams[stream].playing = true;
         this.playing = true;
         this.updatePlayPauseBtn(stream);
@@ -322,7 +325,8 @@ Module.register("MMM-RTSPStream", {
 
     stopStream: function(stream) {
         if (stream in this.currentPlayers) {
-            this.currentPlayers[stream].destroy();
+            // this.currentPlayers[stream].destroy();
+            this.sendSocketNotification("STOP_OMXSTREAM", stream);
             delete this.currentPlayers[stream];
         }
         this.streams[stream].playing = false;

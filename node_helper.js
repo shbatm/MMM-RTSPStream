@@ -12,12 +12,16 @@ var request = require('request');
 var fs = require('fs');
 const DataURI = require('datauri');
 const datauri = new DataURI();
+const exec = require("child_process").exec;
+const child_process = require('child_process');
 
 module.exports = NodeHelper.create({
 
     config: {},
 
     streams: {},
+
+    omxStream: {},
 
     snapshots: {},
 
@@ -71,6 +75,33 @@ module.exports = NodeHelper.create({
         this.snapshots[name] = setTimeout(function() { self.getData(name); }, this.config[name].snapshotRefresh * 1000);
     },
 
+    getOmxplayer: function(payload) {
+        var self = this;
+        var opts = { detached: false };
+
+        var omxCmd = `omxplayer`;
+        var args = ["--avdict", "rtsp_transport:tcp", "--live", "--refresh", "--video_queue", "4", "--fps", "30", "--win",
+                         payload.box.left, payload.box.top, payload.box.right, payload.box.bottom, this.config[payload.name].url];
+        this.omxStream[name] = child_process.spawn(omxCmd, args, opts);
+    },
+
+    stopOmxplayer: function(name) {
+        this.omxStream[name].kill('SIGINT');
+        delete this.omxStream[name]; 
+    },
+
+    checkForExecError: function(error, stdout, stderr) {
+        if (stderr) {
+            console.log('stderr: "' + stderr + '"');
+            return 1;
+        }
+        if (error !== null) {
+            console.log('exec error: ' + error);
+            return 1;
+        }
+        return 0;
+    },
+
     // Override socketNotificationReceived method.
 
     /* socketNotificationReceived(notification, payload)
@@ -98,6 +129,12 @@ module.exports = NodeHelper.create({
                 clearTimeout(this.snapshots[payload]);
                 delete this.snapshots[payload];
             }
+        }
+        if (notification === "PLAY_OMXSTREAM") {
+            this.getOmxplayer(payload);
+        }
+        if (notification === "STOP_OMXSTREAM") {
+            this.getOmxplayer(payload);
         }
     },
 });
