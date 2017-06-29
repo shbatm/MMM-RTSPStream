@@ -256,7 +256,7 @@ Module.register("MMM-RTSPStream", {
         return playBtnWrapper;
     },
 
-    playStream: function(stream) {
+    playStream: function(stream, fullscreen=false) {
         var canvasId = (this.config.rotateStreams) ? "canvas_" : "canvas_" + stream;
         var canvas = document.getElementById(canvasId);
         var ctx = canvas.getContext("2d");
@@ -267,15 +267,17 @@ Module.register("MMM-RTSPStream", {
                 this.stopStream(stream);
             }
             var rect = canvas.getBoundingClientRect();
-            this.sendSocketNotification("PLAY_OMXSTREAM", 
-                {   name: stream, 
+            var payload = {   
+                    name: stream, 
                     box: {
                         top: rect.top + 47,       // Compensate for Margins 
                         right: rect.right + 47,   // Compensate for Margins
                         bottom: rect.bottom + 47, // Compensate for Margins
                         left: rect.left + 47      // Compensate for Margins
                     }
-                });
+                };
+            if (fullscreen) { payload.fullscreen = true; }
+            this.sendSocketNotification("PLAY_OMXSTREAM", payload);
         } else {
             if (stream in this.currentPlayers) {
                 this.currentPlayers[stream].destroy();
@@ -405,8 +407,13 @@ Module.register("MMM-RTSPStream", {
                         this.stopStream(this.selectedStream);
                         this.playSnapshots(this.selectedStream);
                     } else {
+                        console.log(payload);
                         this.sendSocketNotification("SNAPSHOT_STOP", this.selectedStream);
-                        this.playStream(this.selectedStream);
+                        if (payload.KeyState === "KEY_LONGPRESSED") {
+                            this.playStream(this.selectedStream, true);
+                        } else {
+                            this.playStream(this.selectedStream);
+                        }
                     }
                 }
             }

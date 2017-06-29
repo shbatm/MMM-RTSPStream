@@ -76,18 +76,25 @@ module.exports = NodeHelper.create({
     },
 
     getOmxplayer: function(payload) {
-        console.log(`Starting stream ${payload.name}`);
         var self = this;
         var opts = { detached: false,  stdio: 'ignore' };
 
         var omxCmd = `omxplayer`;
 
-        var args = ["--live", "--video_queue", "4", "--fps", "30", "--win",
-                         `${payload.box.left}, ${payload.box.top}, ${payload.box.right}, ${payload.box.bottom}`, 
+        var args = ["--live", "--video_queue", "4", "--fps", "30", 
                          this.config[payload.name].url];
+        if (!("fullscreen" in payload)) {
+            args.unshift("--win", `${payload.box.left}, ${payload.box.top}, ${payload.box.right}, ${payload.box.bottom}`);
+        } else {
+            if ("hdUrl" in this.config[payload.name]) {
+                args.pop();
+                args.push(this.config[payload.name].hdUrl);
+            }
+        }
         if (this.config[payload.name].protocol !== "udp") {
             args.unshift("--avdict", "rtsp_transport:tcp");
         }
+        console.log(`Starting stream ${payload.name} with args: ${JSON.stringify(args,null,4)}`);
         this.omxStream[payload.name] = child_process.spawn(omxCmd, args, opts);
     },
 
