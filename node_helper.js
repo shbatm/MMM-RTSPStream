@@ -28,7 +28,26 @@ module.exports = NodeHelper.create({
     start: function() {
         this.started = false;
         this.config = {};
+
+        // Add exit handler to allow a graceful restart.
+        process.on('SIGINT', () => {
+            // Kill any running OMX Streams
+            if (omxStream in this) {
+                Object.keys(this.omxStream).forEach(s => {
+                    this.kill(this.omxStream[s].pid);
+                });
+            }
+
+            // Kill any FFMPEG strems that are running
+            // { need to do anything here?? }
+
+            // Wait 300ms and then exiting.
+            setTimeout(function() {
+                process.exit(0);
+            }, 300);
+        });
     },
+
 
     startListener: function(name) {
         if (this.config[name].url) {
@@ -163,4 +182,5 @@ module.exports = NodeHelper.create({
             callback();
         }
     },
+
 });
