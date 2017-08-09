@@ -13,6 +13,10 @@ Fixes:
 * JSMpeg throws error "Failed to get WebGL context." - Using option in JSMpeg call to disable WebGL.
 * Audio is ignored from the streams to prevent interference with other modules.
 
+## [1.0.2] - Fixes #10 - No playback on Monitor resume from suspend
+
+Added actions to suspend/resume the module when a `USER_PRESENCE` notification is received from the MMM-PIR-sensor module. This restarts the camera feeds when the monitor is resumed.
+
 ## [1.0.1] - Fixes #2 - Add UDP Protocol
 
 Added option for using UDP protocol in `ffmpeg`

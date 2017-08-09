@@ -445,6 +445,14 @@ Module.register("MMM-RTSPStream", {
         if (notification === 'DOM_OBJECTS_CREATED') {
 
         }
+        // Handle USER_PRESENCE events from the MMM-PIR-sensor Module
+        if (notification === "USER_PRESENCE") {
+                this.resume();
+            if (payload) {
+            } else {
+                this.suspend();
+            }
+        }
         if (this.kbInstance === "SERVER") {
             if (notification === 'RTSP-PLAY') {
                 if (payload.stream === 'all') {
