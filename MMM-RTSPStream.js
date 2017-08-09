@@ -362,6 +362,14 @@ Module.register("MMM-RTSPStream", {
         if (notification === "KEYPRESS_MODE_CHANGED") {
             this.currentKeyPressMode = payload;
         }
+        // Handle USER_PRESENCE events from the MMM-PIR-sensor Module
+        if (notification === "USER_PRESENCE") {
+            if (payload) {
+                this.resume();
+            } else {
+                this.suspend();
+            }
+        }
         // if (notification === "KEYPRESS") {
         //  console.log(payload);
         // }
