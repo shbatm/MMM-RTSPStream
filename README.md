@@ -42,14 +42,14 @@ which omxplayer
 apt-get install omxplayer
 ```
 
-Second, ensure `ffmpeg` is installed.  
+Second, if the MM² server is on a different machine than the screen you are using to view it: `ffmpeg` should be installed.  
 For Raspberry Pi running Raspbian Jessie a precompiled package can be installed from the following location: (*[source](https://github.com/ccrisan/motioneye/wiki/Install-On-Raspbian)*)
 ```shell
 wget https://github.com/ccrisan/motioneye/wiki/precompiled/ffmpeg_3.1.1-1_armhf.deb
 dpkg -i ffmpeg_3.1.1-1_armhf.deb
 ```
 
-Run the following commands to install the module:
+Finally, run the following commands to install the module:
 ```shell
 cd ~/MagicMirror/modules
 git clone https://github.com/shbatm/MMM-RTSPStream.git
@@ -62,7 +62,7 @@ npm install
 ```shell
 cd ~/MagicMirror/modules/MMM-RTSPStream
 git pull
-npm run-script update
+npm install
 ```
 
 ## Using the module
@@ -81,7 +81,8 @@ var config = {
                 showSnapWhenPaused: false,
                 moduleWidth: 354,
                 moduleHeight: 240,
-                player: 'ffmpeg',     
+                moduleOffset: 47,
+                localPlayer: 'omxplayer',     
                 stream1: {
                     name: 'BigBuckBunny Test Stream',
                     url: 'rtsp://184.72.239.149/vod/mp4:BigBuckBunny_115k.mov',
@@ -98,6 +99,8 @@ var config = {
 
 ## Configuration options
 
+Several sample configurations are available on [this wiki page](https://github.com/shbatm/MMM-RSTPStream/wiki/Sample-Configurations), detailed options are listed below.
+
 | Option           | Description
 |----------------- |-----------
 | `autoStart`      | Start the stream(s) automatically<br>*Default:* `true`
@@ -109,6 +112,7 @@ var config = {
 | `showSnapWhenPaused` | Whether or not to show snapshots when the stream(s) is paused.<br>*Default:* `true`
 | `moduleWidth` | Width in `px` of the module.<br>*Note:* When `rotateStreams` is `false` and multiple streams are used, adjust this value to adjust the number of streams shown side by side. E.G. to show 2 streams side by side, this value should be `= 2*(Stream Width + 2*1px (border) + 2*15px (margin))`<br>*Default:* `354px`
 | `moduleHeight` | Similar (but less critical) to `moduleWidth`. Adjust to the number of streams high to ensure other modules clear.<br>*Default:* `240px`
+| `moduleOffset` | *Only applies when using OMXPlayer.* On some displays, the video does not properly line up with the box on the screen.  Entering a pixel value will shift the video over by that amount.<br>*Default:* `0` *Values:* Any number (no units)
 | `streamX` | The individual stream configuration options. See table below for more details.
 
 ### Stream Configuration Options

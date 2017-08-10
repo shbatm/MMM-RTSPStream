@@ -31,6 +31,8 @@ module.exports = NodeHelper.create({
 
         // Add exit handler to allow a graceful restart.
         process.on('SIGINT', () => {
+            console.log("Shutting down MMM-RTSPStream streams...");
+            
             // Kill any running OMX Streams
             if (omxStream in this) {
                 Object.keys(this.omxStream).forEach(s => {

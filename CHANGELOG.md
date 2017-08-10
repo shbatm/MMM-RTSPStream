@@ -1,3 +1,7 @@
+## [1.1.1] - Added OMXPlayer Offset config option
+
+* Added `moduleOffset` config option. On some displays, the method used to find the location to draw the video does not properly line up with the screen.  Entering a pixel value will shift the video location by that amount.
+
 ## [1.1.0] - Hardware Acceleration w/ OMXPlayer
 
 Changes:

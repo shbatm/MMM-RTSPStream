@@ -19,6 +19,7 @@ Module.register("MMM-RTSPStream", {
         remoteSnaps: true,        // Show remote snapshots
         moduleWidth: 384,         // Width = (Stream Width + 30px margin + 2px border) * # of Streams Wide
         moduleHeight: 272,        // Height = (Stream Height + 30px margin + 2px border) * # of Streams Tall
+        moduleOffset: 0,          // Offset to align OMX player windows
         animationSpeed: 1500,
         stream1: {
             name: 'BigBuckBunny Test',
@@ -319,10 +320,10 @@ Module.register("MMM-RTSPStream", {
             var payload = {   
                     name: stream, 
                     box: {
-                        top: rect.top + 47,       // Compensate for Margins 
-                        right: rect.right + 47,   // Compensate for Margins
-                        bottom: rect.bottom + 47, // Compensate for Margins
-                        left: rect.left + 47      // Compensate for Margins
+                        top: rect.top + this.config.moduleOffset,       // Compensate for Margins 
+                        right: rect.right + this.config.moduleOffset,   // Compensate for Margins
+                        bottom: rect.bottom + this.config.moduleOffset, // Compensate for Margins
+                        left: rect.left + this.config.moduleOffset      // Compensate for Margins
                     }
                 };
             if (fullscreen) { payload.fullscreen = true; }
