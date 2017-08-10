@@ -317,13 +317,21 @@ Module.register("MMM-RTSPStream", {
 
         if (this.kbInstance === "SERVER" && this.config.localPlayer === "omxplayer") {
             var rect = canvas.getBoundingClientRect();
+            var offset = {};
+            if (typeof this.config.moduleOffset === "object") {
+                offset.left = ("left" in this.config.moduleOffset) ? this.config.moduleOffset.left : 0;
+                offset.top = ("top" in this.config.moduleOffset) ? this.config.moduleOffset.top : 0;
+            } else {
+                offset.left = this.config.moduleOffset;
+                offset.top = this.config.moduleOffset;
+            }
             var payload = {   
                     name: stream, 
                     box: {
-                        top: rect.top + this.config.moduleOffset,       // Compensate for Margins 
-                        right: rect.right + this.config.moduleOffset,   // Compensate for Margins
-                        bottom: rect.bottom + this.config.moduleOffset, // Compensate for Margins
-                        left: rect.left + this.config.moduleOffset      // Compensate for Margins
+                        top: rect.top + offset.top,       // Compensate for Margins 
+                        right: rect.right + offset.left,   // Compensate for Margins
+                        bottom: rect.bottom + offset.top, // Compensate for Margins
+                        left: rect.left + offset.left      // Compensate for Margins
                     }
                 };
             if (fullscreen) { payload.fullscreen = true; }
