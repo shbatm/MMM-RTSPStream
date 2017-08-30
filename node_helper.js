@@ -36,7 +36,7 @@ module.exports = NodeHelper.create({
             // Kill any running OMX Streams
             if ("omxStream" in this) {
                 Object.keys(this.omxStream).forEach(s => {
-                    this.kill(this.omxStream[s].pid);
+                    this.stopOmxplayer(s);
                 });
             }
 
@@ -116,13 +116,69 @@ module.exports = NodeHelper.create({
             args.unshift("--avdict", "rtsp_transport:tcp");
         }
         console.log(`Starting stream ${payload.name} with args: ${JSON.stringify(args,null,4)}`);
-        this.omxStream[payload.name] = child_process.spawn(omxCmd, args, opts);
+        // this.omxStream[payload.name] = child_process.spawn(omxCmd, args, opts);
+
+
+        // PM2 Test
+        var pm2 = require('pm2');
+        var proc_name = "omx_" + payload.name;
+
+        pm2.connect( (err) => {
+          if (err) {
+            console.error(err);
+            process.exit(2);
+          }
+
+          // Stops the Daemon if it's already started
+          pm2.list(function (err, list){        
+            var errCB = function(err, apps) {
+                if (err) { console.log(err); }
+            };
+
+            for (var proc in list) {
+                if ("name" in list[proc] && list[proc].name === proc_name) {
+                    if ("status" in list[proc] && list[proc].status === "online") {
+                      console.log(`PM2: ${proc_name} already running. Stopping old instance...`);
+                      pm2.stop(proc_name, errCB);
+                    }
+                }
+            }
+          });
+          
+          pm2.start({
+            script    : "omxplayer",
+            name      : proc_name,
+            interpreter: 'bash',
+            out_file: "/dev/null",
+            //interpreterArgs: '-u',
+            args      : args,
+            //max_memory_restart : '100M'   // Optional: Restarts your app if it reaches 100Mo
+          }, (err, proc) => {
+            pm2.disconnect();   // Disconnects from PM2
+            if (err) { throw err; }
+          });
+        });
+        this.omxStream[payload.name] = proc_name;
+        console.log(JSON.stringify(this.omxStream[payload.name]));
     },
 
     stopOmxplayer: function(name) {
         console.log(`Stopping stream ${name}`);
-        console.log(this.omxStream[name].pid);
-        this.kill(this.omxStream[name].pid);
+        // console.log(this.omxStream[name].pid);
+        // this.kill(this.omxStream[name].pid);
+        var pm2 = require('pm2');
+
+        pm2.connect( (err) => {
+          if (err) {
+            console.error(err);
+            process.exit(2);
+          }
+
+          pm2.stop(this.omxStream[name], function(err, apps) {
+                pm2.disconnect();
+                if (err) { console.log(err); }
+          });
+        });
         delete this.omxStream[name]; 
     },
 

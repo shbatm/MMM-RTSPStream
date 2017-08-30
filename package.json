@@ -12,6 +12,7 @@
   "dependencies": {
     "datauri": "^1.0.5",
     "node-rtsp-stream-es6": "github:shbatm/node-rtsp-stream-es6",
+    "pm2": "^2.6.1",
     "ps-tree": "^1.1.0",
     "ws": "^3.0.0"
   },
