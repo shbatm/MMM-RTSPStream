@@ -34,7 +34,7 @@ module.exports = NodeHelper.create({
             console.log("Shutting down MMM-RTSPStream streams...");
             
             // Kill any running OMX Streams
-            if (omxStream in this) {
+            if ("omxStream" in this) {
                 Object.keys(this.omxStream).forEach(s => {
                     this.kill(this.omxStream[s].pid);
                 });
