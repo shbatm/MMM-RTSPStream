@@ -73,7 +73,7 @@ Module.register("MMM-RTSPStream", {
         if (typeof this.config.kbMultiInstance === undefined) {
             this.config.kbMultiInstance = true;
         }
-        this.kbInstance = (["127.0.0.1", "localhost"].indexOf(
+        this.kbInstance = (["127.0.0.1", "localhost", "0.0.0.0"].indexOf(
             window.location.hostname) > -1) ? "SERVER" : "LOCAL";
         this.reverseKBMap = {};
         for (var eKey in this.config.keyBindings) {
