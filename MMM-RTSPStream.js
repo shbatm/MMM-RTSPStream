@@ -328,10 +328,10 @@ Module.register("MMM-RTSPStream", {
             var payload = {   
                     name: stream, 
                     box: {
-                        top: rect.top + offset.top,       // Compensate for Margins 
-                        right: rect.right + offset.left,   // Compensate for Margins
-                        bottom: rect.bottom + offset.top, // Compensate for Margins
-                        left: rect.left + offset.left      // Compensate for Margins
+                        top: Math.round(rect.top) + offset.top,       // Compensate for Margins 
+                        right: Math.round(rect.right) + offset.left,   // Compensate for Margins
+                        bottom: Math.round(rect.bottom) + offset.top, // Compensate for Margins
+                        left: Math.round(rect.left) + offset.left      // Compensate for Margins
                     }
                 };
             if (fullscreen) { payload.fullscreen = true; }
