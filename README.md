@@ -26,6 +26,7 @@ This module will show a live RTSP video stream and/or periodic snapshots on the 
     - Requires `jsmpeg` for front-end display of stream.
     - Requires `node-rtsp-stream-es6` Node.js module and `ffmpeg` for backend.
     - Video flow using `'ffmpeg'`: Camera RTSP Stream → `ffmpeg` pre-processor → MM module's `node_helper.js` (via `node-rtsp-stream-es6`) → Web Socket (`ws`) → MagicMirror² (via `jsmpeg`)
+* For proper shutdown handling, a patch to the MagicMirror code is required (until [Issue #1056](https://github.com/MichMich/MagicMirror/issues/1056) is incorporated). The patch is included in this repo, and installed automatically.
 
 ## Screenshot:
 
@@ -57,6 +58,8 @@ cd MMM-RTSPStream
 npm install
 ```
 
+*Note:* Running `npm install` will attempt to install the "Graceful Shutdown" patch on the MagicMirror installation. This patch allows the module to properly close all streams when the mirror is shutdown or restarted.
+
 ## Updating after a Module Update:
 
 ```shell
@@ -67,39 +70,22 @@ npm install
 
 ## Using the module
 
-To use this module, add the following configuration block to the modules array in the `config/config.js` file:
-```js
-var config = {
-    modules: [
-        {
-            module: 'MMM-RTSPStream',
-            position: 'middle_center',
-            config: {
-                autoStart: true,
-                rotateStreams: false,
-                rotateStreamTimeout: 10,
-                showSnapWhenPaused: false,
-                moduleWidth: 354,
-                moduleHeight: 240,
-                moduleOffset: 47,
-                localPlayer: 'omxplayer',     
-                stream1: {
-                    name: 'BigBuckBunny Test Stream',
-                    url: 'rtsp://184.72.239.149/vod/mp4:BigBuckBunny_115k.mov',
-                    snapshotUrl: '',
-                    snapshotRefresh: 10, // Seconds
-                    frameRate: "30",
-                    port: 9999,
-                }
-            }
-        }
-    ]
-}
-```
+**To use this module, use the configuration builder tool included.**
+
+1. Install the module (see above).
+2. From a command-line:
+````shell
+    cd ~/MagicMirror/modules/MMM-RTSPStream
+    http-server -p 9999
+````
+2. Open a web-browser and navigate to: http://your-mirror-ip:9999/config.html
+3. Use the tool to generate your config details.
+4. Copy the section you your MagicMirror `config.js` file.
+5. Stop the http-server with `Ctrl+C`.
 
 ## Configuration options
 
-Several sample configurations are available on [this wiki page](https://github.com/shbatm/MMM-RSTPStream/wiki/Sample-Configurations), detailed options are listed below.
+It is highly recommended you use the tool included. Several sample configurations are available on [this wiki page](https://github.com/shbatm/MMM-RSTPStream/wiki/Sample-Configurations), detailed options are listed below.
 
 | Option           | Description
 |----------------- |-----------
@@ -143,10 +129,11 @@ config: {
 | `snapshotUrl`    | A string with the path to the camera snapshot. This can either be a url to camera itself (if supported) or a file path to where the snapshot is stored every X seconds by the camera. Leave blank to show just the stream title when paused.<br>Username and password should be passed in the url if required: `http://<username>:<password>@<hostname>:<port>/<path>`
 | `snapshotType`   | The type of snapshot path given<br>*Values:* `url` or `file`<br>*Default:* `url`
 | `snapshotRefresh` | How often to refresh the snapshot image (in sec).<br>*Default:* 10 (seconds)
-| `frameRate`      | Framerate to use for the RTSP stream to be passed to `ffmpeg`. Must be a string.<br>*Default:* `"30"`
-| `port`           | *Required for `ffmpeg`* The port to use for the stream's WebSocket.<br>***Notes:*** Must be unqiue for each stream added and cannot be used by another service on the server. This is a separate WebSocket from the the Socket.IO connection between the module's script and it's `node_helper.js`.<br>*Default:* `9999`
+| `frameRate`      | Framerate to use for the RTSP stream. Must be a string.<br>*Default:* `"30"`
 | `width`          | The width in px of the stream.
 | `height`         | The height in px of the stream.
+| `absPosition`    | *Only required for OMXPlayer* Provide an absolute potiion to show the stream. This overrides the automatic window and moduleOffset settings.<br>*Format:* `{ top: XX, right: XX, bottom: XX, left: XX }` where `XX` is the pixel position on the screen.
+| `ffmpegPort`           | *Only required for `ffmpeg`* Any available port to use for the ffmpeg websocket.<br>***Notes:*** **THIS IS NOT THE PORT FOR YOUR CAMERA** Camera stream's port must be included in the URL above. This port must be unqiue for each stream added and cannot be used by another service on the server. This is a separate WebSocket from the the Socket.IO connection between the module's script and it's `node_helper.js`.<br>*Default:* `9999`
 | `shutdownDelay`  | The time delay (in ms) between when the last client disconnects and the `ffmpeg` stream actually stops.  Once created, the websocket continues to run in the background; however, the `ffmpeg` process will only process the camera's stream while there are active connections on the socket (e.g. someone is watching the video on the frontend). When rotating through multiple streams this prevents `ffmpeg` from closing its connection to a stream only to re-open a few seconds later when it comes back through the loop (which reduces the time delay when restarting a stream). To conserve resources on a slow device, you can set this to 0<br>*Default:* 10000 (ms)
 | `hideFfmpegOutput` | Whether or not so hide the detailed output from `ffmpeg` on the console (or logs if using `pm2`).<br>*Default:* `true` (output hidden).
 
