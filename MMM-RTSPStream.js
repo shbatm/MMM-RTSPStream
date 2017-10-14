@@ -496,12 +496,10 @@ Module.register("MMM-RTSPStream", {
                     this.playAll();
                 } else {
                     ps = this.playStream(payload);
-                    if (ps.length > 0) { this.sendSocketNotification("PLAY_OMXSTREAM", ps); }
                 }
             }
             if (notification === 'RTSP-PLAY-FULLSCREEN') {
-                var ps = this.playStream(payload, true);
-                if (ps.length > 0) { this.sendSocketNotification("PLAY_OMXSTREAM", ps); }
+                ps = this.playStream(payload, true);
             }
             if (notification === 'RTSP-STOP') {
                 if (payload === 'all') {
@@ -511,6 +509,7 @@ Module.register("MMM-RTSPStream", {
                 }
             }
         }
+        if (ps.length > 0) { this.sendSocketNotification("PLAY_OMXSTREAM", ps); }
     },
 
     validateKeyPress: function(notification, payload) {
