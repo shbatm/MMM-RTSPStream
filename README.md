@@ -98,7 +98,7 @@ It is highly recommended you use the tool included. Several sample configuration
 | `showSnapWhenPaused` | Whether or not to show snapshots when the stream(s) is paused.<br>*Default:* `true`
 | `moduleWidth` | Width in `px` of the module.<br>*Note:* When `rotateStreams` is `false` and multiple streams are used, adjust this value to adjust the number of streams shown side by side. E.G. to show 2 streams side by side, this value should be `= 2*(Stream Width + 2*1px (border) + 2*15px (margin))`<br>*Default:* `354px`
 | `moduleHeight` | Similar (but less critical) to `moduleWidth`. Adjust to the number of streams high to ensure other modules clear.<br>*Default:* `240px`
-| `moduleOffset` | *Only applies when using OMXPlayer.* On some displays, the video does not properly line up with the box on the screen.  Entering a pixel value will shift the video over by that amount.<br>*Default:* `0` *Values:* Any number (no units) by itself will adjust both top/left the same amount, or you can specify left & top adjustments separately (e.g. `moduleOffset: { left: 10, top: -10 }`
+| `moduleOffset` | *Only applies when using OMXPlayer.* On some displays, the video does not properly line up with the box on the screen because of differences between JavaScript's reporting and the native display.  Entering a pixel value will shift the video over by that amount.<br>*Default:* `0` *Values:* Any number (no units) by itself will adjust both top/left the same amount, or you can specify left & top adjustments separately (e.g. `moduleOffset: { left: 10, top: -10 }`
 | `streamX` | The individual stream configuration options. See table below for more details.
 
 ### Stream Configuration Options
@@ -155,6 +155,7 @@ The streams can be controlled on the main screen by sending a module notificatio
 this.sendNotification("RTSP-PLAY", "all"); // Play all streams (or current stream if rotating)
 this.sendNotification("RTSP-PLAY", "streamX"); // Play a particular stream (when not rotating)
 this.sendNotification("RTSP-PLAY-FULLSCREEN", "streamX"); // Play a particular stream fullscreen (when using OMXPLAYER)
+this.sendNotification("RTSP-PLAY-WINDOW", { name:"streamX", box: { top: XX, right: XX, bottom: XX, left: XX } }); // Play a particular stream in a custom window (when using OMXPLAYER)
 this.sendNotification("RTSP-STOP", "all"); // Stop the streams
 this.sendNotification("RTSP-STOP", "streamX"); // Stop a particular stream 
 ```
@@ -187,7 +188,7 @@ keyBindings: {
 
 * Add better touchscreen support (use an OnTouch method to play/pause instead of OnClick).
 * KNOWN ISSUE: snapshots can be stopped by another "instance" of the mirror running in a different window. Expected behavior: should only affect the local window.
-* KNOWN ISSUE: `omxplayer` will only play a certain maximum number of streams at a time.  On a RPi3, this appears to be a max of 2. It won't error, it just won't play another stream.
+* KNOWN ISSUE: `omxplayer` will only play a certain maximum number of streams at a time.  On a RPi3, this appears to be a max of 3. It won't error, it just won't play another stream.  To fix: adjust the memory split of the GPU/CPU using the `raspi-config` command.
 
 ## Experimentation
 

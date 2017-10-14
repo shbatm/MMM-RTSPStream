@@ -315,7 +315,7 @@ Module.register("MMM-RTSPStream", {
         }
     },
 
-    playStream: function(stream, fullscreen = false) {
+    playStream: function(stream, fullscreen = false, absPosition=undefined) {
         var canvasId = (this.config.rotateStreams) ? "canvas_" : "canvas_" + stream;
         var canvas = document.getElementById(canvasId);
         var omxPayload = [];
@@ -336,7 +336,9 @@ Module.register("MMM-RTSPStream", {
             }
             var box = {};
             if ("absPosition" in this.config[stream]) {
-                box = this.config[stream];
+                box = this.config[stream].absPosition;
+            } else if (typeof absPosition !== "undefined") {
+                box = absPosition;
             } else {
                 box = {
                     top: Math.round(rect.top + offset.top), // Compensate for Margins 
@@ -500,6 +502,9 @@ Module.register("MMM-RTSPStream", {
             }
             if (notification === 'RTSP-PLAY-FULLSCREEN') {
                 ps = this.playStream(payload, true);
+            }
+            if (notification === 'RSTP-PLAY-WINDOW') {
+                ps = this.playStream(payload.name, false, payload.box);
             }
             if (notification === 'RTSP-STOP') {
                 if (payload === 'all') {

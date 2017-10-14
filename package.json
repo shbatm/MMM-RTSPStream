@@ -1,6 +1,6 @@
 {
   "name": "MMM-RTSPStream",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Magic Mirror 2 module to stream video from an RTSP stream",
   "main": "MMM-RTSPStream.js",
   "author": "shbatm",
