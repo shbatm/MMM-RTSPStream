@@ -356,7 +356,7 @@ Module.register("MMM-RTSPStream", {
         } else {
             var ctx = canvas.getContext("2d");
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            var sUrl = `ws://${document.location.hostname}:${this.config[stream].ffpmegPort}`;
+            var sUrl = `ws://${document.location.hostname}:${this.config[stream].ffmpegPort}`;
             var player = new JSMpeg.Player(sUrl, { canvas: canvas, disableGl: true, audio: false });
             this.streams[stream].player = player;
         }
