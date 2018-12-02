@@ -26,7 +26,6 @@ This module will show a live RTSP video stream and/or periodic snapshots on the 
     - Requires `jsmpeg` for front-end display of stream.
     - Requires `node-rtsp-stream-es6` Node.js module and `ffmpeg` for backend.
     - Video flow using `'ffmpeg'`: Camera RTSP Stream → `ffmpeg` pre-processor → MM module's `node_helper.js` (via `node-rtsp-stream-es6`) → Web Socket (`ws`) → MagicMirror² (via `jsmpeg`)
-* For proper shutdown handling, a patch to the MagicMirror code is required (until [Issue #1056](https://github.com/MichMich/MagicMirror/issues/1056) is incorporated). The patch is included in this repo, and installed automatically.
 
 ## Screenshot:
 
@@ -136,6 +135,7 @@ config: {
 | `ffmpegPort`           | *Only required for `ffmpeg`* Any available port to use for the ffmpeg websocket.<br>***Notes:*** **THIS IS NOT THE PORT FOR YOUR CAMERA** Camera stream's port must be included in the URL above. This port must be unqiue for each stream added and cannot be used by another service on the server. This is a separate WebSocket from the the Socket.IO connection between the module's script and it's `node_helper.js`.<br>*Default:* `9999`
 | `shutdownDelay`  | The time delay (in ms) between when the last client disconnects and the `ffmpeg` stream actually stops.  Once created, the websocket continues to run in the background; however, the `ffmpeg` process will only process the camera's stream while there are active connections on the socket (e.g. someone is watching the video on the frontend). When rotating through multiple streams this prevents `ffmpeg` from closing its connection to a stream only to re-open a few seconds later when it comes back through the loop (which reduces the time delay when restarting a stream). To conserve resources on a slow device, you can set this to 0<br>*Default:* 10000 (ms)
 | `hideFfmpegOutput` | Whether or not so hide the detailed output from `ffmpeg` on the console (or logs if using `pm2`).<br>*Default:* `true` (output hidden).
+| `omxRestart` | Automatically restart the OMX Stream every X hours.<br>*Default:* `24` (hours).
 
 #### Testing a camera feed
 

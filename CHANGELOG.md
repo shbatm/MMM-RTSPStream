@@ -1,3 +1,9 @@
+## [1.2.2] - Auto-restart OMX Stream every X hours (Partially addresses #29)
+
+Changes:
+
+* Added config option to schedule automatic restarts of the OMX streams.
+
 
 ## [1.2.1] - Custom video window parameters
 

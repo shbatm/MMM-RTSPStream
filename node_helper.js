@@ -22,6 +22,7 @@ module.exports = NodeHelper.create({
     streams: {},
 
     omxStream: {},
+    omxStreamTimeouts: {},
 
     snapshots: {},
 
@@ -149,6 +150,17 @@ module.exports = NodeHelper.create({
                         }, (err, proc) => {
                             console.log("PM2 started for " + namesM[namesM.length - 1]);
                             this.omxStream[namesM[namesM.length - 1]] = namesM[namesM.length - 1];
+
+                            // Automatically Restart OMX PM2 Instance every X Hours
+                            let restartHrs = this.config[namesM[namesM.length - 1]].omxRestart;
+                            if (typeof restartHrs === "number") {
+                                let worker = () => {
+                                    pm2.restart(namesM[namesM.length - 1], function() {});
+                                    this.omxStreamTimeouts[namesM[namesM.length - 1]] = setTimeout(worker, restartHrs * 60 * 60 * 1000);
+                                };
+                                this.omxStreamTimeouts[namesM[namesM.length - 1]] = setTimeout(worker, restartHrs * 60 * 60 * 1000);
+                            }
+
                             namesM.pop();
                             argsM.pop();
                             startProcs();
@@ -191,6 +203,8 @@ module.exports = NodeHelper.create({
                 if (err) { console.log(err); }
             });
         });
+
+        clearTimeout(this.omxStreamTimeouts[name]);
         delete this.omxStream[name];
     },
 
@@ -221,6 +235,9 @@ module.exports = NodeHelper.create({
                     } else {
                         pm2.disconnect();
                         this.omxStream = {};
+                        this.omxStreamTimeouts.forEach(s => {
+                            clearTimeout(s);
+                        });
                     }
                 };
 
@@ -235,7 +252,7 @@ module.exports = NodeHelper.create({
 
                 stopProcs();
             });
-        }); 
+        });
     },
 
     // Override socketNotificationReceived method.
