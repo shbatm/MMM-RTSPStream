@@ -33,7 +33,8 @@ Module.register("MMM-RTSPStream", {
             width: undefined,
             height: undefined,
             shutdownDelay: 10000, // Miliseconds
-            hideFfmpegOutput: true
+            hideFfmpegOutput: true,
+            omxRestart: 24, // Hours
         },
         // MMM-KeyBindings mapping.
         keyBindingsMode: "DEFAULT",
