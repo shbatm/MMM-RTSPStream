@@ -29,6 +29,7 @@ module.exports = NodeHelper.create({
     start: function() {
         this.started = false;
         this.config = {};
+        this.stopAllOmxplayers();
     },
 
     stop: function() {
@@ -188,8 +189,6 @@ module.exports = NodeHelper.create({
 
     stopOmxplayer: function(name) {
         console.log(`Stopping stream ${name}`);
-        // console.log(this.omxStream[name].pid);
-        // this.kill(this.omxStream[name].pid);
         var pm2 = require('pm2');
 
         pm2.connect((err) => {
@@ -209,13 +208,14 @@ module.exports = NodeHelper.create({
     },
 
     stopAllOmxplayers: function() {
-        console.log('Stopping all OMXPlayer Streams...');
+        console.log('PM2: Stopping all OMXPlayer Streams...');
         var pm2 = require('pm2');
 
         pm2.connect((err) => {
             if (err) {
                 console.error(err);
             }
+            console.log('PM2: Connected.');
 
             // Stops the Daemon if it's already started
             pm2.list((err, list) => {
@@ -243,6 +243,7 @@ module.exports = NodeHelper.create({
 
                 for (var proc in list) {
                     if ("name" in list[proc] && list[proc].name.startsWith("omx_")) {
+                        console.log(`PM2: Checking if ${list[proc].name} is running...`);
                         if ("status" in list[proc].pm2_env && list[proc].pm2_env.status === "online") {
                             console.log(`PM2: Stopping ${list[proc].name}...`);
                             toStop.push(list[proc].name);
