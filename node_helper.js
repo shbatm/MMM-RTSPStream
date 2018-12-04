@@ -235,7 +235,7 @@ module.exports = NodeHelper.create({
                     } else {
                         pm2.disconnect();
                         this.omxStream = {};
-                        this.omxStreamTimeouts.forEach(s => {
+                        Object.keys(this.omxStreamTimeouts).forEach(s => {
                             clearTimeout(s);
                         });
                     }
