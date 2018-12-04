@@ -36,7 +36,7 @@ module.exports = NodeHelper.create({
         console.log("Shutting down MMM-RTSPStream streams...");
 
         // Kill any running OMX Streams
-        if ("omxStream" in this) {
+        if (Object.keys(this.omxStream).length > 0) {
             this.stopAllOmxplayers();
         }
 
@@ -215,7 +215,7 @@ module.exports = NodeHelper.create({
             if (err) {
                 console.error(err);
             }
-            console.log('PM2: Connected.');
+            // console.log('PM2: Connected.');
 
             // Stops the Daemon if it's already started
             pm2.list((err, list) => {
@@ -294,7 +294,9 @@ module.exports = NodeHelper.create({
             this.stopOmxplayer(payload);
         }
         if (notification === "STOP_ALL_OMXSTREAMS") {
-            this.stopAllOmxplayers();
+            if (Object.keys(this.omxStream).length > 0) {
+                this.stopAllOmxplayers();
+            }
         }
     },
 
