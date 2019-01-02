@@ -12,12 +12,16 @@
   "dependencies": {
     "datauri": "^1.0.5",
     "node-rtsp-stream-es6": "github:shbatm/node-rtsp-stream-es6",
-    "pm2": "^2.6.1",
     "ps-tree": "^1.1.0",
     "ws": "^3.0.0"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/shbatm/MMM-RTSPStream.git"
+  },
+  "scripts": {
+    "preinstall": "./scripts/preinstall.sh",
+    "postinstall": "sudo npm link pm2",
+    "test": "echo \"Error: no test specified\" && exit 1"
   }
 }

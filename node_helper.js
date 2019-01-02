@@ -32,7 +32,7 @@ module.exports = NodeHelper.create({
 
     start: function() {
         this.started = false;
-        this.config = {};
+        this.streamConfig = {};
         this.stopAllOmxplayers();
     },
 
@@ -46,11 +46,19 @@ module.exports = NodeHelper.create({
 
         // Kill any FFMPEG strems that are running
         Object.keys(this.streams).forEach(s => this.streams[s].stopStream(0));
+
+        // Kill any VLC Streams that are open
+        if (this.dp2) {
+            console.log("Killing DevilsPie2...");
+            this.dp2.kill();
+            this.dp2 = undefined;
+        }
+        this.stopAllVlcPlayers();
     },
 
     startListener: function(name) {
-        if ((this.players.localPlayer === 'ffmpeg' || this.players.remotePlayer === 'ffmpeg') && this.config[name].url) {
-            this.streams[name] = new Stream(this.config[name]);
+        if ((this.config.localPlayer === 'ffmpeg' || this.config.remotePlayer === 'ffmpeg') && this.streamConfig[name].url) {
+            this.streams[name] = new Stream(this.streamConfig[name]);
             this.streams[name].startListener();
         }
     },
@@ -59,15 +67,15 @@ module.exports = NodeHelper.create({
         // console.log("Getting data for "+name);
         var self = this;
 
-        var snapUrl = this.config[name].snapshotUrl;
+        var snapUrl = this.streamConfig[name].snapshotUrl;
 
         if (!snapUrl) {
-            console.log("No snapshotUrl given for " + this.config[name].name + ". Ignoring.");
+            console.log("No snapshotUrl given for " + this.streamConfig[name].name + ". Ignoring.");
             return;
         }
 
-        if (typeof this.config[name].snapshotType !== "undefined" && this.config[name].snapshotType === "file") {
-            datauri.encode(this.config[name].snapshotUrl, (err, content) => {
+        if (typeof this.streamConfig[name].snapshotType !== "undefined" && this.streamConfig[name].snapshotType === "file") {
+            datauri.encode(this.streamConfig[name].snapshotUrl, (err, content) => {
                 if (err) {
                     throw err;
                 }
@@ -89,86 +97,115 @@ module.exports = NodeHelper.create({
                 }
             }.bind({ callerName: name })); //.pipe(fs.createWriteStream('/home/pi/snapshot.jpg').on("close", function() { console.log("done"); } ) ); // Debugging code to write file to disk
         }
-        this.snapshots[name] = setTimeout(function() { self.getData(name); }, this.config[name].snapshotRefresh * 1000);
+        this.snapshots[name] = setTimeout(function() { self.getData(name); }, this.streamConfig[name].snapshotRefresh * 1000);
     },
 
     getVlcPlayer: function(payload) {
         var self = this;
-        var opts = { detached: false, stdio: 'ignore', env: Object.assign(process.env, { DISPLAY: ":0" }) };
+        var environ = Object.assign(process.env, { DISPLAY: ":0" });
+        console.log(this.config);
+        var opts = { detached: false, env: environ };
         var vlcCmd = `vlc`;
         var namesM = [];
         var argsM = [];
         var positions = {};
 
         payload.forEach(s => {
-            var args = ["-I", "dummy", "--no-video-deco", "--no-embedded-video", `--video-title="${s.name}"`,
-                this.config[s.name].url
+            var args = ["-I", "dummy", "--no-video-deco", "--no-embedded-video", `--video-title=${s.name}`,
+                this.streamConfig[s.name].url
             ];
-            if (!("fullscreen" in s)) {
+            if ("fullscreen" in s && "hdUrl" in this.streamConfig[s.name]) {
+                args.pop();
+                args.push(this.streamConfig[s.name].hdUrl);
+            } else if (!("fullscreen" in s)) {
+                args.unshift("--width", s.box.right - s.box.left, "--height", s.box.bottom - s.box.top);
                 positions[s.name] = `${s.box.left}, ${s.box.top}, ${s.box.right-s.box.left}, ${s.box.bottom-s.box.top}`;
-            } else {
-                if ("hdUrl" in this.config[s.name]) {
-                    args.pop();
-                    args.push(this.config[s.name].hdUrl);
-                }
             }
-            console.log(`Starting stream ${s.name}...`);
+            console.log(`Starting stream ${s.name} using VLC with args ${args.join(' ')}...`);
 
             this.vlcStream[s.name] = child_process.spawn(vlcCmd, args, opts);
 
             this.vlcStream[s.name].on('error', (err) => {
-                console.error('Failed to start subprocess.');
+                console.error(`Failed to start subprocess: ${this.vlcStream[s.name]}.`);
             });
-
-            if (this.config.debug) {
-                this.vlcStream[s.name].on('data', (data) => {
-                    console.log(`${s.name}: ${data}`);
-                });
-            }
         });
 
         var dp2Cmd = `devilspie2`;
-        var dp2Args = ['-f', path.resolve(__dirname + 'scripts')];
+        var dp2Args = ['--debug', '-f', path.resolve(__dirname + '/scripts')];
         var dp2Config = ``;
 
         Object.keys(positions).forEach(p => {
             dp2Config += `
 if (get_window_name()=="${p}") then
-    set_window_geometry(${positions[p]};
+    set_window_geometry(${positions[p]});
     undecorate_window();
     set_on_top();
-end`;
+end
+`;
         });
 
-        fs.readFile(path.resolve(__dirname + 'scripts/vlc.lua'), (err, data) => {
-            if (err) throw err;
-
-            var startDp2 = () => {
-                this.dp2 = child_process.spawn(dp2Cmd, dp2Args, opts);
-                this.dp2.on('error', (err) => {
-                    console.error('DP2: Failed to start.');
+        var startDp2 = () => {
+            if (this.dp2) {
+                this.dp2.kill();
+                this.dp2 = undefined;
+            }
+            this.dp2 = child_process.spawn(dp2Cmd, dp2Args, opts);
+            this.dp2.on('error', (err) => {
+                console.error('DP2: Failed to start.');
+            });
+            if (this.config.debug) {
+                this.dp2.stdout.on('data', (d) => {
+                    console.log(`DP2: ${d.toString()}`);
                 });
-                if (this.config.debug) {
-                    this.dp2.on('data', (data) => {
-                        console.log(`DP2: ${data}`);
-                    });
-                }
-            };
+            }
+        };
+
+
+        fs.readFile(path.resolve(__dirname + '/scripts/vlc.lua'), (err, data) => {
+            if (err) throw err;
 
             // Only write the new DevilsPie2 config if we need to.
             if (data !== dp2Config) {
-                fs.writeFile(path.resolve(__dirname + 'scripts/vlc.lua'), dp2Config, (err) => {
+                fs.writeFile(path.resolve(__dirname + '/scripts/vlc.lua'), dp2Config, (err) => {
                     // throws an error, you could also catch it here
                     if (err) throw err;
 
                     console.log('DP2: Config File Saved!');
                     if (this.config.debug) { console.log(dp2Config); }
                     startDp2();
+                    setTimeout(() => { startDp2(); }, 7000);
                 });
             } else {
                 startDp2();
+                setTimeout(() => { startDp2(); }, 7000);
             }
         });
+    },
+    
+    stopVlcPlayer: function(name) {
+        console.log(`Stopping stream ${name}`);
+        if (name in this.vlcStream) {
+            try {
+                this.vlcStream[name].kill();
+            } catch (err) {
+                console.log(err);
+            }
+            delete this.vlcStream[name];
+        }
+    },
+
+    stopAllVlcPlayers: function() {
+        if (Object.keys(this.vlcStream).length > 0) {
+            console.log("Killing VLC Streams...");
+            Object.keys(this.vlcStream).forEach(s => {
+                try {
+                    this.vlcStream[s].kill();
+                } catch (err) {
+                    console.log(err);
+                }
+            });
+            this.vlcStream = {};
+        }
     },
 
     getOmxplayer: function(payload) {
@@ -183,17 +220,17 @@ end`;
 
         payload.forEach(s => {
             var args = ["--live", "--video_queue", "4", "--fps", "30",
-                this.config[s.name].url
+                this.streamConfig[s.name].url
             ];
             if (!("fullscreen" in s)) {
                 args.unshift("--win", `${s.box.left}, ${s.box.top}, ${s.box.right}, ${s.box.bottom}`);
             } else {
-                if ("hdUrl" in this.config[s.name]) {
+                if ("hdUrl" in this.streamConfig[s.name]) {
                     args.pop();
-                    args.push(this.config[s.name].hdUrl);
+                    args.push(this.streamConfig[s.name].hdUrl);
                 }
             }
-            if (this.config[s.name].protocol !== "udp") {
+            if (this.streamConfig[s.name].protocol !== "udp") {
                 args.unshift("--avdict", "rtsp_transport:tcp");
             }
             console.log(`Starting stream ${s.name} with args: ${JSON.stringify(args,null,4)}`);
@@ -235,7 +272,7 @@ end`;
                             this.omxStream[namesM[namesM.length - 1]] = namesM[namesM.length - 1];
 
                             // Automatically Restart OMX PM2 Instance every X Hours
-                            let restartHrs = this.config[namesM[namesM.length - 1]].omxRestart;
+                            let restartHrs = this.streamConfig[namesM[namesM.length - 1]].omxRestart;
                             if (typeof restartHrs === "number") {
                                 let worker = () => {
                                     pm2.restart(namesM[namesM.length - 1], function() {});
@@ -349,11 +386,11 @@ end`;
     socketNotificationReceived: function(notification, payload) {
         var self = this;
         if (notification === 'CONFIG') {
-            this.players = payload;
+            this.config = payload;
         }
         if (notification === 'STREAM_CONFIG') {
-            if (!(payload.name in this.config)) {
-                this.config[payload.name] = payload.config;
+            if (!(payload.name in this.streamConfig)) {
+                this.streamConfig[payload.name] = payload.config;
                 this.startListener(payload.name);
             }
             this.sendSocketNotification("STARTED", payload.name);
@@ -370,7 +407,7 @@ end`;
             }
         }
         if (notification === "PLAY_OMXSTREAM") {
-            this.getVlcPlayer(payload);
+            this.getOmxplayer(payload);
         }
         if (notification === "STOP_OMXSTREAM") {
             this.stopOmxplayer(payload);
@@ -378,6 +415,17 @@ end`;
         if (notification === "STOP_ALL_OMXSTREAMS") {
             if (Object.keys(this.omxStream).length > 0) {
                 this.stopAllOmxplayers();
+            }
+        }
+        if (notification === "PLAY_VLCSTREAM") {
+            this.getVlcPlayer(payload);
+        }
+        if (notification === "STOP_VLCSTREAM") {
+            this.stopVlcPlayer(payload);
+        }
+        if (notification === "STOP_ALL_VLCSTREAMS") {
+            if (Object.keys(this.vlcStream).length > 0) {
+                this.stopAllVlcPlayers();
             }
         }
     },

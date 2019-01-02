@@ -56,14 +56,6 @@ else
     fi
 fi
 
-# Update before first apt-get
-echo -e "\e[96mUpdating packages ...\e[90m"
-sudo apt-get update || echo -e "\e[91mUpdate failed, carrying on installation ...\e[90m"
-
-# Installing helper tools
-echo -e "\e[96mInstalling helper tools ...\e[90m"
-sudo apt-get --assume-yes install devilspie2 || exit
-
 if [ -d "$MM_HOME/modules/$MODULE_NAME" ] ; then
     # already installed
     echo "Directory $MM_HOME/modules/$MODULE_NAME already exists."

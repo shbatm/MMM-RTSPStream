@@ -14,10 +14,10 @@ Module.register("MMM-RTSPStream", {
         initialSetup: false,
         debug: true,
         autoStart: true,
-        rotateStreams: true,
+        rotateStreams: false,
         rotateStreamTimeout: 10, // Seconds
         showSnapWhenPaused: true,
-        localPlayer: "omxplayer", // "omxplayer" or "ffmpeg", or "vlc"
+        localPlayer: "vlc", // "omxplayer" or "ffmpeg", or "vlc"
         remotePlayer: "none", // "ffmpeg" or "none"
         remoteSnaps: true, // Show remote snapshots
         moduleWidth: 384, // Width = (Stream Width + 30px margin + 2px border) * # of Streams Wide
@@ -79,15 +79,15 @@ Module.register("MMM-RTSPStream", {
         this.loaded = false;
 
         if (!this.config.initialSetup) {
-            this.sendSocketNotification('CONFIG', { localPlayer: this.config.localPlayer, remotePlayer: this.config.remotePlayer });
-        }
+            this.sendSocketNotification('CONFIG', this.config);
 
-        Object.keys(this.config).filter(key => key.startsWith("stream")).forEach((key) => {
-            self.streams[key] = { playing: false };
-            if (self.config[key].url || self.config[key].snapshotUrl) {
-                self.sendSocketNotification('STREAM_CONFIG', { name: key, config: self.config[key] });
-            }
-        });
+            Object.keys(this.config).filter(key => key.startsWith("stream")).forEach((key) => {
+                self.streams[key] = { playing: false };
+                if (self.config[key].url || self.config[key].snapshotUrl) {
+                    self.sendSocketNotification('STREAM_CONFIG', { name: key, config: self.config[key] });
+                }
+            });
+        }
     },
 
     setupStreamRotation: function() {
@@ -132,7 +132,13 @@ Module.register("MMM-RTSPStream", {
         if (this.playing) {
             if (lastStream) { this.stopStream(lastStream); }
             ps = this.playStream(this.currentStream);
-            if (ps.length > 0) { this.sendSocketNotification("PLAY_OMXSTREAM", ps); }
+            if (ps.length > 0) {
+                if (this.config.localPlayer === "omxplayer") {
+                    this.sendSocketNotification("PLAY_OMXSTREAM", ps);
+                } else if (this.config.localPlayer === "vlc") {
+                    this.sendSocketNotification("PLAY_VLCSTREAM", ps);
+                }
+            }
 
         } else {
             if (lastStream) { this.sendSocketNotification("SNAPSHOT_STOP", lastStream); }
@@ -184,7 +190,13 @@ Module.register("MMM-RTSPStream", {
             } else {
                 this.sendSocketNotification("SNAPSHOT_STOP", this.currentStream);
                 ps = this.playStream(this.currentStream);
-                if (ps.length > 0) { this.sendSocketNotification("PLAY_OMXSTREAM", ps); }
+                if (ps.length > 0) {
+                    if (this.config.localPlayer === "omxplayer") {
+                        this.sendSocketNotification("PLAY_OMXSTREAM", ps);
+                    } else if (this.config.localPlayer === "vlc") {
+                        this.sendSocketNotification("PLAY_VLCSTREAM", ps);
+                    }
+                }
             }
         } else {
             if (this.streams[s].playing) {
@@ -193,7 +205,13 @@ Module.register("MMM-RTSPStream", {
             } else {
                 this.sendSocketNotification("SNAPSHOT_STOP", s);
                 ps = this.playStream(s);
-                if (ps.length > 0) { this.sendSocketNotification("PLAY_OMXSTREAM", ps); }
+                if (ps.length > 0) {
+                    if (this.config.localPlayer === "omxplayer") {
+                        this.sendSocketNotification("PLAY_OMXSTREAM", ps);
+                    } else if (this.config.localPlayer === "vlc") {
+                        this.sendSocketNotification("PLAY_VLCSTREAM", ps);
+                    }
+                }
             }
         }
     },
@@ -201,7 +219,13 @@ Module.register("MMM-RTSPStream", {
     playBtnDblClickCB: function(s) {
         if (this.instance === "SERVER" && !this.streams[s].playing) {
             var ps = this.playStream(s, true);
-            if (ps.length > 0) { this.sendSocketNotification("PLAY_OMXSTREAM", ps); }
+            if (ps.length > 0) {
+                if (this.config.localPlayer === "omxplayer") {
+                    this.sendSocketNotification("PLAY_OMXSTREAM", ps);
+                } else if (this.config.localPlayer === "vlc") {
+                    this.sendSocketNotification("PLAY_VLCSTREAM", ps);
+                }
+            }
         } else {
             this.playBtnCallback(s);
         }
@@ -213,6 +237,10 @@ Module.register("MMM-RTSPStream", {
         // create element wrapper for show into the module
         var wrapper = document.createElement("div");
 
+        if (this.config.initialSetup) {
+            wrapper.innerHTML = `Use config wizard at http://${global.location.hostname}:${global.location.port}/${this.name}/config.html<br>to generate a configuration for this moudle.`;
+            return wrapper;
+        }
         if (!this.loaded) {
             wrapper.innerHTML = "Loading " + this.name + "...";
             wrapper.className = "dimmed light small";
@@ -328,7 +356,7 @@ Module.register("MMM-RTSPStream", {
             this.stopStream(stream);
         }
 
-        if (this.instance === "SERVER" && this.config.localPlayer === "omxplayer") {
+        if (this.instance === "SERVER" && ["omxplayer", "vlc"].indexOf(this.config.localPlayer) !== -1) {
             var rect = canvas.getBoundingClientRect();
             var offset = {};
             if (typeof this.config.moduleOffset === "object") {
@@ -402,13 +430,21 @@ Module.register("MMM-RTSPStream", {
                 }
             }
         });
-        if (ps.length > 0) { this.sendSocketNotification("PLAY_OMXSTREAM", ps); }
+        if (ps.length > 0) {
+            if (this.config.localPlayer === "omxplayer") {
+                this.sendSocketNotification("PLAY_OMXSTREAM", ps);
+            } else if (this.config.localPlayer === "vlc") {
+                this.sendSocketNotification("PLAY_VLCSTREAM", ps);
+            }
+        }
     },
 
     stopStream: function(stream, omxStopAll = false) {
         if (this.streams[stream].playing) {
             if (this.instance === "SERVER" && this.config.localPlayer === "omxplayer" && !omxStopAll) {
                 this.sendSocketNotification("STOP_OMXSTREAM", stream);
+            } else if (this.instance === "SERVER" && this.config.localPlayer === "vlc" && !omxStopAll) {
+                this.sendSocketNotification("STOP_VLCSTREAM", stream);
             } else if ("player" in this.streams[stream]) {
                 this.streams[stream].player.destroy();
                 delete this.streams[stream].player;
@@ -425,6 +461,10 @@ Module.register("MMM-RTSPStream", {
         var omxStopAll = false;
         if (this.instance === "SERVER" && this.config.localPlayer === "omxplayer") {
             this.sendSocketNotification("STOP_ALL_OMXSTREAMS", "");
+            omxStopAll = true;
+        }
+        if (this.instance === "SERVER" && this.config.localPlayer === "vlc") {
+            this.sendSocketNotification("STOP_ALL_VLCSTREAMS", "");
             omxStopAll = true;
         }
         Object.keys(this.streams).forEach(s => {
@@ -471,7 +511,13 @@ Module.register("MMM-RTSPStream", {
                 }
             }
         }
-        if (ps.length > 0) { this.sendSocketNotification("PLAY_OMXSTREAM", ps); }
+        if (ps.length > 0) {
+            if (this.config.localPlayer === "omxplayer") {
+                this.sendSocketNotification("PLAY_OMXSTREAM", ps);
+            } else if (this.config.localPlayer === "vlc") {
+                this.sendSocketNotification("PLAY_VLCSTREAM", ps);
+            }
+        }
     },
 
     getScripts: function() {
@@ -540,7 +586,13 @@ Module.register("MMM-RTSPStream", {
                 }
             }
         }
-        if (ps.length > 0) { this.sendSocketNotification("PLAY_OMXSTREAM", ps); }
+        if (ps.length > 0) {
+            if (this.config.localPlayer === "omxplayer") {
+                this.sendSocketNotification("PLAY_OMXSTREAM", ps);
+            } else if (this.config.localPlayer === "vlc") {
+                this.sendSocketNotification("PLAY_VLCSTREAM", ps);
+            }
+        }
     },
 
     validKeyPress: function(kp) {
