@@ -444,7 +444,7 @@ Module.register("MMM-RTSPStream", {
             if (this.instance === "SERVER" && this.config.localPlayer === "omxplayer" && !omxStopAll) {
                 this.sendSocketNotification("STOP_OMXSTREAM", stream);
             } else if (this.instance === "SERVER" && this.config.localPlayer === "vlc" && !omxStopAll) {
-                this.sendSocketNotification("STOP_VLCSTREAM", stream);
+                this.sendSocketNotification("STOP_VLCSTREAM", { name: stream, delay: this.config[stream].shutdownDelay });
             } else if ("player" in this.streams[stream]) {
                 this.streams[stream].player.destroy();
                 delete this.streams[stream].player;
@@ -464,7 +464,7 @@ Module.register("MMM-RTSPStream", {
             omxStopAll = true;
         }
         if (this.instance === "SERVER" && this.config.localPlayer === "vlc") {
-            this.sendSocketNotification("STOP_ALL_VLCSTREAMS", "");
+            this.sendSocketNotification("STOP_ALL_VLCSTREAMS", this.config.stream1.shutdownDelay);
             omxStopAll = true;
         }
         Object.keys(this.streams).forEach(s => {

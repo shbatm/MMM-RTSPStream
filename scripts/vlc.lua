@@ -1,12 +1,9 @@
 
-if (get_window_name()=="stream1") then
-    set_window_geometry(269, 230, 640, 480);
-    undecorate_window();
-    set_on_top();
+local function starts_with(str, start)
+   return str:sub(1, #start) == start
 end
-
-if (get_window_name()=="stream2") then
-    set_window_geometry(915, 230, 640, 480);
+if (starts_with(get_window_name(), "stream")) then
+    set_window_geometry(592, 230, 640, 480);
     undecorate_window();
     set_on_top();
 end
