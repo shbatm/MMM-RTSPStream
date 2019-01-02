@@ -33,6 +33,14 @@ This module will show a live RTSP video stream and/or periodic snapshots on the 
 
 ## Installation:
 
+### Quick install
+
+If you followed the default installation instructions for the [Magic Mirror²](https://github.com/MichMich/MagicMirror) project, you should be able to use the automatic installer.
+The following command will download the installer and execute it:
+```bash
+bash -c "$(curl -s https://raw.githubusercontent.com/shbatm/MMM-RTSPStream/develop/scripts/installer.sh)"
+```
+
 First, ensure `omxplayer` is installed; if not, install using your system's package manager.  For Raspberry Pi:
 ```shell
 # Test for installation:

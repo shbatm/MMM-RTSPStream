@@ -7,14 +7,17 @@
  * MIT Licensed.
  */
 /* jshint esversion: 6*/
+var global = this;
 
 Module.register("MMM-RTSPStream", {
     defaults: {
+        initialSetup: false,
+        debug: true,
         autoStart: true,
         rotateStreams: true,
         rotateStreamTimeout: 10, // Seconds
         showSnapWhenPaused: true,
-        localPlayer: "omxplayer", // "omxplayer" or "ffmpeg"
+        localPlayer: "omxplayer", // "omxplayer" or "ffmpeg", or "vlc"
         remotePlayer: "none", // "ffmpeg" or "none"
         remoteSnaps: true, // Show remote snapshots
         moduleWidth: 384, // Width = (Stream Width + 30px margin + 2px border) * # of Streams Wide
@@ -36,13 +39,27 @@ Module.register("MMM-RTSPStream", {
             hideFfmpegOutput: true,
             omxRestart: 24, // Hours
         },
-        // MMM-KeyBindings mapping.
-        keyBindingsMode: "DEFAULT",
-        keyBindings: { Play: "MediaPlayPause", Previous: "MediaPreviousTrack", Next: "MediaNextTrack", Select: "Enter" },
-        kbMultiInstance: true,
+
+        // MMM-KeyBindings Settings
+        keyBindings: {
+            enabled: true
+        },
     },
 
-    requiresVersion: "2.1.0", // Required version of MagicMirror
+    keyBindings: {
+        enabled: false,
+        mode: "DEFAULT",
+        map: {
+            Play: "MediaPlayPause",
+            Previous: "MediaPreviousTrack",
+            Next: "MediaNextTrack",
+            Select: "Enter"
+        },
+        multiInstance: true,
+        takeFocus: "Menu"
+    },
+
+    requiresVersion: "2.4.0", // Required version of MagicMirror
 
     playing: false,
 
@@ -52,15 +69,18 @@ Module.register("MMM-RTSPStream", {
 
     streams: {},
 
+    // Allow for control on muliple instances
+    instance: (global.location && ["localhost", "127.0.0.1", "::1", "::ffff:127.0.0.1", undefined, "0.0.0.0"].indexOf(global.location.hostname) > -1) ? "SERVER" : "LOCAL",
+
     start: function() {
         var self = this;
 
         //Flag for check if module is loaded
         this.loaded = false;
 
-        this.setupKeyBindings();
-
-        this.sendSocketNotification('CONFIG', { localPlayer: this.config.localPlayer, remotePlayer: this.config.remotePlayer });
+        if (!this.config.initialSetup) {
+            this.sendSocketNotification('CONFIG', { localPlayer: this.config.localPlayer, remotePlayer: this.config.remotePlayer });
+        }
 
         Object.keys(this.config).filter(key => key.startsWith("stream")).forEach((key) => {
             self.streams[key] = { playing: false };
@@ -69,23 +89,6 @@ Module.register("MMM-RTSPStream", {
             }
         });
     },
-
-    /* Setup Key Bindings for the MMM-KeyBindings module */
-    setupKeyBindings: function() {
-        this.currentKeyPressMode = "DEFAULT";
-        if (typeof this.config.kbMultiInstance === undefined) {
-            this.config.kbMultiInstance = true;
-        }
-        this.kbInstance = (["localhost", "127.0.0.1", "::1", "::ffff:127.0.0.1", undefined, "0.0.0.0"].indexOf(
-            window.location.hostname) > -1) ? "SERVER" : "LOCAL";
-        this.reverseKBMap = {};
-        for (var eKey in this.config.keyBindings) {
-            if (this.config.keyBindings.hasOwnProperty(eKey)) {
-                this.reverseKBMap[this.config.keyBindings[eKey]] = eKey;
-            }
-        }
-    },
-
 
     setupStreamRotation: function() {
         this.playing = this.config.autoStart;
@@ -196,7 +199,7 @@ Module.register("MMM-RTSPStream", {
     },
 
     playBtnDblClickCB: function(s) {
-        if (this.kbInstance === "SERVER" && !this.streams[s].playing) {
+        if (this.instance === "SERVER" && !this.streams[s].playing) {
             var ps = this.playStream(s, true);
             if (ps.length > 0) { this.sendSocketNotification("PLAY_OMXSTREAM", ps); }
         } else {
@@ -316,7 +319,7 @@ Module.register("MMM-RTSPStream", {
         }
     },
 
-    playStream: function(stream, fullscreen = false, absPosition=undefined) {
+    playStream: function(stream, fullscreen = false, absPosition = undefined) {
         var canvasId = (this.config.rotateStreams) ? "canvas_" : "canvas_" + stream;
         var canvas = document.getElementById(canvasId);
         var omxPayload = [];
@@ -325,7 +328,7 @@ Module.register("MMM-RTSPStream", {
             this.stopStream(stream);
         }
 
-        if (this.kbInstance === "SERVER" && this.config.localPlayer === "omxplayer") {
+        if (this.instance === "SERVER" && this.config.localPlayer === "omxplayer") {
             var rect = canvas.getBoundingClientRect();
             var offset = {};
             if (typeof this.config.moduleOffset === "object") {
@@ -389,12 +392,12 @@ Module.register("MMM-RTSPStream", {
     playAll: function() {
         var ps = [];
         Object.keys(this.streams).forEach(s => {
-            if (this.kbInstance === "SERVER" || (this.kbInstance === "LOCAL" && this.config.remotePlayer === "ffmpeg")) {
+            if (this.instance === "SERVER" || (this.instance === "LOCAL" && this.config.remotePlayer === "ffmpeg")) {
                 var res = this.playStream(s);
                 if (res.length > 0) {
                     ps = ps.concat(res);
                 }
-                if (!(this.kbInstance === "SERVER" && this.config.remoteSnaps)) {
+                if (!(this.instance === "SERVER" && this.config.remoteSnaps)) {
                     this.sendSocketNotification("SNAPSHOT_STOP", s);
                 }
             }
@@ -402,9 +405,9 @@ Module.register("MMM-RTSPStream", {
         if (ps.length > 0) { this.sendSocketNotification("PLAY_OMXSTREAM", ps); }
     },
 
-    stopStream: function(stream, omxStopAll=false) {
+    stopStream: function(stream, omxStopAll = false) {
         if (this.streams[stream].playing) {
-            if (this.kbInstance === "SERVER" && this.config.localPlayer === "omxplayer" && !omxStopAll) {
+            if (this.instance === "SERVER" && this.config.localPlayer === "omxplayer" && !omxStopAll) {
                 this.sendSocketNotification("STOP_OMXSTREAM", stream);
             } else if ("player" in this.streams[stream]) {
                 this.streams[stream].player.destroy();
@@ -420,7 +423,7 @@ Module.register("MMM-RTSPStream", {
 
     stopAllStreams: function(startSnapshots = true) {
         var omxStopAll = false;
-        if (this.kbInstance === "SERVER" && this.config.localPlayer === "omxplayer") {
+        if (this.instance === "SERVER" && this.config.localPlayer === "omxplayer") {
             this.sendSocketNotification("STOP_ALL_OMXSTREAMS", "");
             omxStopAll = true;
         }
@@ -442,11 +445,11 @@ Module.register("MMM-RTSPStream", {
                 this.stopStream(this.currentStream);
                 this.playSnapshots(this.currentStream);
             } else {
-                if ((this.kbInstance === "SERVER" && !this.config.remoteSnaps) ||
-                    (this.kbInstance === "LOCAL" && this.config.remotePlayer === "ffmpeg")) {
+                if ((this.instance === "SERVER" && !this.config.remoteSnaps) ||
+                    (this.instance === "LOCAL" && this.config.remotePlayer === "ffmpeg")) {
                     this.sendSocketNotification("SNAPSHOT_STOP", this.currentStream);
                 }
-                if (this.kbInstance === "SERVER" || (this.kbInstance === "LOCAL" && this.config.remotePlayer === "ffmpeg")) {
+                if (this.instance === "SERVER" || (this.instance === "LOCAL" && this.config.remotePlayer === "ffmpeg")) {
                     ps = this.playStream(this.currentStream);
                 }
             }
@@ -457,13 +460,13 @@ Module.register("MMM-RTSPStream", {
                 this.stopStream(this.selectedStream);
                 this.playSnapshots(this.selectedStream);
             } else {
-                if ((this.kbInstance === "SERVER" && !this.config.remoteSnaps) ||
-                    (this.kbInstance === "LOCAL" && this.config.remotePlayer === "ffmpeg")) {
+                if ((this.instance === "SERVER" && !this.config.remoteSnaps) ||
+                    (this.instance === "LOCAL" && this.config.remotePlayer === "ffmpeg")) {
                     this.sendSocketNotification("SNAPSHOT_STOP", this.selectedStream);
                 }
-                if (this.kbInstance === "SERVER" && payload.KeyState === "KEY_LONGPRESSED") {
+                if (this.instance === "SERVER" && payload.KeyState === "KEY_LONGPRESSED") {
                     ps = this.playStream(this.selectedStream, true);
-                } else if (this.kbInstance === "SERVER" || (this.kbInstance === "LOCAL" && this.config.remotePlayer === "ffmpeg")) {
+                } else if (this.instance === "SERVER" || (this.instance === "LOCAL" && this.config.remotePlayer === "ffmpeg")) {
                     ps = this.playStream(this.selectedStream);
                 }
             }
@@ -472,7 +475,7 @@ Module.register("MMM-RTSPStream", {
     },
 
     getScripts: function() {
-        return ['jsmpeg.min.js'];
+        return [this.file('scripts/jsmpeg.min.js')];
     },
 
     getStyles: function() {
@@ -481,11 +484,32 @@ Module.register("MMM-RTSPStream", {
 
     notificationReceived: function(notification, payload, sender) {
         var ps = [];
-        if (this.validateKeyPress(notification, payload)) { return; }
 
-        if (notification === 'DOM_OBJECTS_CREATED') {
-
+        if (notification === "DOM_OBJECTS_CREATED") {
+            // Register Key Handler
+            if (this.config.keyBindings.enabled &&
+                MM.getModules().filter(kb => kb.name === "MMM-KeyBindings").length > 0) {
+                this.keyBindings = Object.assign({}, this.keyBindings, this.config.keyBindings);
+                KeyHandler.register(this.name, {
+                    sendNotification: (n, p) => { this.sendNotification(n, p); },
+                    validKeyPress: (kp) => { this.validKeyPress(kp); },
+                    onFocus: () => {
+                        if (!this.menuOpen) { this.toggleMenu(); }
+                    },
+                    onFocusReleased: () => {
+                        if (this.menuOpen) { this.toggleMenu(); }
+                    }
+                });
+                this.keyHandler = KeyHandler.create(this.name, this.keyBindings);
+            }
+            this.sendNotification("REGISTER_API", {
+                module: "MMM-OnScreenMenu",
+                path: "onscreenmenu",
+                actions: {}
+            });
         }
+        if (this.keyHandler && this.keyHandler.validate(notification, payload)) { return; }
+
         // Handle USER_PRESENCE events from the MMM-PIR-sensor Module
         if (notification === "USER_PRESENCE") {
             if (payload) {
@@ -494,7 +518,7 @@ Module.register("MMM-RTSPStream", {
                 this.suspend();
             }
         }
-        if (this.kbInstance === "SERVER") {
+        if (this.instance === "SERVER") {
             if (notification === 'RTSP-PLAY') {
                 if (payload === 'all') {
                     this.playAll();
@@ -519,44 +543,19 @@ Module.register("MMM-RTSPStream", {
         if (ps.length > 0) { this.sendSocketNotification("PLAY_OMXSTREAM", ps); }
     },
 
-    validateKeyPress: function(notification, payload) {
-        // Handle KEYPRESS mode change events from the MMM-KeyBindings Module
-        if (notification === "KEYPRESS_MODE_CHANGED") {
-            this.currentKeyPressMode = payload;
-            return true;
-        }
-
-        // Uncomment line below for diagnostics & to confirm keypresses are being recieved
-        // if (notification === "KEYPRESS") { console.log(payload); }
-
-        // Validate Keypresses
-        if (notification === "KEYPRESS" && this.currentKeyPressMode === this.config.keyBindingsMode) {
-            if (this.config.kbMultiInstance && payload.Sender !== this.kbInstance) {
-                return false; // Wrong Instance
-            }
-            if (!(payload.KeyName in this.reverseKBMap)) {
-                return false; // Not a key we listen for
-            }
-            this.validKeyPress(payload);
-            return true;
-        }
-
-        return false;
-    },
-
     validKeyPress: function(kp) {
         // Example for responding to "Left" and "Right" arrow
-        if (kp.KeyName === this.config.keyBindings.Play) {
+        if (kp.keyName === this.config.keyBindings.Play) {
             this.toggleStreams(kp);
         }
-        if (kp.KeyName === this.config.keyBindings.Next) {
+        if (kp.keyName === this.config.keyBindings.Next) {
             if (this.config.rotateStreams) {
                 this.manualTransition(undefined, 1);
                 this.restartTimer();
             } else {
                 this.selectStream(1);
             }
-        } else if (kp.KeyName === this.config.keyBindings.Previous) {
+        } else if (kp.keyName === this.config.keyBindings.Previous) {
             if (this.config.rotateStreams) {
                 this.manualTransition(undefined, -1);
                 this.restartTimer();

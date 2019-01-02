@@ -10,6 +10,7 @@ var NodeHelper = require("node_helper");
 var Stream = require('node-rtsp-stream-es6');
 var request = require('request');
 const fs = require('fs');
+const path = require("path");
 const DataURI = require('datauri');
 const datauri = new DataURI();
 const psTree = require('ps-tree');
@@ -23,6 +24,9 @@ module.exports = NodeHelper.create({
 
     omxStream: {},
     omxStreamTimeouts: {},
+
+    vlcStream: {},
+    vlcStreamTimeouts: {},
 
     snapshots: {},
 
@@ -43,7 +47,6 @@ module.exports = NodeHelper.create({
         // Kill any FFMPEG strems that are running
         Object.keys(this.streams).forEach(s => this.streams[s].stopStream(0));
     },
-
 
     startListener: function(name) {
         if ((this.players.localPlayer === 'ffmpeg' || this.players.remotePlayer === 'ffmpeg') && this.config[name].url) {
@@ -87,6 +90,85 @@ module.exports = NodeHelper.create({
             }.bind({ callerName: name })); //.pipe(fs.createWriteStream('/home/pi/snapshot.jpg').on("close", function() { console.log("done"); } ) ); // Debugging code to write file to disk
         }
         this.snapshots[name] = setTimeout(function() { self.getData(name); }, this.config[name].snapshotRefresh * 1000);
+    },
+
+    getVlcPlayer: function(payload) {
+        var self = this;
+        var opts = { detached: false, stdio: 'ignore', env: Object.assign(process.env, { DISPLAY: ":0" }) };
+        var vlcCmd = `vlc`;
+        var namesM = [];
+        var argsM = [];
+        var positions = {};
+
+        payload.forEach(s => {
+            var args = ["-I", "dummy", "--no-video-deco", "--no-embedded-video", `--video-title="${s.name}"`,
+                this.config[s.name].url
+            ];
+            if (!("fullscreen" in s)) {
+                positions[s.name] = `${s.box.left}, ${s.box.top}, ${s.box.right-s.box.left}, ${s.box.bottom-s.box.top}`;
+            } else {
+                if ("hdUrl" in this.config[s.name]) {
+                    args.pop();
+                    args.push(this.config[s.name].hdUrl);
+                }
+            }
+            console.log(`Starting stream ${s.name}...`);
+
+            this.vlcStream[s.name] = child_process.spawn(vlcCmd, args, opts);
+
+            this.vlcStream[s.name].on('error', (err) => {
+                console.error('Failed to start subprocess.');
+            });
+
+            if (this.config.debug) {
+                this.vlcStream[s.name].on('data', (data) => {
+                    console.log(`${s.name}: ${data}`);
+                });
+            }
+        });
+
+        var dp2Cmd = `devilspie2`;
+        var dp2Args = ['-f', path.resolve(__dirname + 'scripts')];
+        var dp2Config = ``;
+
+        Object.keys(positions).forEach(p => {
+            dp2Config += `
+if (get_window_name()=="${p}") then
+    set_window_geometry(${positions[p]};
+    undecorate_window();
+    set_on_top();
+end`;
+        });
+
+        fs.readFile(path.resolve(__dirname + 'scripts/vlc.lua'), (err, data) => {
+            if (err) throw err;
+
+            var startDp2 = () => {
+                this.dp2 = child_process.spawn(dp2Cmd, dp2Args, opts);
+                this.dp2.on('error', (err) => {
+                    console.error('DP2: Failed to start.');
+                });
+                if (this.config.debug) {
+                    this.dp2.on('data', (data) => {
+                        console.log(`DP2: ${data}`);
+                    });
+                }
+            };
+
+            // Only write the new DevilsPie2 config if we need to.
+            if (data !== dp2Config) {
+                fs.writeFile(path.resolve(__dirname + 'scripts/vlc.lua'), dp2Config, (err) => {
+                    // throws an error, you could also catch it here
+                    if (err) throw err;
+
+                    console.log('DP2: Config File Saved!');
+                    if (this.config.debug) { console.log(dp2Config); }
+                    startDp2();
+                });
+            } else {
+                startDp2();
+            }
+        });
     },
 
     getOmxplayer: function(payload) {
@@ -288,7 +370,7 @@ module.exports = NodeHelper.create({
             }
         }
         if (notification === "PLAY_OMXSTREAM") {
-            this.getOmxplayer(payload);
+            this.getVlcPlayer(payload);
         }
         if (notification === "STOP_OMXSTREAM") {
             this.stopOmxplayer(payload);
