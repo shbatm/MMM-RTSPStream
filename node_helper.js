@@ -183,6 +183,7 @@ if (get_window_name()=="${p}") then
     set_window_geometry(${positions[p]});
     undecorate_window();
     set_on_top();
+    make_always_on_top();
 end
 `;
                 });
@@ -193,6 +194,7 @@ end
                     this.dp2.kill();
                     this.dp2 = undefined;
                 }
+                console.info("DP2: Running window resizers...");
                 this.dp2 = child_process.spawn(dp2Cmd, dp2Args, opts);
                 this.dp2.on('error', (err) => {
                     console.error('DP2: Failed to start.');
@@ -208,8 +210,6 @@ end
             fs.readFile(path.resolve(__dirname + '/scripts/vlc.lua'), "utf8", (err, data) => {
                 if (err) throw err;
 
-                console.error(data === dp2Config);
-
                 // Only write the new DevilsPie2 config if we need to.
                 if (data !== dp2Config) {
                     fs.writeFile(path.resolve(__dirname + '/scripts/vlc.lua'), dp2Config, (err) => {
@@ -219,11 +219,12 @@ end
                         console.log('DP2: Config File Saved!');
                         if (this.config.debug) { console.log(dp2Config); }
                         startDp2();
-                        setTimeout(() => { startDp2(); }, 7000);
+                        // Give the windows time to settle, then re-call to resize again.
+                        setTimeout(() => { startDp2(); }, 7000 * payload.length);
                     });
                 } else {
                     startDp2();
-                    setTimeout(() => { startDp2(); }, 7000);
+                    setTimeout(() => { startDp2(); }, 7000 * payload.length);
                 }
             });
         }
