@@ -244,7 +244,6 @@ end
             }
         };
 
-        console.log(name, delay);
         if (name in this.vlcStream) {
             if (delay) {
                 this.vlcDelayedExit[name] = setTimeout(() => { quitVlc(); }, delay);
