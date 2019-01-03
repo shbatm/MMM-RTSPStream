@@ -9,9 +9,9 @@
 
 
 # Check for required Debian packages
-PACKAGE="devilspie2 wmctrl"
+PACKAGE="devilspie2 wmctrl ffmpeg omxplayer vlc"
 
-if [[ $(dpkg-query -W -f='${Status}\n' $PACKAGE 2>/dev/null | grep -c "ok installed") -lt 2 ]];
+if [[ $(dpkg-query -W -f='${Status}\n' $PACKAGE 2>/dev/null | grep -c "ok installed") -lt 5 ]];
 then
     echo -e "\e[96mUpdating packages ...\e[90m"
     sudo apt update || echo -e "\e[91mUpdate failed, carrying on installation ...\e[90m";

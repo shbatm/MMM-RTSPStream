@@ -21,7 +21,7 @@ module.exports = NodeHelper.create({
 
     config: {},
 
-    streams: {},
+    ffmpegStreams: {},
 
     omxStream: {},
     omxStreamTimeouts: {},
@@ -34,7 +34,6 @@ module.exports = NodeHelper.create({
 
     start: function() {
         this.started = false;
-        this.streamConfig = {};
         this.stopAllOmxplayers();
     },
 
@@ -47,7 +46,7 @@ module.exports = NodeHelper.create({
         }
 
         // Kill any FFMPEG strems that are running
-        Object.keys(this.streams).forEach(s => this.streams[s].stopStream(0));
+        Object.keys(this.ffmpegStreams).forEach(s => this.ffmpegStreams[s].stopStream(0));
 
         // Kill any VLC Streams that are open
         if (this.dp2) {
@@ -59,9 +58,14 @@ module.exports = NodeHelper.create({
     },
 
     startListener: function(name) {
-        if ((this.config.localPlayer === 'ffmpeg' || this.config.remotePlayer === 'ffmpeg') && this.streamConfig[name].url) {
-            this.streams[name] = new Stream(this.streamConfig[name]);
-            this.streams[name].startListener();
+        if ((this.config.localPlayer === 'ffmpeg' || this.config.remotePlayer === 'ffmpeg') && this.config[name].url) {
+            if (this.config.shutdownDelay) {
+                this.config[name].shutdownDelay = this.config.shutdownDelay * 1000;
+            }
+            if (this.config.debug) {
+                this.config[name].hideFfmpegOutput = false;
+            }
+            this.ffmpegStreams[name] = new Stream(this.config[name]);
         }
     },
 
@@ -69,15 +73,15 @@ module.exports = NodeHelper.create({
         // console.log("Getting data for "+name);
         var self = this;
 
-        var snapUrl = this.streamConfig[name].snapshotUrl;
+        var snapUrl = this.config[name].snapshotUrl;
 
         if (!snapUrl) {
-            console.log("No snapshotUrl given for " + this.streamConfig[name].name + ". Ignoring.");
+            console.log("No snapshotUrl given for " + name + ". Ignoring.");
             return;
         }
 
-        if (typeof this.streamConfig[name].snapshotType !== "undefined" && this.streamConfig[name].snapshotType === "file") {
-            datauri.encode(this.streamConfig[name].snapshotUrl, (err, content) => {
+        if (typeof this.config[name].snapshotType !== "undefined" && this.config[name].snapshotType === "file") {
+            datauri.encode(this.config[name].snapshotUrl, (err, content) => {
                 if (err) {
                     throw err;
                 }
@@ -99,7 +103,7 @@ module.exports = NodeHelper.create({
                 }
             }.bind({ callerName: name })); //.pipe(fs.createWriteStream('/home/pi/snapshot.jpg').on("close", function() { console.log("done"); } ) ); // Debugging code to write file to disk
         }
-        this.snapshots[name] = setTimeout(function() { self.getData(name); }, this.streamConfig[name].snapshotRefresh * 1000);
+        this.snapshots[name] = setTimeout(function() { self.getData(name); }, this.config[name].snapshotRefresh * 1000);
     },
 
     getVlcPlayer: function(payload) {
@@ -109,64 +113,48 @@ module.exports = NodeHelper.create({
         var positions = {};
         let dp2Check = false;
 
-        // Abort a delayed shutdown, if there was one
-        if ("all" in this.vlcDelayedExit) {
-            clearTimeout(this.vlcDelayedExit.all);
-            delete this.vlcDelayedExit.all;
-            payload.forEach(s => {
-                if (s.name in this.vlcStream) {
-                    child_process.exec(`wmctrl -r ${s.name} -b remove,hidden && wmctrl -a ${s.name}`, { env: environ }, (error, stdout, stderr) => {
-                        if (error) {
-                            console.error(`exec error: ${error}`);
-                            return;
-                        }
-                    });
-                }
-            });
-        } else {
-            payload.forEach(s => {
-                // Abort a single delayed shutdown, if there was one.
-                if (s.name in this.vlcDelayedExit && s.name in this.vlcStream) {
-                    clearTimeout(this.vlcDelayedExit[s.name]);
-                    delete this.vlcDelayedExit[s.name];
-                    child_process.exec(`wmctrl -r ${s.name} -b remove,hidden && wmctrl -a ${s.name}`, { env: environ }, (error, stdout, stderr) => {
-                        if (error) {
-                            console.error(`exec error: ${error}`);
-                            return;
-                        }
-                    });
-                    return;
-                } else {
-                    // Otherwise, Generate the VLC window
-                    var args = ["-I", "dummy", "--no-video-deco", "--no-embedded-video", `--video-title=${s.name}`,
-                        this.streamConfig[s.name].url
-                    ];
-                    if ("fullscreen" in s && "hdUrl" in this.streamConfig[s.name]) {
-                        args.pop();
-                        args.push(this.streamConfig[s.name].hdUrl);
-                    } else if (!("fullscreen" in s)) {
-                        args.unshift("--width", s.box.right - s.box.left, "--height", s.box.bottom - s.box.top);
-                        positions[s.name] = `${s.box.left}, ${s.box.top}, ${s.box.right-s.box.left}, ${s.box.bottom-s.box.top}`;
+        payload.forEach(s => {
+            // Abort a single delayed shutdown, if there was one.
+            if (s.name in this.vlcDelayedExit && s.name in this.vlcStream) {
+                clearTimeout(this.vlcDelayedExit[s.name]);
+                delete this.vlcDelayedExit[s.name];
+                child_process.exec(`wmctrl -r ${s.name} -b remove,hidden && wmctrl -a ${s.name}`, { env: environ }, (error, stdout, stderr) => {
+                    if (error) {
+                        console.error(`exec error: ${error}`);
+                        return;
                     }
-                    console.log(`Starting stream ${s.name} using VLC with args ${args.join(' ')}...`);
-
-                    this.vlcStream[s.name] = child_process.spawn(vlcCmd, args, opts);
-
-                    this.vlcStream[s.name].on('error', (err) => {
-                        console.error(`Failed to start subprocess: ${this.vlcStream[s.name]}.`);
-                    });
-
-                    dp2Check = true;
+                });
+                return;
+            } else {
+                // Otherwise, Generate the VLC window
+                var args = ["-I", "dummy", "--no-video-deco", "--no-embedded-video", `--video-title=${s.name}`,
+                    this.config[s.name].url
+                ];
+                if ("fullscreen" in s && "hdUrl" in this.config[s.name]) {
+                    args.pop();
+                    args.push(this.config[s.name].hdUrl);
+                } else if (!("fullscreen" in s)) {
+                    args.unshift("--width", s.box.right - s.box.left, "--height", s.box.bottom - s.box.top);
+                    positions[s.name] = `${s.box.left}, ${s.box.top}, ${s.box.right-s.box.left}, ${s.box.bottom-s.box.top}`;
                 }
-            });
+                console.log(`Starting stream ${s.name} using VLC with args ${args.join(' ')}...`);
 
+                this.vlcStream[s.name] = child_process.spawn(vlcCmd, args, opts);
 
-            if (!dp2Check) { return; }
-            var dp2Cmd = `devilspie2`;
-            var dp2Args = ['--debug', '-f', path.resolve(__dirname + '/scripts')];
-            let dp2Config = ``;
-            if (this.config.rotateStreams) {
-                dp2Config = `
+                this.vlcStream[s.name].on('error', (err) => {
+                    console.error(`Failed to start subprocess: ${this.vlcStream[s.name]}.`);
+                });
+
+                dp2Check = true;
+            }
+        });
+
+        if (!dp2Check) { return; }
+        var dp2Cmd = `devilspie2`;
+        var dp2Args = ['--debug', '-f', path.resolve(__dirname + '/scripts')];
+        let dp2Config = ``;
+        if (this.config.rotateStreams) {
+            dp2Config = `
 local function starts_with(str, start)
    return str:sub(1, #start) == start
 end
@@ -176,9 +164,9 @@ if (starts_with(get_window_name(), "stream")) then
     set_on_top();
 end
 `;
-            } else {
-                Object.keys(positions).forEach(p => {
-                    dp2Config += `
+        } else {
+            Object.keys(positions).forEach(p => {
+                dp2Config += `
 if (get_window_name()=="${p}") then
     set_window_geometry(${positions[p]});
     undecorate_window();
@@ -186,48 +174,42 @@ if (get_window_name()=="${p}") then
     make_always_on_top();
 end
 `;
-                });
-            }
-
-            var startDp2 = () => {
-                if (this.dp2) {
-                    this.dp2.kill();
-                    this.dp2 = undefined;
-                }
-                console.info("DP2: Running window resizers...");
-                this.dp2 = child_process.spawn(dp2Cmd, dp2Args, opts);
-                this.dp2.on('error', (err) => {
-                    console.error('DP2: Failed to start.');
-                });
-                if (this.config.debug) {
-                    this.dp2.stdout.on('data', (d) => {
-                        console.log(`DP2: ${d.toString()}`);
-                    });
-                }
-            };
-
-
-            fs.readFile(path.resolve(__dirname + '/scripts/vlc.lua'), "utf8", (err, data) => {
-                if (err) throw err;
-
-                // Only write the new DevilsPie2 config if we need to.
-                if (data !== dp2Config) {
-                    fs.writeFile(path.resolve(__dirname + '/scripts/vlc.lua'), dp2Config, (err) => {
-                        // throws an error, you could also catch it here
-                        if (err) throw err;
-
-                        console.log('DP2: Config File Saved!');
-                        if (this.config.debug) { console.log(dp2Config); }
-                        startDp2();
-                        // Give the windows time to settle, then re-call to resize again.
-                        setTimeout(() => { startDp2(); }, 7000 * payload.length);
-                    });
-                } else {
-                    startDp2();
-                    setTimeout(() => { startDp2(); }, 7000 * payload.length);
-                }
             });
         }
+
+        var startDp2 = () => {
+            if (this.dp2) {
+                this.dp2.kill();
+                this.dp2 = undefined;
+            }
+            console.info("DP2: Running window resizers...");
+            this.dp2 = child_process.spawn(dp2Cmd, dp2Args, opts);
+            this.dp2.on('error', (err) => {
+                console.error('DP2: Failed to start.');
+            });
+        };
+
+
+        fs.readFile(path.resolve(__dirname + '/scripts/vlc.lua'), "utf8", (err, data) => {
+            if (err) throw err;
+
+            // Only write the new DevilsPie2 config if we need to.
+            if (data !== dp2Config) {
+                fs.writeFile(path.resolve(__dirname + '/scripts/vlc.lua'), dp2Config, (err) => {
+                    // throws an error, you could also catch it here
+                    if (err) throw err;
+
+                    console.log('DP2: Config File Saved!');
+                    if (this.config.debug) { console.log(dp2Config); }
+                    startDp2();
+                    // Give the windows time to settle, then re-call to resize again.
+                    setTimeout(() => { startDp2(); }, 7000 * payload.length);
+                });
+            } else {
+                startDp2();
+                setTimeout(() => { startDp2(); }, 7000 * payload.length);
+            }
+        });
     },
 
     stopVlcPlayer: function(name, delay) {
@@ -243,16 +225,17 @@ end
                 delete this.vlcDelayedExit[name];
             }
         };
-
         if (name in this.vlcStream) {
             if (delay) {
-                this.vlcDelayedExit[name] = setTimeout(() => { quitVlc(); }, delay);
-                child_process.exec(`wmctrl -r ${name} -b add,hidden`, { env: environ }, (error, stdout, stderr) => {
-                    if (error) {
-                        console.error(`exec error: ${error}`);
-                        return;
-                    }
-                });
+                if (!(name in this.vlcDelayedExit)) {
+                    this.vlcDelayedExit[name] = setTimeout(() => { quitVlc(); }, delay * 1000);
+                    child_process.exec(`wmctrl -r ${name} -b add,hidden`, { env: environ }, (error, stdout, stderr) => {
+                        if (error) {
+                            console.error(`exec error: ${error}`);
+                            return;
+                        }
+                    });
+                }
             } else {
                 quitVlc();
             }
@@ -261,32 +244,20 @@ end
 
     stopAllVlcPlayers: function(delay) {
         if (Object.keys(this.vlcStream).length > 0) {
-            let quitVlc = () => {
-                console.log("Killing VLC Streams...");
-                Object.keys(this.vlcStream).forEach(s => {
+            console.log((delay) ? "Delayed exit of all VLC Streams in " + delay + " sec..." : "Killing All VLC Streams...");
+            Object.keys(this.vlcStream).forEach(s => {
+                if (delay) {
+                    this.stopVlcPlayer(s, delay);
+                } else {
                     try {
                         this.vlcStream[s].kill();
+                        delete this.vlcStream[s];
+                        delete this.vlcDelayedExit[s];
                     } catch (err) {
                         console.log(err);
                     }
-                });
-                this.vlcStream = {};
-                delete this.vlcDelayedExit.all;
-            };
-
-            if (delay) {
-                this.vlcDelayedExit.all = setTimeout(() => { quitVlc(); }, delay);
-                Object.keys(this.vlcStream).forEach(s => {
-                    child_process.exec(`wmctrl -r ${s} -b add,hidden`, { env: environ }, (error, stdout, stderr) => {
-                        if (error) {
-                            console.error(`exec error: ${error}`);
-                            return;
-                        }
-                    });
-                });
-            } else {
-                quitVlc();
-            }
+                }
+            });
         }
     },
 
@@ -302,18 +273,21 @@ end
 
         payload.forEach(s => {
             var args = ["--live", "--video_queue", "4", "--fps", "30",
-                this.streamConfig[s.name].url
+                this.config[s.name].url
             ];
             if (!("fullscreen" in s)) {
                 args.unshift("--win", `${s.box.left}, ${s.box.top}, ${s.box.right}, ${s.box.bottom}`);
             } else {
-                if ("hdUrl" in this.streamConfig[s.name]) {
+                if ("hdUrl" in this.config[s.name]) {
                     args.pop();
-                    args.push(this.streamConfig[s.name].hdUrl);
+                    args.push(this.config[s.name].hdUrl);
                 }
             }
-            if (this.streamConfig[s.name].protocol !== "udp") {
+            if (this.config[s.name].protocol !== "udp") {
                 args.unshift("--avdict", "rtsp_transport:tcp");
+            }
+            if (this.config.debug) {
+                args.unshift("-I");
             }
             console.log(`Starting stream ${s.name} with args: ${JSON.stringify(args,null,4)}`);
 
@@ -354,7 +328,7 @@ end
                             this.omxStream[namesM[namesM.length - 1]] = namesM[namesM.length - 1];
 
                             // Automatically Restart OMX PM2 Instance every X Hours
-                            let restartHrs = this.streamConfig[namesM[namesM.length - 1]].omxRestart;
+                            let restartHrs = this.config.omxRestart;
                             if (typeof restartHrs === "number") {
                                 let worker = () => {
                                     pm2.restart(namesM[namesM.length - 1], function() {});
@@ -469,13 +443,17 @@ end
         var self = this;
         if (notification === 'CONFIG') {
             this.config = payload;
-        }
-        if (notification === 'STREAM_CONFIG') {
-            if (!(payload.name in this.streamConfig)) {
-                this.streamConfig[payload.name] = payload.config;
-                this.startListener(payload.name);
+            let streams = Object.keys(this.config).filter(key => key.startsWith("stream"));
+            if (this.config.rotateStreams &&
+                this.config.shutdownDelay &&
+                this.config.shutdownDelay < ((streams.length - 1) * this.config.rotateStreamsTimeout)) {
+                let suggestedDelay = ((streams.length - 1) * this.config.rotateStreamsTimeout) + 2;
+                console.warn("WARNING: shutdownDelay is shorter than the time it takes to make it through the loop. Consider increasing to " + suggestedDelay + "s.");
             }
-            this.sendSocketNotification("STARTED", payload.name);
+            streams.forEach((name) => {
+                this.startListener(name);
+                this.sendSocketNotification("STARTED", name);
+            });
         }
         if (notification === "SNAPSHOT_START") {
             if (!(payload in this.snapshots)) {
@@ -511,26 +489,4 @@ end
             }
         }
     },
-
-    kill: function(pid, signal, callback) {
-        signal = signal || 'SIGKILL';
-        callback = callback || function() {};
-        var killTree = true;
-        if (killTree) {
-            psTree(pid, function(err, children) {
-                [pid].concat(
-                    children.map(function(p) {
-                        return p.PID;
-                    })
-                ).forEach(function(tpid) {
-                    try { process.kill(tpid, signal); } catch (ex) {}
-                });
-                callback();
-            });
-        } else {
-            try { process.kill(pid, signal); } catch (ex) {}
-            callback();
-        }
-    },
-
 });

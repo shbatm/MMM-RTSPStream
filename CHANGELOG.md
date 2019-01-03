@@ -1,3 +1,18 @@
+## [2.0.0] - Add VLC Streaming Support
+
+Added:
+
+* VLC Window Overlay support added. Use `localPlayer: 'vlc',` in your module configuration.
+* Module-wide debug option added for more verbose output: `debug: true,`
+
+Changed:
+
+* `shutdownDelay` parameter moved from the individual stream config sections to the main module config so it only has to be provided once. It has also changed from milliseconds to seconds.  Warning has been added if the timeout is less time than it takes to make it through the loop of streams (causes unnecessary restarts).
+* `hideFfmpegOutput` configuration option removed from stream config in favor of global `debug` module option.
+* Fixed bug where transition timer was not properly reset after module resume.
+* Added `hwAccel` stream option for `ffmpeg` to attempt to use hardware accelerated decoding. Encoding still uses CPU unfortunatly.
+    - You must update the node-rtsp-stream-es6 package too. This is most easily done by deleting your node_modules folder and re-running `npm install` on the module.
+
 ## [1.2.2] - Auto-restart OMX Stream every X hours (Partially addresses #29)
 
 Changes:

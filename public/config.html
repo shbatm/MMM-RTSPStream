@@ -102,6 +102,7 @@
                 <label class="col-md-4 control-label" for="localPlayer">Local Screen Player to Use</label>
                 <div class="col-md-4">
                     <select id="localPlayer" name="localPlayer" class="form-control">
+                        <option value="vlc">VLC Player (HW-accelerated)</option>
                         <option value="omxplayer">OMXPlayer (HW-accelerated)</option>
                         <option value="ffmpeg">FFPMEG (SW decoder)</option>
                     </select>
@@ -152,11 +153,21 @@
                     <p class="help-block">Similar (but less critical) to moduleWidth. Adjust to the number of streams high to ensure other modules clear.</p>
                 </div>
             </div>
-            <div class="form-group omxplayer">
-                <label class="col-md-4 control-label" for="moduleOffset">Module Offset - Only applies when using OMXPlayer. </label>
+            <div class="form-group omxplayer vlc">
+                <label class="col-md-4 control-label" for="moduleOffset">Module Offset - Only applies when using OMXPlayer/VLC. </label>
                 <div class="col-md-4">
                     <textarea class="form-control" id="moduleOffset" name="moduleOffset"></textarea>
                     <p class="help-block">On some displays, the video does not properly line up with the box on the screen. Entering a pixel value will shift the video over by that amount. Default: 0 Values: Any number (no units) by itself will adjust both top/left the same amount, or you can specify left &amp; top adjustments separately (e.g. { left: 10, top: -10 })</p>
+                </div>
+            </div>
+            <div class="form-group ffmpeg">
+                <label class="col-md-4 control-label" for="s1shutdownDelay">Shutdown Delay</label>
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <input id="s1shutdownDelay" name="s1shutdownDelay" class="form-control" placeholder="12" value="12" type="text">
+                        <span class="input-group-addon">ms</span>
+                    </div>
+                    <p class="help-block">The time delay (in sec) between when the stream is hidden/closed and when the stream actually stops. When rotating through multiple streams this prevents closing the connection to a stream only to re-open a few seconds later when it comes back through the loop (which reduces the time delay when restarting a stream). To conserve resources on a slow device, you can set this to 0</p>
                 </div>
             </div>
         </fieldset>
@@ -209,7 +220,7 @@
                 <label class="col-md-4 control-label" for="s1hdUrl">Feed #1 HD URL</label>
                 <div class="col-md-4">
                     <input id="s1hdUrl" name="s1hdUrl" type="text" placeholder="" class="form-control input-md">
-                    <span class="help-block">The url of the HD RTSP stream for full screen OMXPlayer use.</span>
+                    <span class="help-block">The url of the HD RTSP stream for full screen OMXPlayer/VLC use.</span>
                 </div>
             </div>
             <div class="form-group count-1 snapshotDetails">
@@ -260,11 +271,11 @@
                     <p class="help-block">The height in px of the stream</p>
                 </div>
             </div>
-            <div class="form-group count-1 omxplayer">
+            <div class="form-group count-1 omxplayer vlc">
                 <label class="col-md-4 control-label" for="s1absPosition">Absolute Position</label>
                 <div class="col-md-4">
                     <input id="s1absPosition" name="s1absPosition" type="text" placeholder="optional" class="form-control input-md">
-                    <span class="help-block">Required only for OMXPlayer. Use this to set an exact position for the video instead of getting it automatically.  Format: "{ top: XX, right: XX, bottom: XX, left: XX }"</span>
+                    <span class="help-block">Required only for OMXPlayer or VLC. Use this to set an exact position for the video instead of getting it automatically.  Format: "{ top: XX, right: XX, bottom: XX, left: XX }"</span>
                 </div>
             </div>
             <div class="form-group count-1 ffmpeg">
@@ -272,28 +283,6 @@
                 <div class="col-md-4">
                     <input id="s1ffmpegPort" name="s1ffmpegPort" type="text" placeholder="9999" value="9999" class="form-control input-md">
                     <span class="help-block"><i>Only required for `ffmpeg`</i> Any available port to use for the ffmpeg websocket.<br><strong><i>Notes:</i> THIS IS NOT THE PORT FOR YOUR CAMERA</strong> Camera stream's port must be included in the URL above. This port must be unqiue for each stream added and cannot be used by another service on the server. This is a separate WebSocket from the the Socket.IO connection between the module's script and it's `node_helper.js`.</span>
-                </div>
-            </div>
-            <div class="form-group count-1 ffmpeg">
-                <label class="col-md-4 control-label" for="s1shutdownDelay">FFMPEG Shutdown Delay</label>
-                <div class="col-md-4">
-                    <div class="input-group">
-                        <input id="s1shutdownDelay" name="s1shutdownDelay" class="form-control" placeholder="10000" value="10000" type="text">
-                        <span class="input-group-addon">ms</span>
-                    </div>
-                    <p class="help-block">The time delay (in ms) between when the last client disconnects and the `ffmpeg` stream actually stops. Once created, the websocket continues to run in the background; however, the `ffmpeg` process will only process the camera's stream while there are active connections on the socket (e.g. someone is watching the video on the frontend). When rotating through multiple streams this prevents `ffmpeg` from closing its connection to a stream only to re-open a few seconds later when it comes back through the loop (which reduces the time delay when restarting a stream). To conserve resources on a slow device, you can set this to 0</p>
-                </div>
-            </div>
-            <div class="form-group count-1 ffmpeg">
-                <label class="col-md-4 control-label" for="s1hideFfmpegOutput">Hide FFMPEG Output in Log</label>
-                <div class="col-md-4">
-                    <label class="radio-inline" for="s1hideFfmpegOutput-0">
-                        <input type="radio" name="s1hideFfmpegOutput" id="s1hideFfmpegOutput-0" value="true" checked="checked"> Yes
-                    </label>
-                    <label class="radio-inline" for="s1hideFfmpegOutput-1">
-                        <input type="radio" name="s1hideFfmpegOutput" id="s1hideFfmpegOutput-1" value="false"> No
-                    </label>
-                    <p class="help-block">Whether or not to hide the detailed logs from FFMPEG in your console log. Set to no for debugging FFMPEG problems.</p>
                 </div>
             </div>
             <!-- Strem #1 Stop -->
@@ -372,7 +361,7 @@
                     </div>
                 </div>
             </div>
-            <div class="form-group count-2 omxplayer">
+            <div class="form-group count-2 omxplayer vlc">
                 <label class="col-md-4 control-label" for="s2absPosition">Absolute Position</label>
                 <div class="col-md-4">
                     <input id="s2absPosition" name="s2absPosition" type="text" placeholder="optional" class="form-control input-md">
@@ -382,26 +371,6 @@
                 <label class="col-md-4 control-label" for="s2ffmpegPort">FFMPEG WebSocket Port</label>
                 <div class="col-md-4">
                     <input id="s2ffmpegPort" name="s2ffmpegPort" type="text" placeholder="10000" value="10000" class="form-control input-md">
-                </div>
-            </div>
-            <div class="form-group count-2 ffmpeg">
-                <label class="col-md-4 control-label" for="s2shutdownDelay">FFMPEG Shutdown Delay</label>
-                <div class="col-md-4">
-                    <div class="input-group">
-                        <input id="s2shutdownDelay" name="s2shutdownDelay" class="form-control" placeholder="10000" value="10000" type="text">
-                        <span class="input-group-addon">ms</span>
-                    </div>
-                </div>
-            </div>
-            <div class="form-group count-2 ffmpeg">
-                <label class="col-md-4 control-label" for="s2hideFfmpegOutput">Hide FFMPEG Output in Log</label>
-                <div class="col-md-4">
-                    <label class="radio-inline" for="s2hideFfmpegOutput-0">
-                        <input type="radio" name="s2hideFfmpegOutput" id="s2hideFfmpegOutput-0" value="true" checked="checked"> Yes
-                    </label>
-                    <label class="radio-inline" for="s2hideFfmpegOutput-1">
-                        <input type="radio" name="s2hideFfmpegOutput" id="s2hideFfmpegOutput-1" value="false"> No
-                    </label>
                 </div>
             </div>
             <!-- Stream #2 Stop -->
@@ -480,7 +449,7 @@
                     </div>
                 </div>
             </div>
-            <div class="form-group count-3 omxplayer">
+            <div class="form-group count-3 omxplayer vlc">
                 <label class="col-md-4 control-label" for="s3absPosition">Absolute Position</label>
                 <div class="col-md-4">
                     <input id="s3absPosition" name="s3absPosition" type="text" placeholder="optional" class="form-control input-md">
@@ -490,26 +459,6 @@
                 <label class="col-md-4 control-label" for="s3ffmpegPort">FFMPEG WebSocket Port</label>
                 <div class="col-md-4">
                     <input id="s3ffmpegPort" name="s3ffmpegPort" type="text" placeholder="10001" value="10001" class="form-control input-md">
-                </div>
-            </div>
-            <div class="form-group count-3 ffmpeg">
-                <label class="col-md-4 control-label" for="s3shutdownDelay">FFMPEG Shutdown Delay</label>
-                <div class="col-md-4">
-                    <div class="input-group">
-                        <input id="s3shutdownDelay" name="s3shutdownDelay" class="form-control" placeholder="10000" value="10000" type="text">
-                        <span class="input-group-addon">ms</span>
-                    </div>
-                </div>
-            </div>
-            <div class="form-group count-3 ffmpeg">
-                <label class="col-md-4 control-label" for="s3hideFfmpegOutput">Hide FFMPEG Output in Log</label>
-                <div class="col-md-4">
-                    <label class="radio-inline" for="s3hideFfmpegOutput-0">
-                        <input type="radio" name="s3hideFfmpegOutput" id="s3hideFfmpegOutput-0" value="true" checked="checked"> Yes
-                    </label>
-                    <label class="radio-inline" for="s3hideFfmpegOutput-1">
-                        <input type="radio" name="s3hideFfmpegOutput" id="s3hideFfmpegOutput-1" value="false"> No
-                    </label>
                 </div>
             </div>
             <!-- Stream #3 Stop -->
@@ -588,7 +537,7 @@
                     </div>
                 </div>
             </div>
-            <div class="form-group count-4 omxplayer">
+            <div class="form-group count-4 omxplayer vlc">
                 <label class="col-md-4 control-label" for="s4absPosition">Absolute Position</label>
                 <div class="col-md-4">
                     <input id="s4absPosition" name="s4absPosition" type="text" placeholder="optional" class="form-control input-md">
@@ -598,26 +547,6 @@
                 <label class="col-md-4 control-label" for="s4ffmpegPort">FFMPEG WebSocket Port</label>
                 <div class="col-md-4">
                     <input id="s4ffmpegPort" name="s4ffmpegPort" type="text" placeholder="10002" value="10002" class="form-control input-md">
-                </div>
-            </div>
-            <div class="form-group count-4 ffmpeg">
-                <label class="col-md-4 control-label" for="s4shutdownDelay">FFMPEG Shutdown Delay</label>
-                <div class="col-md-4">
-                    <div class="input-group">
-                        <input id="s4shutdownDelay" name="s4shutdownDelay" class="form-control" placeholder="10000" value="10000" type="text">
-                        <span class="input-group-addon">ms</span>
-                    </div>
-                </div>
-            </div>
-            <div class="form-group count-4 ffmpeg">
-                <label class="col-md-4 control-label" for="s4hideFfmpegOutput">Hide FFMPEG Output in Log</label>
-                <div class="col-md-4">
-                    <label class="radio-inline" for="s4hideFfmpegOutput-0">
-                        <input type="radio" name="s4hideFfmpegOutput" id="s4hideFfmpegOutput-0" value="true" checked="checked"> Yes
-                    </label>
-                    <label class="radio-inline" for="s4hideFfmpegOutput-1">
-                        <input type="radio" name="s4hideFfmpegOutput" id="s4hideFfmpegOutput-1" value="false"> No
-                    </label>
                 </div>
             </div>
             <!-- Stream #4 Stop -->
@@ -653,8 +582,12 @@
         s = s + `config: {
         autoStart: ${$('input[name=autoStart]:checked').val()},
         rotateStreams: ${$('input[name=rotateStreams]:checked').val()},
-        rotateStreamTimeout: ${$('#rotateStreamTimeout').val()},
-        moduleWidth: ${$('#moduleWidth').val()},
+        `;
+        if ($('input[name=rotateStreams]:checked').val()) {
+            s = s +  `rotateStreamTimeout: ${$('#rotateStreamTimeout').val()},
+        `;
+        }
+        s = s + `moduleWidth: ${$('#moduleWidth').val()},
         moduleHeight: ${$('#moduleHeight').val()},
         localPlayer: '${$('#localPlayer').val()}',
         remotePlayer: '${$('#remotePlayer').val()}',
@@ -664,6 +597,10 @@
         if ($('#moduleOffset').val() !== "") {
             s = s + `moduleOffset: ${$('#moduleOffset').val()},
         `;
+        }
+        if (["ffmpeg", "vlc"].indexOf($("select[name=localPlayer]").val()) !== -1 || $("select[name=remotePlayer]").val() === "ffmpeg") {
+            s = s + `shutdownDelay: ${$('#s1shutdownDelay').val()},
+            `;
         }
         s = s + `stream1: {
             name: '${$('#s1Name').val()}',
@@ -683,216 +620,214 @@
         }
         if ($("input[name=showSnapWhenPaused]:checked").val() === "true" && $('#s1snapshotUrl').val() !== "") {
             s = s + `snapshotUrl: '${$('#s1snapshotUrl').val()}',
-            `; 
+            `;
         }
         if ($("input[name=showSnapWhenPaused]:checked").val() === "true") {
             s = s + `snapshotType: '${$('input[name=s1snapshotType]:checked').val()}',
-            `; 
+            `;
         }
         if ($("input[name=showSnapWhenPaused]:checked").val() === "true" && $('#s1snapshotRefresh').val() !== "") {
             s = s + `snapshotRefresh: ${$('#s1snapshotRefresh').val()},
-            `; 
+            `;
         }
         if ($('#s1width').val() !== "") {
             s = s + `width: ${$('#s1width').val()},
             `;
         } else {
             s = s + `width: undefined,
-            `; 
+            `;
         }
         if ($('#s1height').val() !== "") {
             s = s + `height: ${$('#s1height').val()},
             `;
         } else {
             s = s + `height: undefined,
-            `; 
+            `;
         }
-        if ($("select[name=localPlayer]").val() === "omxplayer" && $('#s1absPosition').val() !== "") {
+        if (['omxplayer','vlc'].indexOf($("select[name=localPlayer]").val()) && $('#s1absPosition').val() !== "") {
             s = s + `absPosition: ${$('#s1absPosition').val()},
             `;
         }
-        if ($("select[name=localPlayer]").val() === "ffmpeg" || $("select[name=localPlayer]").val() === "ffmpeg") {
+        if ($("select[name=localPlayer]").val() === "ffmpeg" || $("select[name=remotePlayer]").val() === "ffmpeg") {
             s = s + `ffmpegPort: ${$('#s1ffmpegPort').val()},
-            shutdownDelay: ${$('#s1shutdownDelay').val()},
-            hideFfmpegOutput: ${$('input[name=s1hideFfmpegOutput]:checked').val()},
             `;
         }
         s = s + `},
         `;
 
         if (parseInt($('input[type=radio][name=streamCount]:checked').val()) >= 2) {
-        s = s + `stream2: {
+            s = s + `stream2: {
             name: '${$('#s2Name').val()}',
             url: '${$('#s2url').val()}',
             `;
-        if ($('#s2protocol').val() === "udp") {
-            s = s + `protocol: 'udp',
+            if ($('#s2protocol').val() === "udp") {
+                s = s + `protocol: 'udp',
             `;
-        }
-        if ($('#s2frameRate') !== "") {
-            s = s + `frameRate: '${$('#s2frameRate').val()}',
+            }
+            if ($('#s2frameRate') !== "") {
+                s = s + `frameRate: '${$('#s2frameRate').val()}',
             `;
-        }
-        if ($('#s2hdUrl').val() !== "") {
-            s = s + `hdUrl: '${$('#s2hdUrl').val()}',
+            }
+            if ($('#s2hdUrl').val() !== "") {
+                s = s + `hdUrl: '${$('#s2hdUrl').val()}',
             `;
-        }
-        if ($("input[name=showSnapWhenPaused]:checked").val() === "true" && $('#s2snapshotUrl').val() !== "") {
-            s = s + `snapshotUrl: '${$('#s2snapshotUrl').val()}',
-            `; 
-        }
-        if ($("input[name=showSnapWhenPaused]:checked").val() === "true") {
-            s = s + `snapshotType: '${$('input[name=s2snapshotType]:checked').val()}',
-            `; 
-        }
-        if ($("input[name=showSnapWhenPaused]:checked").val() === "true" && $('#s2snapshotRefresh').val() !== "") {
-            s = s + `snapshotRefresh: ${$('#s2snapshotRefresh').val()},
-            `; 
-        }
-        if ($('#s2width').val() !== "") {
-            s = s + `width: ${$('#s2width').val()},
+            }
+            if ($("input[name=showSnapWhenPaused]:checked").val() === "true" && $('#s2snapshotUrl').val() !== "") {
+                s = s + `snapshotUrl: '${$('#s2snapshotUrl').val()}',
             `;
-        } else {
-            s = s + `width: undefined,
-            `; 
-        }
-        if ($('#s2height').val() !== "") {
-            s = s + `height: ${$('#s2height').val()},
+            }
+            if ($("input[name=showSnapWhenPaused]:checked").val() === "true") {
+                s = s + `snapshotType: '${$('input[name=s2snapshotType]:checked').val()}',
             `;
-        } else {
-            s = s + `height: undefined,
-            `; 
-        }
-        if ($("select[name=localPlayer]").val() === "omxplayer" && $('#s2absPosition').val() !== "") {
-            s = s + `absPosition: ${$('#s2absPosition').val()},
+            }
+            if ($("input[name=showSnapWhenPaused]:checked").val() === "true" && $('#s2snapshotRefresh').val() !== "") {
+                s = s + `snapshotRefresh: ${$('#s2snapshotRefresh').val()},
             `;
-        }
-        if ($("select[name=localPlayer]").val() === "ffmpeg" || $("select[name=localPlayer]").val() === "ffmpeg") {
-            s = s + `ffmpegPort: ${$('#s2ffmpegPort').val()},
+            }
+            if ($('#s2width').val() !== "") {
+                s = s + `width: ${$('#s2width').val()},
+            `;
+            } else {
+                s = s + `width: undefined,
+            `;
+            }
+            if ($('#s2height').val() !== "") {
+                s = s + `height: ${$('#s2height').val()},
+            `;
+            } else {
+                s = s + `height: undefined,
+            `;
+            }
+            if (['omxplayer','vlc'].indexOf($("select[name=localPlayer]").val()) && $('#s2absPosition').val() !== "") {
+                s = s + `absPosition: ${$('#s2absPosition').val()},
+            `;
+            }
+            if ($("select[name=localPlayer]").val() === "ffmpeg" || $("select[name=localPlayer]").val() === "ffmpeg") {
+                s = s + `ffmpegPort: ${$('#s2ffmpegPort').val()},
             shutdownDelay: ${$('#s2shutdownDelay').val()},
             hideFfmpegOutput: ${$('input[name=s2hideFfmpegOutput]:checked').val()},
             `;
-        }
-        s = s + `},
+            }
+            s = s + `},
         `;
         }
 
         if (parseInt($('input[type=radio][name=streamCount]:checked').val()) >= 3) {
-        s = s + `stream3: {
+            s = s + `stream3: {
             name: '${$('#s3Name').val()}',
             url: '${$('#s3url').val()}',
             `;
-        if ($('#s3protocol').val() === "udp") {
-            s = s + `protocol: 'udp',
+            if ($('#s3protocol').val() === "udp") {
+                s = s + `protocol: 'udp',
             `;
-        }
-        if ($('#s3frameRate') !== "") {
-            s = s + `frameRate: '${$('#s3frameRate').val()}',
+            }
+            if ($('#s3frameRate') !== "") {
+                s = s + `frameRate: '${$('#s3frameRate').val()}',
             `;
-        }
-        if ($('#s3hdUrl').val() !== "") {
-            s = s + `hdUrl: '${$('#s3hdUrl').val()}',
+            }
+            if ($('#s3hdUrl').val() !== "") {
+                s = s + `hdUrl: '${$('#s3hdUrl').val()}',
             `;
-        }
-        if ($("input[name=showSnapWhenPaused]:checked").val() === "true" && $('#s3snapshotUrl').val() !== "") {
-            s = s + `snapshotUrl: '${$('#s3snapshotUrl').val()}',
-            `; 
-        }
-        if ($("input[name=showSnapWhenPaused]:checked").val() === "true") {
-            s = s + `snapshotType: '${$('input[name=s3snapshotType]:checked').val()}',
-            `; 
-        }
-        if ($("input[name=showSnapWhenPaused]:checked").val() === "true" && $('#s3snapshotRefresh').val() !== "") {
-            s = s + `snapshotRefresh: ${$('#s3snapshotRefresh').val()},
-            `; 
-        }
-        if ($('#s3width').val() !== "") {
-            s = s + `width: ${$('#s3width').val()},
+            }
+            if ($("input[name=showSnapWhenPaused]:checked").val() === "true" && $('#s3snapshotUrl').val() !== "") {
+                s = s + `snapshotUrl: '${$('#s3snapshotUrl').val()}',
             `;
-        } else {
-            s = s + `width: undefined,
-            `; 
-        }
-        if ($('#s3height').val() !== "") {
-            s = s + `height: ${$('#s3height').val()},
+            }
+            if ($("input[name=showSnapWhenPaused]:checked").val() === "true") {
+                s = s + `snapshotType: '${$('input[name=s3snapshotType]:checked').val()}',
             `;
-        } else {
-            s = s + `height: undefined,
-            `; 
-        }
-        if ($("select[name=localPlayer]").val() === "omxplayer" && $('#s3absPosition').val() !== "") {
-            s = s + `absPosition: ${$('#s3absPosition').val()},
+            }
+            if ($("input[name=showSnapWhenPaused]:checked").val() === "true" && $('#s3snapshotRefresh').val() !== "") {
+                s = s + `snapshotRefresh: ${$('#s3snapshotRefresh').val()},
             `;
-        }
-        if ($("select[name=localPlayer]").val() === "ffmpeg" || $("select[name=localPlayer]").val() === "ffmpeg") {
-            s = s + `ffmpegPort: ${$('#s3ffmpegPort').val()},
+            }
+            if ($('#s3width').val() !== "") {
+                s = s + `width: ${$('#s3width').val()},
+            `;
+            } else {
+                s = s + `width: undefined,
+            `;
+            }
+            if ($('#s3height').val() !== "") {
+                s = s + `height: ${$('#s3height').val()},
+            `;
+            } else {
+                s = s + `height: undefined,
+            `;
+            }
+            if (['omxplayer','vlc'].indexOf($("select[name=localPlayer]").val()) && $('#s3absPosition').val() !== "") {
+                s = s + `absPosition: ${$('#s3absPosition').val()},
+            `;
+            }
+            if ($("select[name=localPlayer]").val() === "ffmpeg" || $("select[name=localPlayer]").val() === "ffmpeg") {
+                s = s + `ffmpegPort: ${$('#s3ffmpegPort').val()},
             shutdownDelay: ${$('#s3shutdownDelay').val()},
             hideFfmpegOutput: ${$('input[name=s3hideFfmpegOutput]:checked').val()},
             `;
-        }
-        s = s + `},
+            }
+            s = s + `},
         `;
         }
 
 
-        if (parseInt($('input[type=radio][name=streamCount]:checked').val()) >= 2) {
-        s = s + `stream4: {
+        if (parseInt($('input[type=radio][name=streamCount]:checked').val()) >= 4) {
+            s = s + `stream4: {
             name: '${$('#s4Name').val()}',
             url: '${$('#s4url').val()}',
             `;
-        if ($('#s4protocol').val() === "udp") {
-            s = s + `protocol: 'udp',
+            if ($('#s4protocol').val() === "udp") {
+                s = s + `protocol: 'udp',
             `;
-        }
-        if ($('#s4frameRate') !== "") {
-            s = s + `frameRate: '${$('#s4frameRate').val()}',
+            }
+            if ($('#s4frameRate') !== "") {
+                s = s + `frameRate: '${$('#s4frameRate').val()}',
             `;
-        }
-        if ($('#s4hdUrl').val() !== "") {
-            s = s + `hdUrl: '${$('#s4hdUrl').val()}',
+            }
+            if ($('#s4hdUrl').val() !== "") {
+                s = s + `hdUrl: '${$('#s4hdUrl').val()}',
             `;
-        }
-        if ($("input[name=showSnapWhenPaused]:checked").val() === "true" && $('#s4snapshotUrl').val() !== "") {
-            s = s + `snapshotUrl: '${$('#s4snapshotUrl').val()}',
-            `; 
-        }
-        if ($("input[name=showSnapWhenPaused]:checked").val() === "true") {
-            s = s + `snapshotType: '${$('input[name=s4snapshotType]:checked').val()}',
-            `; 
-        }
-        if ($("input[name=showSnapWhenPaused]:checked").val() === "true" && $('#s4snapshotRefresh').val() !== "") {
-            s = s + `snapshotRefresh: ${$('#s4snapshotRefresh').val()},
-            `; 
-        }
-        if ($('#s4width').val() !== "") {
-            s = s + `width: ${$('#s4width').val()},
+            }
+            if ($("input[name=showSnapWhenPaused]:checked").val() === "true" && $('#s4snapshotUrl').val() !== "") {
+                s = s + `snapshotUrl: '${$('#s4snapshotUrl').val()}',
             `;
-        } else {
-            s = s + `width: undefined,
-            `; 
-        }
-        if ($('#s4height').val() !== "") {
-            s = s + `height: ${$('#s4height').val()},
+            }
+            if ($("input[name=showSnapWhenPaused]:checked").val() === "true") {
+                s = s + `snapshotType: '${$('input[name=s4snapshotType]:checked').val()}',
             `;
-        } else {
-            s = s + `height: undefined,
-            `; 
-        }
-        if ($("select[name=localPlayer]").val() === "omxplayer" && $('#s4absPosition').val() !== "") {
-            s = s + `absPosition: ${$('#s4absPosition').val()},
+            }
+            if ($("input[name=showSnapWhenPaused]:checked").val() === "true" && $('#s4snapshotRefresh').val() !== "") {
+                s = s + `snapshotRefresh: ${$('#s4snapshotRefresh').val()},
             `;
-        }
-        if ($("select[name=localPlayer]").val() === "ffmpeg" || $("select[name=localPlayer]").val() === "ffmpeg") {
-            s = s + `ffmpegPort: ${$('#s4ffmpegPort').val()},
+            }
+            if ($('#s4width').val() !== "") {
+                s = s + `width: ${$('#s4width').val()},
+            `;
+            } else {
+                s = s + `width: undefined,
+            `;
+            }
+            if ($('#s4height').val() !== "") {
+                s = s + `height: ${$('#s4height').val()},
+            `;
+            } else {
+                s = s + `height: undefined,
+            `;
+            }
+            if (['omxplayer','vlc'].indexOf($("select[name=localPlayer]").val()) && $('#s4absPosition').val() !== "") {
+                s = s + `absPosition: ${$('#s4absPosition').val()},
+            `;
+            }
+            if ($("select[name=localPlayer]").val() === "ffmpeg" || $("select[name=localPlayer]").val() === "ffmpeg") {
+                s = s + `ffmpegPort: ${$('#s4ffmpegPort').val()},
             shutdownDelay: ${$('#s4shutdownDelay').val()},
             hideFfmpegOutput: ${$('input[name=s4hideFfmpegOutput]:checked').val()},
             `;
-        }
-        s = s + `},
+            }
+            s = s + `},
         `;
         }
 
-        s=s+`}
+        s = s + `}
 }`;
 
         $('#configResult').val(s);
@@ -937,6 +872,11 @@
                 $('.omxplayer').hide();
             } else {
                 $('.omxplayer').show();
+            }
+            if ($(this).val() !== "vlc") {
+                $('.vlc').hide();
+            } else {
+                $('.vlc').show();
             }
         });
         $('input[type=radio][name=streamCount]').change(function() {

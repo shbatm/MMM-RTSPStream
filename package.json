@@ -6,8 +6,9 @@
   "author": "shbatm",
   "license": "MIT",
   "scripts": {
-    "test": "node test_server.js",
-    "update": "npm install github:shbatm/node-rtsp-stream-es6"
+    "preinstall": "./scripts/preinstall.sh",
+    "postinstall": "sudo npm link pm2",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
     "datauri": "^1.0.5",
@@ -18,10 +19,5 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/shbatm/MMM-RTSPStream.git"
-  },
-  "scripts": {
-    "preinstall": "./scripts/preinstall.sh",
-    "postinstall": "sudo npm link pm2",
-    "test": "echo \"Error: no test specified\" && exit 1"
   }
 }

@@ -150,8 +150,8 @@ if check_no "Do you want to view instructions on how to configure the module?"; 
     echo "(1) Please add the following snippet into your modules array in your config.js:"
     echo -e "\033[33m    -------------- copy below this line --------------"
     echo -e "    {"
-    echo -e "        module: '$MODULE_NAME'",
-    echo -e "        position: 'top_right'"
+    echo -e "        module: '$MODULE_NAME',",
+    echo -e "        position: 'middle_center',"
     echo -e "        config: {"
     echo -e "            initialSetup: true"
     echo -e "        }"

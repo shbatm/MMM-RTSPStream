@@ -12,7 +12,7 @@ var global = this;
 Module.register("MMM-RTSPStream", {
     defaults: {
         initialSetup: false,
-        debug: true,
+        debug: false,
         autoStart: true,
         rotateStreams: false,
         rotateStreamTimeout: 10, // Seconds
@@ -23,6 +23,7 @@ Module.register("MMM-RTSPStream", {
         moduleWidth: 384, // Width = (Stream Width + 30px margin + 2px border) * # of Streams Wide
         moduleHeight: 272, // Height = (Stream Height + 30px margin + 2px border) * # of Streams Tall
         moduleOffset: 0, // Offset to align OMX player windows
+        shutdownDelay: 11, // Seconds
         animationSpeed: 1500,
         stream1: {
             name: 'BigBuckBunny Test',
@@ -33,10 +34,8 @@ Module.register("MMM-RTSPStream", {
             protocol: "tcp", // 'tcp' or 'udp'
             frameRate: "30",
             ffmpegPort: 9999,
-            width: undefined,
-            height: undefined,
-            shutdownDelay: 10000, // Miliseconds
-            hideFfmpegOutput: true,
+            width: 320,
+            height: 240,
             omxRestart: 24, // Hours
         },
 
@@ -83,26 +82,17 @@ Module.register("MMM-RTSPStream", {
 
             Object.keys(this.config).filter(key => key.startsWith("stream")).forEach((key) => {
                 self.streams[key] = { playing: false };
-                if (self.config[key].url || self.config[key].snapshotUrl) {
-                    self.sendSocketNotification('STREAM_CONFIG', { name: key, config: self.config[key] });
-                }
             });
         }
     },
 
     setupStreamRotation: function() {
         this.playing = this.config.autoStart;
-
         // Reference to function for manual transitions (TODO: FUTURE)
         this.manualTransition = this.rotateStream.bind(this);
-
         // Call the first stream
         this.manualTransition();
-
-        if (this.config.rotateStreams && Object.keys(this.streams).length > 1 && this.config.rotateStreamTimeout > 0) {
-            // We set a timer to cause the stream rotation
-            this.transitionTimer = setInterval(this.manualTransition, this.config.rotateStreamTimeout * 1000);
-        }
+        this.restartTimer();
     },
 
     rotateStream: function(goToIndex = -1, goDirection = 0) {
@@ -149,7 +139,7 @@ Module.register("MMM-RTSPStream", {
     restartTimer: function() {
         if (this.config.rotateStreams && Object.keys(this.streams).length > 1 && this.config.rotateStreamTimeout > 0) {
             // Restart the timer
-            clearInterval(this.transitionTimer);
+            if (this.transitionTimer) { clearInterval(this.transitionTimer); }
             this.transitionTimer = setInterval(this.manualTransition, this.config.rotateStreamTimeout * 1000);
         }
     },
@@ -444,7 +434,7 @@ Module.register("MMM-RTSPStream", {
             if (this.instance === "SERVER" && this.config.localPlayer === "omxplayer" && !omxStopAll) {
                 this.sendSocketNotification("STOP_OMXSTREAM", stream);
             } else if (this.instance === "SERVER" && this.config.localPlayer === "vlc" && !omxStopAll) {
-                this.sendSocketNotification("STOP_VLCSTREAM", { name: stream, delay: this.config[stream].shutdownDelay });
+                this.sendSocketNotification("STOP_VLCSTREAM", { name: stream, delay: this.config.shutdownDelay });
             } else if ("player" in this.streams[stream]) {
                 this.streams[stream].player.destroy();
                 delete this.streams[stream].player;
@@ -464,7 +454,7 @@ Module.register("MMM-RTSPStream", {
             omxStopAll = true;
         }
         if (this.instance === "SERVER" && this.config.localPlayer === "vlc") {
-            this.sendSocketNotification("STOP_ALL_VLCSTREAMS", this.config.stream1.shutdownDelay);
+            this.sendSocketNotification("STOP_ALL_VLCSTREAMS", this.config.shutdownDelay);
             omxStopAll = true;
         }
         Object.keys(this.streams).forEach(s => {
