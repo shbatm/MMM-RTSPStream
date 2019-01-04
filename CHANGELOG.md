@@ -1,3 +1,14 @@
+## [2.0.1] - Major OMX Bugfixes
+
+Changed:
+* App closing now spawns a new process to actually kill the OMX streams, it was getting cut off in the middle of closing everything due to it being an async process.
+* Wait for DOM to be shown before calling to start the streams--this was causing the Fullscreen on Resume problems.
+* Only start one stream at a time if we're in RotateStreams mode
+* Can jump to a specific stream in RotateStreams mode using notifications
+* Fixed and cleaned up all notifications and control from other modules
+* Fixed broken key bindings after MMM-KeyBindings upgrade
+* Fixed issue where module was trying to connect to PM2 while it was already connected (e.g. stop stream 1 and start stream 2 back to back).
+
 ## [2.0.0] - Add VLC Streaming Support
 
 Added:

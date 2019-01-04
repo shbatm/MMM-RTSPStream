@@ -16,6 +16,7 @@ const datauri = new DataURI();
 const psTree = require('ps-tree');
 const child_process = require('child_process');
 const environ = Object.assign(process.env, { DISPLAY: ":0" });
+const pm2 = require('pm2');
 
 module.exports = NodeHelper.create({
 
@@ -38,23 +39,28 @@ module.exports = NodeHelper.create({
     },
 
     stop: function() {
-        console.log("Shutting down MMM-RTSPStream streams...");
+        console.log("Shutting down MMM-RTSPStream streams that were using " + this.config.localPlayer);
 
         // Kill any running OMX Streams
-        if (Object.keys(this.omxStream).length > 0) {
-            this.stopAllOmxplayers();
+        if (this.config.localPlayer === "omxplayer") {
+            child_process.spawn(path.resolve(__dirname + '/scripts/onexit.js'), { stdio: 'ignore', detached: true });
         }
 
         // Kill any FFMPEG strems that are running
-        Object.keys(this.ffmpegStreams).forEach(s => this.ffmpegStreams[s].stopStream(0));
+        if (this.config.localPlayer === "ffmpeg" || this.config.remotePlayer === "ffmpeg") {
+            Object.keys(this.ffmpegStreams).forEach(s => this.ffmpegStreams[s].stopStream(0));
+        }
 
         // Kill any VLC Streams that are open
-        if (this.dp2) {
-            console.log("Killing DevilsPie2...");
-            this.dp2.kill();
-            this.dp2 = undefined;
+        if (this.config.localPlayer === "vlc") {
+            if (this.dp2) {
+                console.log("Killing DevilsPie2...");
+                this.dp2.stderr.removeAllListeners();
+                this.dp2.kill();
+                this.dp2 = undefined;
+            }
+            this.stopAllVlcPlayers();
         }
-        this.stopAllVlcPlayers();
     },
 
     startListener: function(name) {
@@ -108,7 +114,7 @@ module.exports = NodeHelper.create({
 
     getVlcPlayer: function(payload) {
         var self = this;
-        var opts = { detached: false, env: environ };
+        var opts = { detached: false, env: environ, stdio: ['ignore', 'ignore', 'pipe'] };
         var vlcCmd = `vlc`;
         var positions = {};
         let dp2Check = false;
@@ -179,6 +185,7 @@ end
 
         var startDp2 = () => {
             if (this.dp2) {
+                this.dp2.stderr.removeAllListeners();
                 this.dp2.kill();
                 this.dp2 = undefined;
             }
@@ -212,11 +219,12 @@ end
         });
     },
 
-    stopVlcPlayer: function(name, delay) {
+    stopVlcPlayer: function(name, delay, callback) {
         let quitVlc = () => {
             console.log(`Stopping stream ${name}`);
             if (name in this.vlcStream) {
                 try {
+                    this.vlcStream[name].stderr.removeAllListeners();
                     this.vlcStream[name].kill();
                 } catch (err) {
                     console.log(err);
@@ -240,9 +248,10 @@ end
                 quitVlc();
             }
         }
+        if (typeof callback === "function") { callback(); }
     },
 
-    stopAllVlcPlayers: function(delay) {
+    stopAllVlcPlayers: function(delay, callback) {
         if (Object.keys(this.vlcStream).length > 0) {
             console.log((delay) ? "Delayed exit of all VLC Streams in " + delay + " sec..." : "Killing All VLC Streams...");
             Object.keys(this.vlcStream).forEach(s => {
@@ -250,6 +259,7 @@ end
                     this.stopVlcPlayer(s, delay);
                 } else {
                     try {
+                        this.vlcStream[s].stderr.removeAllListeners();
                         this.vlcStream[s].kill();
                         delete this.vlcStream[s];
                         delete this.vlcDelayedExit[s];
@@ -259,10 +269,18 @@ end
                 }
             });
         }
+        if (typeof callback === "function") { callback(); }
     },
 
     getOmxplayer: function(payload) {
         var self = this;
+
+        if (this.pm2Connected) {
+            // Busy doing something, wait a half sec.
+            setTimeout(() => { this.getOmxplayer(payload); }, 500);
+            return;
+        }
+
         var opts = { detached: false, stdio: 'ignore' };
 
         var omxCmd = `omxplayer`;
@@ -276,7 +294,7 @@ end
                 this.config[s.name].url
             ];
             if (!("fullscreen" in s)) {
-                args.unshift("--win", `${s.box.left}, ${s.box.top}, ${s.box.right}, ${s.box.bottom}`);
+                args.unshift("--win", `${s.box.left},${s.box.top},${s.box.right},${s.box.bottom}`);
             } else {
                 if ("hdUrl" in this.config[s.name]) {
                     args.pop();
@@ -289,7 +307,7 @@ end
             if (this.config.debug) {
                 args.unshift("-I");
             }
-            console.log(`Starting stream ${s.name} with args: ${JSON.stringify(args,null,4)}`);
+            console.log(`Starting stream ${s.name} using: ${omxCmd} ${args.join(' ')}`);
 
             argsM.push(args);
             namesM.push("omx_" + s.name);
@@ -298,18 +316,23 @@ end
         // this.omxStream[payload.name] = child_process.spawn(omxCmd, args, opts);
 
         // PM2 Test
-        var pm2 = require('pm2');
 
         pm2.connect((err) => {
             if (err) {
                 console.error(err);
-                process.exit(2);
+                return;
             }
+            this.pm2Connected = true;
 
             // Stops the Daemon if it's already started
             pm2.list((err, list) => {
                 var errCB = (err, apps) => {
-                    if (err) { console.log(err); }
+                    if (err) {
+                        console.log(err);
+                        pm2.disconnect();
+                        this.pm2Connected = false;
+                        return;
+                    }
                 };
 
                 var startProcs = () => {
@@ -344,6 +367,7 @@ end
                         });
                     } else {
                         pm2.disconnect(); // Disconnects from PM2
+                        this.pm2Connected = false;
                     }
                 };
 
@@ -362,41 +386,63 @@ end
         });
     },
 
-    stopOmxplayer: function(name) {
+    stopOmxplayer: function(name, callback) {
+        if (this.pm2Connected) {
+            // Busy doing something, wait a half sec.
+            console.info("PM2: waiting my turn...");
+            setTimeout(() => { this.stopOmxplayer(name, callback); }, 500);
+            return;
+        }
+
         console.log(`Stopping stream ${name}`);
-        var pm2 = require('pm2');
 
         pm2.connect((err) => {
             if (err) {
                 console.error(err);
+                return;
             }
+            this.pm2Connected = true;
 
             console.log("Stopping PM2 process: omx_" + name);
-            pm2.stop("omx_" + name, function(err, apps) {
+            pm2.stop("omx_" + name, (err2, apps) => {
+                if (!err2) {
+                    clearTimeout(this.omxStreamTimeouts[name]);
+                    delete this.omxStream[name];
+                } else {
+                    console.log(err2);
+                }
                 pm2.disconnect();
-                if (err) { console.log(err); }
+                this.pm2Connected = false;
+
+                if (typeof callback === "function") { callback(); }
             });
         });
 
-        clearTimeout(this.omxStreamTimeouts[name]);
-        delete this.omxStream[name];
     },
 
-    stopAllOmxplayers: function() {
-        console.log('PM2: Stopping all OMXPlayer Streams...');
-        var pm2 = require('pm2');
+    stopAllOmxplayers: function(callback) {
+        if (this.pm2Connected) {
+            // Busy doing something, wait a half sec.
+            setTimeout(() => { this.stopAllOmxplayers(callback); }, 500);
+            return;
+        }
 
+        console.log('PM2: Stopping all OMXPlayer Streams...');
         pm2.connect((err) => {
             if (err) {
                 console.error(err);
+                return;
             }
-            // console.log('PM2: Connected.');
-
+            this.pm2Connected = true;
+            
             // Stops the Daemon if it's already started
-            pm2.list((err, list) => {
-                var errCB = (err, apps) => {
-                    if (err) { console.log(err); }
-                };
+            pm2.list((err2, list) => {
+                if (err2) {
+                    console.log(err2);
+                    pm2.disconnect();
+                    this.pm2Connected = false;
+                    return;
+                }
 
                 var toStop = [];
 
@@ -410,9 +456,12 @@ end
                     } else {
                         pm2.disconnect();
                         this.omxStream = {};
+                        this.pm2Connected = false;
                         Object.keys(this.omxStreamTimeouts).forEach(s => {
                             clearTimeout(s);
                         });
+                        if (typeof callback === "function") { callback(); }
+                        return;
                     }
                 };
 
@@ -425,7 +474,18 @@ end
                         }
                     }
                 }
-
+                // New Way:
+                // let omxProcs = list.filter(o => o.name.startsWith("omx_"));
+                // if (omxProcs) {
+                //     console.log(Object.keys(omxProcs));
+                //     omxProcs.forEach(o => {
+                //         console.log(`PM2: Checking if ${o.name} is running...`);
+                //         if ("status" in o.pm2_env && o.pm2_env.status === "online") {
+                //             console.log(`PM2: Stopping ${o.name}...`);
+                //             toStop.push(o.name);
+                //         }
+                //     });
+                // }
                 stopProcs();
             });
         });
