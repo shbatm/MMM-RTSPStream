@@ -127,7 +127,7 @@ module.exports = NodeHelper.create({
                 return;
             } else {
                 // Otherwise, Generate the VLC window
-                var args = ["-I", "dummy", "--no-video-deco", "--no-embedded-video", `--video-title=${s.name}`,
+                var args = ["-I", "dummy", '--video-on-top', "--no-video-deco", "--no-embedded-video", `--video-title=${s.name}`,
                     this.config[s.name].url
                 ];
                 if ("fullscreen" in s && "hdUrl" in this.config[s.name]) {
