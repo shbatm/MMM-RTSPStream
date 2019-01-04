@@ -558,6 +558,9 @@ Module.register("MMM-RTSPStream", {
             if (notification === 'RTSP-PLAY') {
                 if (payload === 'all') {
                     this.playAll();
+                } else if (typeof payload === "object" && "stopOthers" in payload) {
+                    this.stopAllStreams();
+                    ps = this.playStream(payload.stream);
                 } else {
                     ps = this.playStream(payload);
                 }

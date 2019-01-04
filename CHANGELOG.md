@@ -12,6 +12,7 @@ Changed:
 * Fixed bug where transition timer was not properly reset after module resume.
 * Added `hwAccel` stream option for `ffmpeg` to attempt to use hardware accelerated decoding. Encoding still uses CPU unfortunatly.
     - You must update the node-rtsp-stream-es6 package too. This is most easily done by deleting your node_modules folder and re-running `npm install` on the module.
+* `RTSP-PLAY` notification now accepts an object `{ stream: "streamX", stopOthers: true }` which will stop other streams before starting the new stream.
 
 ## [1.2.2] - Auto-restart OMX Stream every X hours (Partially addresses #29)
 
