@@ -104,7 +104,7 @@ Module.register("MMM-RTSPStream", {
         // Update the current index
         if (goToStream && goToStream in this.streams) {
             this.currentStream = goToStream; // Go to a specific slide if in range
-        } else  { 
+        } else {
             if (goDirection === 0) {
                 this.currentIndex += 1; // Normal Transition, Increment by 1
             } else {
@@ -553,6 +553,30 @@ Module.register("MMM-RTSPStream", {
                 });
                 this.keyHandler = KeyHandler.create(this.name, this.keyBindings);
             }
+
+            let api = {
+                module: this.name,
+                path: "stream",
+                actions: {
+                    play: {
+                        notification: "RTSP-PLAY",
+                        prettyName: "Play Stream(s)"
+                    },
+                    stop: {
+                        notification: "RTSP-STOP",
+                        prettyName: "Stop Stream(s)"
+                    },
+                    fullscreen: {
+                        notification: "RTSP-PLAY-FULLSCREEN",
+                        prettyName: "Play Fullscreen"
+                    },
+                    window: {
+                        notification: "RSTP-PLAY-WINDOW",
+                        prettyName: "Play in Window"
+                    },
+                }
+            };
+            this.sendNotification("REGISTER_API", api);
         }
         if (this.keyHandler && this.keyHandler.validate(notification, payload)) { return; }
 
@@ -571,6 +595,7 @@ Module.register("MMM-RTSPStream", {
         if (notification === 'RTSP-PLAY' && this.instance === "SERVER") {
             if (!payload || payload === {} || payload === 'all') {
                 if (this.config.rotateStreams) {
+                    this.playing = true;
                     this.manualTransition(undefined, 1);
                     this.restartTimer();
                 } else {
@@ -578,6 +603,7 @@ Module.register("MMM-RTSPStream", {
                 }
             } else {
                 if (this.config.rotateStreams) {
+                    this.playing = true;
                     this.manualTransition(payload);
                     this.restartTimer();
                 } else {
