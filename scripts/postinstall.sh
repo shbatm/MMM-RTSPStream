@@ -11,6 +11,6 @@ if [[ $( which pm2 ) != '/usr/bin/pm2' ]]; then
 	sudo npm i -g install pm2
 fi
 
-npm link pm2
+
 
 exit 0;
