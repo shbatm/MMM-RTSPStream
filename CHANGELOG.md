@@ -1,4 +1,9 @@
-## [2.0.1] - Major OMX Bugfixes
+## [2.0.2-dev] - Attempted fix for OMXPlayer with OpenGL (Fake KMS) enabled
+
+Changed:
+* Added "--no-osd" command line switch to omxplayer command.  Per [this thread](https://www.raspberrypi.org/forums/viewtopic.php?t=159853), "omxplayer uses OpenVG for subtitles and status messsages which is not compatible with [the OpenGL (Fake KMS)] driver."
+
+## [2.0.1-dev] - Major OMX Bugfixes
 
 Changed:
 * App closing now spawns a new process to actually kill the OMX streams, it was getting cut off in the middle of closing everything due to it being an async process.

@@ -290,7 +290,7 @@ end
         var argsM = [];
 
         payload.forEach(s => {
-            var args = ["--live", "--video_queue", "4", "--fps", "30",
+            var args = ["--live", "--video_queue", "4", "--fps", "30", "--no-osd",
                 this.config[s.name].url
             ];
             if (!("fullscreen" in s)) {
