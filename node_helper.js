@@ -46,7 +46,7 @@ module.exports = NodeHelper.create({
     startListener: function(name) {
         if ((this.players.localPlayer === 'ffmpeg' || this.players.remotePlayer === 'ffmpeg') && this.config[name].url) {
             this.streams[name] = new Stream(this.config[name]);
-            this.streams[name].startListener();
+            this.streams[name].start();
         }
     },
 
