@@ -504,7 +504,7 @@ Module.register("MMM-RTSPStream", {
             if (notification === 'RTSP-PLAY-FULLSCREEN') {
                 ps = this.playStream(payload, true);
             }
-            if (notification === 'RSTP-PLAY-WINDOW') {
+            if (notification === 'RTSP-PLAY-WINDOW') {
                 ps = this.playStream(payload.name, false, payload.box);
             }
             if (notification === 'RTSP-STOP') {
