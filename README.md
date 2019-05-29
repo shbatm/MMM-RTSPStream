@@ -128,6 +128,9 @@ config: {
 | `absPosition`    | *Only required for OMXPlayer* Provide an absolute potiion to show the stream. This overrides the automatic window and moduleOffset settings.<br>*Format:* `{ top: XX, right: XX, bottom: XX, left: XX }` where `XX` is the pixel position on the screen.
 | `ffmpegPort`           | *Only required for `ffmpeg`* Any available port to use for the ffmpeg websocket.<br>***Notes:*** **THIS IS NOT THE PORT FOR YOUR CAMERA** Camera stream's port must be included in the URL above. This port must be unqiue for each stream added and cannot be used by another service on the server. This is a separate WebSocket from the the Socket.IO connection between the module's script and it's `node_helper.js`.<br>*Default:* `9999`
 | `hwAccel` | *Only required for `ffmpeg`* Attempt to use Hardware Accelerated Decoding with `ffmpeg`.<br>*Default:* `false`
+| `muted` | Disable sound (*OMXPlayer only*)<br>*Default:* `false`
+| `timeout` | Timeout for stalled file/network operations (*OMXPlayer only*)<br>*Default:* `10` (seconds)
+| `rotateDegree` | Set orientation of video (*OMXPlayer only*)<br>Available values: `0`, `90`, `180` or `270`<br>*Default:* `0`
 
 #### Testing a camera feed
 

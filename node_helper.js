@@ -304,6 +304,16 @@ end
             if (this.config[s.name].protocol !== "udp") {
                 args.unshift("--avdict", "rtsp_transport:tcp");
             }
+            if (this.config[s.name].muted) {
+                args.unshift("-n", "-1");
+            }
+            if ("timeout" in this.config[s.name] && this.config[s.name].timeout) {
+                args.unshift("--timeout", this.config[s.name].timeout);
+            }
+            if ("rotateDegree" in this.config[s.name] && this.config[s.name].rotateDegree) {
+                args.unshift("--orientation", this.config[s.name].rotateDegree);
+                args.unshift("--aspect-mode", "stretch");
+            }
             if (this.config.debug) {
                 args.unshift("-I");
             }
