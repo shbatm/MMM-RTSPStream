@@ -583,7 +583,7 @@ Module.register("MMM-RTSPStream", {
         // Handle USER_PRESENCE events from the MMM-PIR-sensor Module
         if (notification === "USER_PRESENCE") {
             if (payload) {
-                if (this.suspsended && this.suspendedForUserPresence) {
+                if (this.suspended && this.suspendedForUserPresence) {
                     this.resumed();
                 }
                 this.suspendedForUserPresence = false;
