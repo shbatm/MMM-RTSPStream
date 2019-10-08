@@ -1,19 +1,19 @@
 {
   "name": "MMM-RTSPStream",
-  "version": "1.2.2",
+  "version": "2.0.2-dev",
   "description": "Magic Mirror 2 module to stream video from an RTSP stream",
   "main": "MMM-RTSPStream.js",
   "author": "shbatm",
   "license": "MIT",
   "scripts": {
-    "test": "node test_server.js",
-    "update": "npm install github:shbatm/node-rtsp-stream-es6",
-    "postinstall": "sudo npm i -g http-server"
+    "preinstall": "./scripts/preinstall.sh",
+    "postinstall": "./scripts/postinstall.sh",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
     "datauri": "^1.0.5",
     "node-rtsp-stream-es6": "github:shbatm/node-rtsp-stream-es6",
-    "pm2": "^2.6.1",
+    "pm2": "^3.2.4",
     "ps-tree": "^1.1.0",
     "ws": "^3.0.0"
   },
