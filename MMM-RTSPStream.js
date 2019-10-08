@@ -384,7 +384,7 @@ Module.register("MMM-RTSPStream", {
                 payload.fullscreen = true;
             } else {
                 box = {
-                    top: Math.round(rect.top + offset.top), // Compensate for Margins 
+                    top: Math.round(rect.top + offset.top), // Compensate for Margins
                     right: Math.round(rect.right + offset.left), // Compensate for Margins
                     bottom: Math.round(rect.bottom + offset.top), // Compensate for Margins
                     left: Math.round(rect.left + offset.left) // Compensate for Margins
@@ -700,13 +700,17 @@ Module.register("MMM-RTSPStream", {
         }
         if (notification === "SNAPSHOT") {
             if (payload.image) {
-                var canvasId = (this.config.rotateStreams) ? "canvas_" : "canvas_" + payload.name;
-                var canvas = document.getElementById(canvasId);
-                var ctx = canvas.getContext('2d');
-                var img = new Image();
-                img.onload = () => {
-                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                };
+                var img = document.getElementById("img_" + payload.name)
+                if (img === null) {
+                    iw = document.getElementById("iw_" + payload.name)
+                    img = document.createElement("img");
+                    img.style.width = "100%";
+                    img.style.height = "100%";
+                    img.id = "img_" + payload.name;
+                    console.log(iw, img)
+                    img.className = "MMM-RTSPStream snapshot"
+                    iw.appendChild(img)
+                }
                 img.src = payload.buffer;
             }
         }
