@@ -287,6 +287,8 @@ end
         var namesM = [];
 
         var argsM = [];
+        
+        this.omxStreamTimeouts = [];
 
         payload.forEach(s => {
             var args = ["--live", "--video_queue", "4", "--fps", "30", "--no-osd",
