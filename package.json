@@ -8,17 +8,21 @@
   "scripts": {
     "preinstall": "./scripts/preinstall.sh",
     "postinstall": "./scripts/postinstall.sh",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "snyk-protect": "snyk protect",
+    "prepublish": "npm run snyk-protect"
   },
   "dependencies": {
     "datauri": "^1.0.5",
     "node-rtsp-stream-es6": "github:shbatm/node-rtsp-stream-es6",
     "pm2": "^3.2.4",
     "ps-tree": "^1.1.0",
-    "ws": "^3.0.0"
+    "ws": "^3.0.0",
+    "snyk": "^1.317.0"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/shbatm/MMM-RTSPStream.git"
-  }
+  },
+  "snyk": true
 }
