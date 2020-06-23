@@ -7,7 +7,7 @@
 # Usage         : ./postinstall.sh
 #==============================================================================
 
-if [[ $( which pm2 ) != '/usr/bin/pm2' ]]; then
+if [[ -f '/usr/bin/pm2' ]]; then
 	sudo npm i -g install pm2
 fi
 
