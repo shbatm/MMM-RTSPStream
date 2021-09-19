@@ -75,7 +75,7 @@ npm install
 
 ## Configuration options
 
-It is highly recommended you use the tool included. Several sample configurations are available on [this wiki page](https://github.com/shbatm/MMM-RSTPStream/wiki/Sample-Configurations), detailed options are listed below.
+It is highly recommended you use the tool included. Several sample configurations are available on [this wiki page](https://github.com/shbatm/MMM-RTSPStream/wiki/Sample-Configurations), detailed options are listed below.
 
 | Option           | Description
 |----------------- |-----------
