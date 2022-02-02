@@ -4,6 +4,11 @@ This is a module for the [MagicMirror²](https://github.com/MichMich/MagicMirror
 
 This module will show a live RTSP video stream and/or periodic snapshots on the Magic Mirror from any IP Security Camera which supports the [RTSP protocol](https://github.com/shbatm/MMM-RTSPStream/wiki/Stream-URLs-for-Various-Cameras) and/or can serve a snapshot periodically.
 
+> :warning: This module is no longer being actively developed. I will accept PRs and leave the repo active, but will not be directly supporting any issues. If anyone is interested in assuming ownership of the module, please contact @shbatm. :warning:
+> 
+> Why?
+>  - I am no longer using this module on my own mirror. After several years, I found that I use the snapshots much more frequently than I streamed the actual cameras, which can be performed by much simpler modules and methods. To enable streaming, WebRTC (like [MMM-HomeAssistant-WebRTC](https://github.com/Anonym-tsk/MMM-HomeAssistant-WebRTC)) is a newer and better standard with much lower server overhead and latency for delivering RTSP Streams to the frontend than any of the options used here, in the future, this will be the method  I focus on and I will not try to shoehorn another technology into this module.
+
 ### Features:
 
 * Supports single or multiple camera streams/snapshots
