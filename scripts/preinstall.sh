@@ -9,7 +9,7 @@
 
 
 # Check for required Debian packages
-PACKAGE="devilspie2 wmctrl ffmpeg omxplayer vlc"
+PACKAGE="devilspie2 wmctrl"
 
 if [[ $(dpkg-query -W -f='${Status}\n' $PACKAGE 2>/dev/null | grep -c "ok installed") -lt 5 ]];
 then
@@ -18,6 +18,17 @@ then
     echo ""
     echo -e "\e[96mInstalling helper tools: devilspie2 and wmctrl...\e[90m"
     sudo apt install -y $PACKAGE;
+    echo ""
+    echo ""
 else
     echo "$PACKAGE is already installed. Moving on.";
 fi
+
+echo ""
+echo ""
+echo -e "\033[1;32mPlease ensure you have installed ffmpeg, omxplayer, or vlc depending on your"
+echo -e "specific platform and use case. This script won't do that for you.\033[0m"
+echo ""
+echo ""
+
+exit 0;

@@ -299,7 +299,8 @@ Module.register("MMM-RTSPStream", {
     getInnerWrapper: function(stream) {
         var innerWrapper = document.createElement("div");
         innerWrapper.className = "MMM-RTSPStream innerWrapper";
-        if (stream) { innerWrapper.style.cssText = this.getCanvasSize(this.config[stream]); } else { innerWrapper.style.cssText = this.getCanvasSize(this.config.stream1); }
+        if (!stream) { stream = "stream1" };
+        innerWrapper.style.cssText = this.getCanvasSize(this.config[stream]);
         innerWrapper.id = "iw_" + stream;
         return innerWrapper;
     },
