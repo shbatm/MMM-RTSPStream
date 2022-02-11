@@ -45,7 +45,7 @@ This module will show a live RTSP video stream and/or periodic snapshots on the 
 If you followed the default installation instructions for the [Magic Mirror²](https://github.com/MichMich/MagicMirror) project, you should be able to use the automatic installer.
 The following command will download the installer and execute it:
 ```bash
-bash -c "$(curl -s https://raw.githubusercontent.com/shbatm/MMM-RTSPStream/develop/scripts/installer.sh)"
+bash -c "$(curl -s https://raw.githubusercontent.com/shbatm/MMM-RTSPStream/master/scripts/installer.sh)"
 ```
 
 ## Updating after a Module Update:
