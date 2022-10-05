@@ -214,6 +214,9 @@ module.exports = NodeHelper.create({
                         s.box.right - s.box.left
                     }, ${s.box.bottom - s.box.top}`;
                 }
+                if (this.config[s.name].muted) {
+                    args.unshift("--no-audio");
+                }
                 console.log(
                     `Starting stream ${s.name} using VLC with args ${args.join(
                         " "
