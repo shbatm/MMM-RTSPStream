@@ -37,6 +37,7 @@ Module.register("MMM-RTSPStream", {
             width: 320,
             height: 240,
             omxRestart: 24, // Hours
+            muted: false
         },
 
         // MMM-KeyBindings Settings

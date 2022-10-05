@@ -5,9 +5,10 @@ This is a module for the [MagicMirror²](https://github.com/MichMich/MagicMirror
 This module will show a live RTSP video stream and/or periodic snapshots on the Magic Mirror from any IP Security Camera which supports the [RTSP protocol](https://github.com/shbatm/MMM-RTSPStream/wiki/Stream-URLs-for-Various-Cameras) and/or can serve a snapshot periodically.
 
 > :warning: This module is no longer being actively developed. I will accept PRs and leave the repo active, but will not be directly supporting any issues. If anyone is interested in assuming ownership of the module, please contact @shbatm. :warning:
-> 
+>
 > Why?
 >  - I am no longer using this module on my own mirror. After several years, I found that I use the snapshots much more frequently than I streamed the actual cameras, which can be performed by much simpler modules and methods. To enable streaming, WebRTC (like [MMM-HomeAssistant-WebRTC](https://github.com/Anonym-tsk/MMM-HomeAssistant-WebRTC)) is a newer and better standard with much lower server overhead and latency for delivering RTSP Streams to the frontend than any of the options used here, in the future, this will be the method  I focus on and I will not try to shoehorn another technology into this module.
+>  - Update 5-Oct-2022: See alternative module [MMM-RTSPtoWeb](https://github.com/shbatm/MMM-RTSPtoWeb) for a drastically simplified module relying on WebRTC and a backend server.
 
 ### Features:
 
@@ -26,8 +27,8 @@ This module will show a live RTSP video stream and/or periodic snapshots on the 
 ### Dependencies:
 
 * The following packages are required for the module to function fully and the installer will attempt to install them with `apt`:
-    * `ffmpeg`, `omxplayer`, `vlc`, `devilspie2`, `wmctrl` 
-* For hardware-accelerated streaming, `vlc` or `omxplayer` is required. 
+    * `ffmpeg`, `omxplayer`, `vlc`, `devilspie2`, `wmctrl`
+* For hardware-accelerated streaming, `vlc` or `omxplayer` is required.
 * For manipulating VLC's windows, `devilspie2` and `wmctrl` are used.
 * For software-decoded streaming and/or remote browser viewing:
     - Requires `jsmpeg` for front-end display of stream.
@@ -95,7 +96,6 @@ It is highly recommended you use the tool included. Several sample configuration
 | `moduleHeight` | Similar (but less critical) to `moduleWidth`. Adjust to the number of streams high to ensure other modules clear.<br>*Default:* `240px`
 | `moduleOffset` | *Only applies when using OMXPlayer.* On some displays, the video does not properly line up with the box on the screen because of differences between JavaScript's reporting and the native display.  Entering a pixel value will shift the video over by that amount.<br>*Default:* `0` *Values:* Any number (no units) by itself will adjust both top/left the same amount, or you can specify left & top adjustments separately (e.g. `moduleOffset: { left: 10, top: -10 }`
 | `shutdownDelay`  | The time delay (in sec) between when the last client disconnects and the `ffmpeg` or `vlc` stream actually stops.  Once created, the websocket continues to run in the background; however, the `ffmpeg` process will only process the camera's stream while there are active connections on the socket (e.g. someone is watching the video on the frontend). When rotating through multiple streams this prevents closing the connection to a stream only to re-open a few seconds later when it comes back through the loop (which reduces the time delay when restarting a stream). To conserve resources on a slow device, you can set this to 0<br>*Default:* 11 (sec)
-| `omxRestart` | Automatically restart the OMX Stream every X hours.<br>*Default:* `24` (hours).
 | `debug` | Set to `true` to show additional logging information.
 | `streamX` | The individual stream configuration options. See table below for more details.
 
@@ -133,9 +133,10 @@ config: {
 | `absPosition`    | *Only required for OMXPlayer* Provide an absolute potiion to show the stream. This overrides the automatic window and moduleOffset settings.<br>*Format:* `{ top: XX, right: XX, bottom: XX, left: XX }` where `XX` is the pixel position on the screen.
 | `ffmpegPort`           | *Only required for `ffmpeg`* Any available port to use for the ffmpeg websocket.<br>***Notes:*** **THIS IS NOT THE PORT FOR YOUR CAMERA** Camera stream's port must be included in the URL above. This port must be unqiue for each stream added and cannot be used by another service on the server. This is a separate WebSocket from the the Socket.IO connection between the module's script and it's `node_helper.js`.<br>*Default:* `9999`
 | `hwAccel` | *Only required for `ffmpeg`* Attempt to use Hardware Accelerated Decoding with `ffmpeg`.<br>*Default:* `false`
-| `muted` | Disable sound (*OMXPlayer only*)<br>*Default:* `false`
+| `muted` | Disable sound (*OMXPlayer and VLC only*)<br>*Default:* `false`
 | `timeout` | Timeout for stalled file/network operations (*OMXPlayer only*)<br>*Default:* `10` (seconds)
 | `rotateDegree` | Set orientation of video (*OMXPlayer only*)<br>Available values: `0`, `90`, `180` or `270`<br>*Default:* `0`
+| `omxRestart` | Automatically restart the OMX Stream every X hours.<br>*Default:* `24` (hours).
 
 #### Testing a camera feed
 
@@ -157,7 +158,7 @@ this.sendNotification("RTSP-PLAY", "streamX"); // Play a particular stream (when
 this.sendNotification("RTSP-PLAY-FULLSCREEN", "streamX"); // Play a particular stream fullscreen (when using OMXPLAYER)
 this.sendNotification("RTSP-PLAY-WINDOW", { name:"streamX", box: { top: XX, right: XX, bottom: XX, left: XX } }); // Play a particular stream in a custom window (when using OMXPLAYER)
 this.sendNotification("RTSP-STOP", "all"); // Stop the streams
-this.sendNotification("RTSP-STOP", "streamX"); // Stop a particular stream 
+this.sendNotification("RTSP-STOP", "streamX"); // Stop a particular stream
 ```
 
 ### KeyBindings Configuration (Requires [MMM-KeyBindings](https://github.com/shbatm/MMM-KeyBindings))
@@ -170,12 +171,12 @@ this.sendNotification("RTSP-STOP", "streamX"); // Stop a particular stream
 | `map` | The map between this module's key functions and the Keyboard / MMM-KeyBinding's key name that is sent (i.e. when the "MediaPlayPause" key is pressed, it will send a `Play` action to this module).<br>`Previous`/`Next` actions will cycle through the streams when `rotateStreams` is enabled, and will change which stream is selected when multiple streams are shown (red border will appear around selected stream).
 
 ```js
-keyBindings: { 
+keyBindings: {
     enabled: true,
     mode: "DEFAULT",
     map: {
-        Play: "MediaPlayPause", 
-        Previous: "MediaPreviousTrack", 
+        Play: "MediaPlayPause",
+        Previous: "MediaPreviousTrack",
         Next: "MediaNextTrack",
     }
 }
@@ -200,4 +201,4 @@ ffmpeg -i {RTSP_SOURCE} -f image2 -vf fps=fps=1/{x} -update 1 thumb.png
 // Grab the first frame from a stream and save as thumb.jpg
 ffmpeg -i {RTSP_SOURCE} -ss 00:00:01.500 -f image2 -vframes 1 thumb.png
 ```
-([source](https://superuser.com/questions/663928/ffmpeg-to-capture-stills-from-h-264-stream)) 
+([source](https://superuser.com/questions/663928/ffmpeg-to-capture-stills-from-h-264-stream))

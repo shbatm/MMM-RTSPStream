@@ -1,3 +1,5 @@
+## :warning: Refer to GitHub Releases page for Change Logs post [2.0.2-dev]
+
 ## [2.0.2-dev] - Attempted fix for OMXPlayer with OpenGL (Fake KMS) enabled
 
 Changed:
