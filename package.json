@@ -12,11 +12,11 @@
   },
   "dependencies": {
     "datauri": "^1.0.5",
-    "node-fetch": "^2.6.1",
+    "node-fetch": "^3.2.10",
     "node-rtsp-stream-es6": "github:shbatm/node-rtsp-stream-es6",
     "pm2": "^5.1.2",
     "ps-tree": "^1.1.0",
-    "ws": "^3.0.0"
+    "ws": "^5.2.3"
   },
   "repository": {
     "type": "git",
