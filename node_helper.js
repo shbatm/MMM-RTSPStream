@@ -5,14 +5,16 @@
  * MIT Licensed.
  */
 
-var NodeHelper = require("node_helper");
-var Stream = require("node-rtsp-stream-es6");
+const child_process = require("child_process");
 const fs = require("fs");
 const path = require("path");
 const DataURI = require("datauri");
+var NodeHelper = require("node_helper");
+var Stream = require("node-rtsp-stream-es6");
+
 const datauri = new DataURI();
 const psTree = require("ps-tree");
-const child_process = require("child_process");
+
 const environ = Object.assign(process.env, { DISPLAY: ":0" });
 const pm2 = require("pm2");
 
