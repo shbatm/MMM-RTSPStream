@@ -1,33 +1,33 @@
 {
-  "name": "mmm-rtspstream",
-  "version": "2.0.5",
-  "description": "MagicMirror² module to stream video from an RTSP stream",
-  "keywords": [
-    "magic mirror",
-    "rtsp",
-    "camera"
-  ],
-  "main": "MMM-RTSPStream.js",
-  "author": "shbatm",
-  "license": "MIT",
-  "scripts": {
-    "preinstall": "./scripts/preinstall.sh",
-    "postinstall": "./scripts/postinstall.sh",
-    "test": "prettier --check .",
-    "prettier:fix": "prettier --write ."
-  },
-  "devDependencies": {
-    "prettier": "^3.1.0"
-  },
-  "dependencies": {
-    "datauri": "^2.0.0",
-    "node-rtsp-stream-es6": "github:shbatm/node-rtsp-stream-es6",
-    "pm2": "^5.3.0",
-    "ps-tree": "^1.2.0",
-    "ws": "^8.14.2"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/shbatm/MMM-RTSPStream.git"
-  }
+    "name": "mmm-rtspstream",
+    "version": "2.0.5",
+    "description": "MagicMirror² module to stream video from an RTSP stream",
+    "keywords": [
+        "magic mirror",
+        "rtsp",
+        "camera"
+    ],
+    "main": "MMM-RTSPStream.js",
+    "author": "shbatm",
+    "license": "MIT",
+    "scripts": {
+        "preinstall": "./scripts/preinstall.sh",
+        "postinstall": "./scripts/postinstall.sh",
+        "test": "prettier --check .",
+        "prettier:fix": "prettier --write ."
+    },
+    "devDependencies": {
+        "prettier": "^3.1.0"
+    },
+    "dependencies": {
+        "datauri": "^2.0.0",
+        "node-rtsp-stream-es6": "github:shbatm/node-rtsp-stream-es6",
+        "pm2": "^5.3.0",
+        "ps-tree": "^1.2.0",
+        "ws": "^8.14.2"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/shbatm/MMM-RTSPStream.git"
+    }
 }

@@ -9,8 +9,8 @@ const child_process = require("child_process");
 const fs = require("fs");
 const path = require("path");
 const DataURI = require("datauri");
-var NodeHelper = require("node_helper");
-var Stream = require("node-rtsp-stream-es6");
+const NodeHelper = require("node_helper");
+const Stream = require("node-rtsp-stream-es6");
 
 const datauri = new DataURI();
 const psTree = require("ps-tree");
@@ -32,24 +32,23 @@ module.exports = NodeHelper.create({
 
     snapshots: {},
 
-    start: function () {
+    start() {
         this.started = false;
         this.stopAllOmxplayers();
     },
 
-    stop: function () {
+    stop() {
         console.log(
-            "Shutting down MMM-RTSPStream streams that were using " +
-                this.config.localPlayer
+            `Shutting down MMM-RTSPStream streams that were using ${this.config.localPlayer}`
         );
 
         // Kill any running OMX Streams
         if (this.config.localPlayer === "omxplayer") {
             child_process.spawn(
-                path.resolve(__dirname + "/scripts/onexit.js"),
+                path.resolve(`${__dirname}/scripts/onexit.js`),
                 {
                     stdio: "ignore",
-                    detached: true,
+                    detached: true
                 }
             );
         }
@@ -76,7 +75,7 @@ module.exports = NodeHelper.create({
         }
     },
 
-    startListener: function (name) {
+    startListener(name) {
         if (
             (this.config.localPlayer === "ffmpeg" ||
                 this.config.remotePlayer === "ffmpeg") &&
@@ -93,14 +92,14 @@ module.exports = NodeHelper.create({
         }
     },
 
-    getData: function (name) {
+    getData(name) {
         // console.log("Getting data for "+name);
-        var self = this;
+        const self = this;
 
-        var snapUrl = this.config[name].snapshotUrl;
+        const snapUrl = this.config[name].snapshotUrl;
 
         if (!snapUrl) {
-            console.log("No snapshotUrl given for " + name + ". Ignoring.");
+            console.log(`No snapshotUrl given for ${name}. Ignoring.`);
             return;
         }
 
@@ -113,14 +112,14 @@ module.exports = NodeHelper.create({
                     throw err;
                 }
                 self.sendSocketNotification("SNAPSHOT", {
-                    name: name,
+                    name,
                     image: true,
-                    buffer: content,
+                    buffer: content
                 });
             });
         } else {
             fetch(snapUrl, {
-                method: "GET",
+                method: "GET"
             })
                 .then(async (response) => {
                     if (response.status === 200) {
@@ -128,24 +127,22 @@ module.exports = NodeHelper.create({
                         self.sendSocketNotification("SNAPSHOT", {
                             name: name,
                             image: true,
-                            buffer:
-                                "data:image/jpeg;base64," + buffer.toString("base64"),
+                            buffer: `data:image/jpeg;base64,${buffer.toString(
+                                "base64"
+                            )}`
                         });
-                        return;
                     } else if (response.status === 401) {
                         self.sendSocketNotification(
-                            "DATA_ERROR_" + name,
+                            `DATA_ERROR_${name}`,
                             "401 Error"
                         );
                         console.error(self.name, "401 Error");
-                        return;
                     } else {
                         console.error(
                             self.name,
                             "Could not load data.",
                             response.statusText
                         );
-                        return;
                     }
                 })
                 .catch((error) => {
@@ -154,7 +151,6 @@ module.exports = NodeHelper.create({
                         "ERROR: Could not load data.",
                         error
                     );
-                    return;
                 });
             return;
         }
@@ -163,15 +159,15 @@ module.exports = NodeHelper.create({
         }, this.config[name].snapshotRefresh * 1000);
     },
 
-    getVlcPlayer: function (payload) {
-        var self = this;
-        var opts = {
+    getVlcPlayer(payload) {
+        const self = this;
+        const opts = {
             detached: false,
             env: environ,
-            stdio: ["ignore", "ignore", "pipe"],
+            stdio: ["ignore", "ignore", "pipe"]
         };
-        var vlcCmd = `vlc`;
-        var positions = {};
+        const vlcCmd = `vlc`;
+        const positions = {};
         let dp2Check = false;
 
         payload.forEach((s) => {
@@ -185,21 +181,19 @@ module.exports = NodeHelper.create({
                     (error, stdout, stderr) => {
                         if (error) {
                             console.error(`exec error: ${error}`);
-                            return;
                         }
                     }
                 );
-                return;
             } else {
                 // Otherwise, Generate the VLC window
-                var args = [
+                const args = [
                     "-I",
                     "dummy",
                     "--video-on-top",
                     "--no-video-deco",
                     "--no-embedded-video",
                     `--video-title=${s.name}`,
-                    this.config[s.name].url,
+                    this.config[s.name].url
                 ];
                 if ("fullscreen" in s && "hdUrl" in this.config[s.name]) {
                     args.pop();
@@ -243,8 +237,8 @@ module.exports = NodeHelper.create({
         if (!dp2Check) {
             return;
         }
-        var dp2Cmd = `devilspie2`;
-        var dp2Args = ["--debug", "-f", path.resolve(__dirname + "/scripts")];
+        const dp2Cmd = `devilspie2`;
+        const dp2Args = ["--debug", "-f", path.resolve(`${__dirname}/scripts`)];
         let dp2Config = ``;
         if (this.config.rotateStreams) {
             dp2Config = `
@@ -253,8 +247,8 @@ local function starts_with(str, start)
 end
 if (starts_with(get_window_name(), "stream")) then
     set_window_geometry(${payload[0].box.left}, ${payload[0].box.top}, ${
-                payload[0].box.right - payload[0].box.left
-            }, ${payload[0].box.bottom - payload[0].box.top});
+        payload[0].box.right - payload[0].box.left
+    }, ${payload[0].box.bottom - payload[0].box.top});
     undecorate_window();
     set_on_top();
 end
@@ -272,7 +266,7 @@ end
             });
         }
 
-        var startDp2 = () => {
+        const startDp2 = () => {
             if (this.dp2) {
                 this.dp2.stderr.removeAllListeners();
                 this.dp2.kill();
@@ -286,7 +280,7 @@ end
         };
 
         fs.readFile(
-            path.resolve(__dirname + "/scripts/vlc.lua"),
+            path.resolve(`${__dirname}/scripts/vlc.lua`),
             "utf8",
             (err, data) => {
                 if (err) throw err;
@@ -294,7 +288,7 @@ end
                 // Only write the new DevilsPie2 config if we need to.
                 if (data !== dp2Config) {
                     fs.writeFile(
-                        path.resolve(__dirname + "/scripts/vlc.lua"),
+                        path.resolve(`${__dirname}/scripts/vlc.lua`),
                         dp2Config,
                         (err) => {
                             // throws an error, you could also catch it here
@@ -321,8 +315,8 @@ end
         );
     },
 
-    stopVlcPlayer: function (name, delay, callback) {
-        let quitVlc = () => {
+    stopVlcPlayer(name, delay, callback) {
+        const quitVlc = () => {
             console.log(`Stopping stream ${name}`);
             if (name in this.vlcStream) {
                 try {
@@ -347,7 +341,6 @@ end
                         (error, stdout, stderr) => {
                             if (error) {
                                 console.error(`exec error: ${error}`);
-                                return;
                             }
                         }
                     );
@@ -361,11 +354,11 @@ end
         }
     },
 
-    stopAllVlcPlayers: function (delay, callback) {
+    stopAllVlcPlayers(delay, callback) {
         if (Object.keys(this.vlcStream).length > 0) {
             console.log(
                 delay
-                    ? "Delayed exit of all VLC Streams in " + delay + " sec..."
+                    ? `Delayed exit of all VLC Streams in ${delay} sec...`
                     : "Killing All VLC Streams..."
             );
             Object.keys(this.vlcStream).forEach((s) => {
@@ -388,8 +381,8 @@ end
         }
     },
 
-    getOmxplayer: function (payload) {
-        var self = this;
+    getOmxplayer(payload) {
+        const self = this;
 
         if (this.pm2Connected) {
             // Busy doing something, wait a half sec.
@@ -399,34 +392,32 @@ end
             return;
         }
 
-        var opts = { detached: false, stdio: "ignore" };
+        const opts = { detached: false, stdio: "ignore" };
 
-        var omxCmd = `omxplayer`;
+        const omxCmd = `omxplayer`;
 
-        var namesM = [];
+        const namesM = [];
 
-        var argsM = [];
+        const argsM = [];
 
         payload.forEach((s) => {
-            var args = [
+            const args = [
                 "--live",
                 "--video_queue",
                 "4",
                 "--fps",
                 "30",
                 "--no-osd",
-                this.config[s.name].url,
+                this.config[s.name].url
             ];
             if (!("fullscreen" in s)) {
                 args.unshift(
                     "--win",
                     `${s.box.left},${s.box.top},${s.box.right},${s.box.bottom}`
                 );
-            } else {
-                if ("hdUrl" in this.config[s.name]) {
-                    args.pop();
-                    args.push(this.config[s.name].hdUrl);
-                }
+            } else if ("hdUrl" in this.config[s.name]) {
+                args.pop();
+                args.push(this.config[s.name].hdUrl);
             }
             if (this.config[s.name].protocol !== "udp") {
                 args.unshift("--avdict", "rtsp_transport:tcp");
@@ -455,7 +446,7 @@ end
             );
 
             argsM.push(args);
-            namesM.push("omx_" + s.name);
+            namesM.push(`omx_${s.name}`);
         });
 
         // this.omxStream[payload.name] = child_process.spawn(omxCmd, args, opts);
@@ -471,19 +462,18 @@ end
 
             // Stops the Daemon if it's already started
             pm2.list((err, list) => {
-                var errCB = (err, apps) => {
+                const errCB = (err, apps) => {
                     if (err) {
                         console.log(err);
                         pm2.disconnect();
                         this.pm2Connected = false;
-                        return;
                     }
                 };
 
-                var startProcs = () => {
+                const startProcs = () => {
                     if (namesM.length > 0) {
                         console.log(
-                            "Starting PM2 for " + namesM[namesM.length - 1]
+                            `Starting PM2 for ${namesM[namesM.length - 1]}`
                         );
                         pm2.start(
                             {
@@ -491,22 +481,23 @@ end
                                 name: namesM[namesM.length - 1],
                                 interpreter: "bash",
                                 out_file: "/dev/null",
-                                //interpreterArgs: '-u',
-                                args: argsM[namesM.length - 1],
-                                //max_memory_restart : '100M'   // Optional: Restarts your app if it reaches 100Mo
+                                // interpreterArgs: '-u',
+                                args: argsM[namesM.length - 1]
+                                // max_memory_restart : '100M'   // Optional: Restarts your app if it reaches 100Mo
                             },
                             (err, proc) => {
                                 console.log(
-                                    "PM2 started for " +
+                                    `PM2 started for ${
                                         namesM[namesM.length - 1]
+                                    }`
                                 );
                                 this.omxStream[namesM[namesM.length - 1]] =
                                     namesM[namesM.length - 1];
 
                                 // Automatically Restart OMX PM2 Instance every X Hours
-                                let restartHrs = this.config.omxRestart;
+                                const restartHrs = this.config.omxRestart;
                                 if (typeof restartHrs === "number") {
-                                    let worker = () => {
+                                    const worker = () => {
                                         pm2.restart(
                                             namesM[namesM.length - 1],
                                             function () {}
@@ -540,7 +531,7 @@ end
                     }
                 };
 
-                for (var proc in list) {
+                for (const proc in list) {
                     if (
                         "name" in list[proc] &&
                         namesM.indexOf(list[proc].name) > -1
@@ -562,7 +553,7 @@ end
         });
     },
 
-    stopOmxplayer: function (name, callback) {
+    stopOmxplayer(name, callback) {
         if (this.pm2Connected) {
             // Busy doing something, wait a half sec.
             console.info("PM2: waiting my turn...");
@@ -581,8 +572,8 @@ end
             }
             this.pm2Connected = true;
 
-            console.log("Stopping PM2 process: omx_" + name);
-            pm2.stop("omx_" + name, (err2, apps) => {
+            console.log(`Stopping PM2 process: omx_${name}`);
+            pm2.stop(`omx_${name}`, (err2, apps) => {
                 if (!err2) {
                     clearTimeout(this.omxStreamTimeouts[name]);
                     delete this.omxStream[name];
@@ -599,7 +590,7 @@ end
         });
     },
 
-    stopAllOmxplayers: function (callback) {
+    stopAllOmxplayers(callback) {
         if (this.pm2Connected) {
             // Busy doing something, wait a half sec.
             setTimeout(() => {
@@ -625,9 +616,9 @@ end
                     return;
                 }
 
-                var toStop = [];
+                const toStop = [];
 
-                var stopProcs = () => {
+                const stopProcs = () => {
                     if (toStop.length > 0) {
                         pm2.stop(toStop[toStop.length - 1], (e, p) => {
                             if (e) {
@@ -647,11 +638,10 @@ end
                         if (typeof callback === "function") {
                             callback();
                         }
-                        return;
                     }
                 };
 
-                for (var proc in list) {
+                for (const proc in list) {
                     if (
                         "name" in list[proc] &&
                         list[proc].name.startsWith("omx_")
@@ -693,11 +683,11 @@ end
      * argument notification string - The identifier of the noitication.
      * argument payload mixed - The payload of the notification.
      */
-    socketNotificationReceived: function (notification, payload) {
-        var self = this;
+    socketNotificationReceived(notification, payload) {
+        const self = this;
         if (notification === "CONFIG") {
             this.config = payload;
-            let streams = Object.keys(this.config).filter((key) =>
+            const streams = Object.keys(this.config).filter((key) =>
                 key.startsWith("stream")
             );
             if (
@@ -706,12 +696,10 @@ end
                 this.config.shutdownDelay <
                     (streams.length - 1) * this.config.rotateStreamsTimeout
             ) {
-                let suggestedDelay =
+                const suggestedDelay =
                     (streams.length - 1) * this.config.rotateStreamsTimeout + 2;
                 console.warn(
-                    "WARNING: shutdownDelay is shorter than the time it takes to make it through the loop. Consider increasing to " +
-                        suggestedDelay +
-                        "s."
+                    `WARNING: shutdownDelay is shorter than the time it takes to make it through the loop. Consider increasing to ${suggestedDelay}s.`
                 );
             }
             streams.forEach((name) => {
@@ -752,5 +740,5 @@ end
                 this.stopAllVlcPlayers(payload);
             }
         }
-    },
+    }
 });
