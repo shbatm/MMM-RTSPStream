@@ -7,7 +7,6 @@
 
 var NodeHelper = require("node_helper");
 var Stream = require("node-rtsp-stream-es6");
-const fetch = require("node-fetch");
 const fs = require("fs");
 const path = require("path");
 const DataURI = require("datauri");
