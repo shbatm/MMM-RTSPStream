@@ -13,7 +13,11 @@
   "scripts": {
     "preinstall": "./scripts/preinstall.sh",
     "postinstall": "./scripts/postinstall.sh",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "prettier --check .",
+    "prettier:fix": "prettier --write ."
+  },
+  "devDependencies": {
+    "prettier": "^3.1.0"
   },
   "dependencies": {
     "datauri": "^2.0.0",
