@@ -2,12 +2,9 @@
 
 /* jshint esversion: 6 */
 
-const fs = require('fs');
-const path = require("path");
-const child_process = require('child_process');
 const pm2 = require('pm2');
 
-stopAllOmxplayers = function() {
+const stopAllOmxplayers = function() {
     console.log('PM2: Stopping all OMXPlayer Streams...');
     pm2.connect((err) => {
         if (err) {
@@ -23,9 +20,9 @@ stopAllOmxplayers = function() {
                 return;
             }
 
-            var toStop = [];
+            const toStop = [];
 
-            var stopProcs = () => {
+            const stopProcs = () => {
                 if (toStop.length > 0) {
                     pm2.stop(toStop[toStop.length - 1], (e, p) => {
                         if (e) { console.log(e); throw e; }
@@ -35,11 +32,11 @@ stopAllOmxplayers = function() {
                 } else {
                     pm2.disconnect();
                     process.exit(0);
-                    return;
+                    
                 }
             };
 
-            let omxProcs = list.filter(o => o.name.startsWith("omx_"));
+            const omxProcs = list.filter(o => o.name.startsWith("omx_"));
             if (omxProcs) {
                 omxProcs.forEach(o => {
                     console.log(`PM2: Checking if ${o.name} is running...`);
