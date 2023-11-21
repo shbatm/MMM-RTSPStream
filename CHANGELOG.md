@@ -1,13 +1,15 @@
-## :warning: Refer to GitHub Releases page for Change Logs post [2.0.2-dev]
+# :warning: Refer to GitHub Releases page for Change Logs post [2.0.2-dev]
 
 ## [2.0.2-dev] - Attempted fix for OMXPlayer with OpenGL (Fake KMS) enabled
 
 Changed:
+
 * Added "--no-osd" command line switch to omxplayer command.  Per [this thread](https://www.raspberrypi.org/forums/viewtopic.php?t=159853), "omxplayer uses OpenVG for subtitles and status messsages which is not compatible with [the OpenGL (Fake KMS)] driver."
 
 ## [2.0.1-dev] - Major OMX Bugfixes
 
 Changed:
+
 * App closing now spawns a new process to actually kill the OMX streams, it was getting cut off in the middle of closing everything due to it being an async process.
 * Wait for DOM to be shown before calling to start the streams--this was causing the Fullscreen on Resume problems.
 * Only start one stream at a time if we're in RotateStreams mode
@@ -29,7 +31,7 @@ Changed:
 * `hideFfmpegOutput` configuration option removed from stream config in favor of global `debug` module option.
 * Fixed bug where transition timer was not properly reset after module resume.
 * Added `hwAccel` stream option for `ffmpeg` to attempt to use hardware accelerated decoding. Encoding still uses CPU unfortunatly.
-    - You must update the node-rtsp-stream-es6 package too. This is most easily done by deleting your node_modules folder and re-running `npm install` on the module.
+  * You must update the node-rtsp-stream-es6 package too. This is most easily done by deleting your node_modules folder and re-running `npm install` on the module.
 * `RTSP-PLAY` notification now accepts an object `{ stream: "streamX", stopOthers: true }` which will stop other streams before starting the new stream.
 
 ## [1.2.2] - Auto-restart OMX Stream every X hours (Partially addresses #29)
@@ -37,7 +39,6 @@ Changed:
 Changes:
 
 * Added config option to schedule automatic restarts of the OMX streams.
-
 
 ## [1.2.1] - Custom video window parameters
 
