@@ -1,1024 +1,1998 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>MMM-RTSPStream Configuration Builder</title>
+        <link rel="stylesheet" href="bootstrap.min.css" type="text/css" />
+        <script src="jquery-3.2.1.min.js" type="text/javascript"></script>
+        <style type="text/css">
+            body {
+                margin: 30px;
+            }
+        </style>
+    </head>
 
-<head>
-    <meta charset="UTF-8">
-    <title>MMM-RTSPStream Configuration Builder</title>
-    <link rel="stylesheet" href="bootstrap.min.css" type="text/css">
-    <script src="jquery-3.2.1.min.js" type="text/javascript"></script>
-    <style type="text/css">
-        body {
-            margin: 30px;
-        }
-    </style>
-</head>
-
-<body>
-    <form class="form-horizontal">
-        <fieldset>
-            <legend>Step 1. MMM-RTSPStream Core Configuration Builder</legend>
-            <div class="form-group">
-                <label class="col-md-4 control-label" for="position">Module Position</label>
-                <div class="col-md-4">
-                    <select id="position" name="position" class="form-control">
-                        <option value="top_bar">top_bar</option>
-                        <option value="top_left">top_left</option>
-                        <option value="top_center">top_center</option>
-                        <option value="top_right">top_right</option>
-                        <option value="upper_third">upper_third</option>
-                        <option value="middle_center" selected>middle_center</option>
-                        <option value="lower_third">lower_third</option>
-                        <option value="bottom_left">bottom_left</option>
-                        <option value="bottom_center">bottom_center</option>
-                        <option value="bottom_right">bottom_right</option>
-                        <option value="bottom_bar">bottom_bar</option>
-                        <option value="fullscreen_above">fullscreen_above</option>
-                        <option value="fullscreen_below">fullscreen_below</option>
-                    </select>
+    <body>
+        <form class="form-horizontal">
+            <fieldset>
+                <legend>
+                    Step 1. MMM-RTSPStream Core Configuration Builder
+                </legend>
+                <div class="form-group">
+                    <label class="col-md-4 control-label" for="position"
+                        >Module Position</label
+                    >
+                    <div class="col-md-4">
+                        <select
+                            id="position"
+                            name="position"
+                            class="form-control"
+                        >
+                            <option value="top_bar">top_bar</option>
+                            <option value="top_left">top_left</option>
+                            <option value="top_center">top_center</option>
+                            <option value="top_right">top_right</option>
+                            <option value="upper_third">upper_third</option>
+                            <option value="middle_center" selected>
+                                middle_center
+                            </option>
+                            <option value="lower_third">lower_third</option>
+                            <option value="bottom_left">bottom_left</option>
+                            <option value="bottom_center">bottom_center</option>
+                            <option value="bottom_right">bottom_right</option>
+                            <option value="bottom_bar">bottom_bar</option>
+                            <option value="fullscreen_above">
+                                fullscreen_above
+                            </option>
+                            <option value="fullscreen_below">
+                                fullscreen_below
+                            </option>
+                        </select>
+                    </div>
                 </div>
-            </div>
-            <div class="form-group">
-                <label class="col-md-4 control-label" for="headerText">Module Header Text</label>
-                <div class="col-md-4">
-                    <input id="headerText" name="headerText" type="text" placeholder="Camera Streams"
-                        class="form-control input-md">
-                    <span class="help-block">Leave blank for no header.</span>
+                <div class="form-group">
+                    <label class="col-md-4 control-label" for="headerText"
+                        >Module Header Text</label
+                    >
+                    <div class="col-md-4">
+                        <input
+                            id="headerText"
+                            name="headerText"
+                            type="text"
+                            placeholder="Camera Streams"
+                            class="form-control input-md"
+                        />
+                        <span class="help-block"
+                            >Leave blank for no header.</span
+                        >
+                    </div>
                 </div>
-            </div>
-            <div class="form-group">
-                <label class="col-md-4 control-label" for="autoStart">Auto Start Streams?</label>
-                <div class="col-md-4">
-                    <label class="radio-inline" for="autoStart-0">
-                        <input type="radio" name="autoStart" id="autoStart-0" value="true" checked="checked"> Yes
+                <div class="form-group">
+                    <label class="col-md-4 control-label" for="autoStart"
+                        >Auto Start Streams?</label
+                    >
+                    <div class="col-md-4">
+                        <label class="radio-inline" for="autoStart-0">
+                            <input
+                                type="radio"
+                                name="autoStart"
+                                id="autoStart-0"
+                                value="true"
+                                checked="checked"
+                            />
+                            Yes
+                        </label>
+                        <label class="radio-inline" for="autoStart-1">
+                            <input
+                                type="radio"
+                                name="autoStart"
+                                id="autoStart-1"
+                                value="false"
+                            />
+                            No
+                        </label>
+                        <p class="help-block">
+                            Yes will start the streams automatically when the
+                            mirror starts, no will show snapshots (if available)
+                            or a blank window until the stream is started by a
+                            notification from another app or by clicking the
+                            play button.
+                        </p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-4 control-label" for="rotateStreams"
+                        >Rotate Through Streams or Individual Windows?</label
+                    >
+                    <div class="col-md-4">
+                        <div class="radio">
+                            <label for="rotateStreams-0">
+                                <input
+                                    type="radio"
+                                    name="rotateStreams"
+                                    id="rotateStreams-0"
+                                    value="true"
+                                    checked="checked"
+                                />
+                                Rotate through all streams in a single window
+                            </label>
+                        </div>
+                        <div class="radio">
+                            <label for="rotateStreams-1">
+                                <input
+                                    type="radio"
+                                    name="rotateStreams"
+                                    id="rotateStreams-1"
+                                    value="false"
+                                />
+                                Display an individual window for each stream
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group rotateStreamTimeout">
+                    <label
+                        class="col-md-4 control-label"
+                        for="rotateStreamTimeout"
+                        >Time (in sec) to show each stream</label
+                    >
+                    <div class="col-md-4">
+                        <input
+                            id="rotateStreamTimeout"
+                            name="rotateStreamTimeout"
+                            type="text"
+                            placeholder="10"
+                            value="10"
+                            class="form-control input-md"
+                        />
+                        <span class="help-block"
+                            >Only applies when the first option above is
+                            selected.</span
+                        >
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label
+                        class="col-md-4 control-label"
+                        for="showSnapWhenPaused"
+                        >Show snapshot images when the stream(s) is
+                        paused</label
+                    >
+                    <div class="col-md-4">
+                        <label class="radio-inline" for="showSnapWhenPaused-0">
+                            <input
+                                type="radio"
+                                name="showSnapWhenPaused"
+                                id="showSnapWhenPaused-0"
+                                value="true"
+                                checked="checked"
+                            />
+                            Yes
+                        </label>
+                        <label class="radio-inline" for="showSnapWhenPaused-1">
+                            <input
+                                type="radio"
+                                name="showSnapWhenPaused"
+                                id="showSnapWhenPaused-1"
+                                value="false"
+                            />
+                            No
+                        </label>
+                        <p class="help-block">
+                            If your camera supports timed snapshot images via
+                            URL or saving to a file location, the module can
+                            display these when the stream is paused.
+                        </p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-4 control-label" for="localPlayer"
+                        >Local Screen Player to Use</label
+                    >
+                    <div class="col-md-4">
+                        <select
+                            id="localPlayer"
+                            name="localPlayer"
+                            class="form-control"
+                        >
+                            <option value="vlc">
+                                VLC Player (HW-accelerated)
+                            </option>
+                            <option value="omxplayer">
+                                OMXPlayer (HW-accelerated)
+                            </option>
+                            <option value="ffmpeg">FFPMEG (SW decoder)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-4 control-label" for="remotePlayer"
+                        >Remote Browser/VNC Player to Use</label
+                    >
+                    <div class="col-md-4">
+                        <select
+                            id="remotePlayer"
+                            name="remotePlayer"
+                            class="form-control"
+                        >
+                            <option value="none">None / N/A</option>
+                            <option value="ffmpeg">FFPMEG</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-4 control-label" for="remoteSnaps"
+                        >Show Snapshots on Remote?</label
+                    >
+                    <div class="col-md-4">
+                        <label class="radio-inline" for="remoteSnaps-0">
+                            <input
+                                type="radio"
+                                name="remoteSnaps"
+                                id="remoteSnaps-0"
+                                value="true"
+                                checked="checked"
+                            />
+                            Yes
+                        </label>
+                        <label class="radio-inline" for="remoteSnaps-1">
+                            <input
+                                type="radio"
+                                name="remoteSnaps"
+                                id="remoteSnaps-1"
+                                value="false"
+                            />
+                            No
+                        </label>
+                        <p class="help-block">
+                            When using OMXPlayer for local player and None for
+                            remote player, no video will be visible if you open
+                            the Mirror on a remote web browser or view through
+                            VNC. Selecting yes for this option will show
+                            snapshots to the remote viewers (saves resources
+                            over using FFMPEG for Remote Player)
+                        </p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-4 control-label" for="moduleWidth"
+                        >Module Width</label
+                    >
+                    <div class="col-md-4">
+                        <div class="input-group">
+                            <input
+                                id="moduleWidth"
+                                name="moduleWidth"
+                                class="form-control"
+                                placeholder="354"
+                                value="354"
+                                type="text"
+                            />
+                            <span class="input-group-addon">px</span>
+                        </div>
+                        <p class="help-block">
+                            When rotateStreams is false and multiple streams are
+                            used, adjust this value to adjust the number of
+                            streams shown side by side. E.G. to show 2 streams
+                            side by side, this value should be = 2*(Stream Width
+                            + 2*1px (border) + 2*15px (margin))
+                        </p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-4 control-label" for="moduleHeight"
+                        >Module Height</label
+                    >
+                    <div class="col-md-4">
+                        <div class="input-group">
+                            <input
+                                id="moduleHeight"
+                                name="moduleHeight"
+                                class="form-control"
+                                placeholder="240"
+                                value="240"
+                                type="text"
+                            />
+                            <span class="input-group-addon">px</span>
+                        </div>
+                        <p class="help-block">
+                            Similar (but less critical) to moduleWidth. Adjust
+                            to the number of streams high to ensure other
+                            modules clear.
+                        </p>
+                    </div>
+                </div>
+                <div class="form-group omxplayer vlc">
+                    <label class="col-md-4 control-label" for="moduleOffset"
+                        >Module Offset - Only applies when using OMXPlayer/VLC.
                     </label>
-                    <label class="radio-inline" for="autoStart-1">
-                        <input type="radio" name="autoStart" id="autoStart-1" value="false"> No
-                    </label>
-                    <p class="help-block">Yes will start the streams automatically when the mirror starts, no will show
-                        snapshots (if available) or a blank window until the stream is started by a notification from
-                        another app or by clicking the play button.</p>
+                    <div class="col-md-4">
+                        <textarea
+                            class="form-control"
+                            id="moduleOffset"
+                            name="moduleOffset"
+                        ></textarea>
+                        <p class="help-block">
+                            On some displays, the video does not properly line
+                            up with the box on the screen. Entering a pixel
+                            value will shift the video over by that amount.
+                            Default: 0 Values: Any number (no units) by itself
+                            will adjust both top/left the same amount, or you
+                            can specify left &amp; top adjustments separately
+                            (e.g. { left: 10, top: -10 })
+                        </p>
+                    </div>
                 </div>
-            </div>
-            <div class="form-group">
-                <label class="col-md-4 control-label" for="rotateStreams">Rotate Through Streams or Individual
-                    Windows?</label>
-                <div class="col-md-4">
-                    <div class="radio">
-                        <label for="rotateStreams-0">
-                            <input type="radio" name="rotateStreams" id="rotateStreams-0" value="true"
-                                checked="checked"> Rotate through all streams in a single window
+                <div class="form-group ffmpeg">
+                    <label class="col-md-4 control-label" for="s1shutdownDelay"
+                        >Shutdown Delay</label
+                    >
+                    <div class="col-md-4">
+                        <div class="input-group">
+                            <input
+                                id="s1shutdownDelay"
+                                name="s1shutdownDelay"
+                                class="form-control"
+                                placeholder="12"
+                                value="12"
+                                type="text"
+                            />
+                            <span class="input-group-addon">ms</span>
+                        </div>
+                        <p class="help-block">
+                            The time delay (in sec) between when the stream is
+                            hidden/closed and when the stream actually stops.
+                            When rotating through multiple streams this prevents
+                            closing the connection to a stream only to re-open a
+                            few seconds later when it comes back through the
+                            loop (which reduces the time delay when restarting a
+                            stream). To conserve resources on a slow device, you
+                            can set this to 0
+                        </p>
+                    </div>
+                </div>
+            </fieldset>
+            <fieldset>
+                <legend>Step 2. Video Stream Configurations</legend>
+                <div class="form-group count-1">
+                    <label class="col-md-4 control-label" for="streamCount"
+                        >Number of Streams</label
+                    >
+                    <div class="col-md-4">
+                        <label class="radio-inline" for="streamCount-0">
+                            <input
+                                type="radio"
+                                name="streamCount"
+                                id="streamCount-0"
+                                value="1"
+                                checked="checked"
+                            />
+                            1
+                        </label>
+                        <label class="radio-inline" for="streamCount-1">
+                            <input
+                                type="radio"
+                                name="streamCount"
+                                id="streamCount-1"
+                                value="2"
+                            />
+                            2
+                        </label>
+                        <label class="radio-inline" for="streamCount-2">
+                            <input
+                                type="radio"
+                                name="streamCount"
+                                id="streamCount-2"
+                                value="3"
+                            />
+                            3
+                        </label>
+                        <label class="radio-inline" for="streamCount-3">
+                            <input
+                                type="radio"
+                                name="streamCount"
+                                id="streamCount-3"
+                                value="4"
+                            />
+                            4
                         </label>
                     </div>
-                    <div class="radio">
-                        <label for="rotateStreams-1">
-                            <input type="radio" name="rotateStreams" id="rotateStreams-1" value="false"> Display an
-                            individual window for each stream
+                </div>
+                <!-- Stream #1 Start -->
+                <div class="form-group count-1">
+                    <label class="col-md-4 control-label" for="sName"
+                        >Stream #1 Name</label
+                    >
+                    <div class="col-md-4">
+                        <input
+                            id="s1Name"
+                            name="s1Name"
+                            type="text"
+                            placeholder="Camera 1"
+                            class="form-control input-md"
+                        />
+                        <span class="help-block"
+                            >Enter the name for the camera</span
+                        >
+                    </div>
+                </div>
+                <div class="form-group count-1">
+                    <label class="col-md-4 control-label" for="url"
+                        >Feed #1 URL</label
+                    >
+                    <div class="col-md-4">
+                        <input
+                            id="s1url"
+                            name="s1url"
+                            type="text"
+                            placeholder="rtsp://184.72.239.149/vod/mp4:BigBuckBunny_115k.mov"
+                            class="form-control input-md"
+                        />
+                        <span class="help-block"
+                            >The url of the RTSP stream. See
+                            <a
+                                href="https://github.com/shbatm/MMM-RTSPStream/wiki/Stream-URLs-for-Various-Cameras"
+                                >this list</a
+                            >
+                            for paths for some common security cameras. Also see
+                            below for how to test for a valid url Username and
+                            password should be passed in the url if required:
+                            rtsp://&lt;username&gt;:&lt;password&gt;@&lt;hostname&gt;:&lt;port&gt;/&lt;path></span
+                        >
+                    </div>
+                </div>
+                <div class="form-group count-1">
+                    <label class="col-md-4 control-label" for="s1protocol"
+                        >Network Protocol #1</label
+                    >
+                    <div class="col-md-4">
+                        <label class="radio-inline" for="s1protocol-0">
+                            <input
+                                type="radio"
+                                name="s1protocol"
+                                id="s1protocol-0"
+                                value="tcp"
+                                checked="checked"
+                            />
+                            TCP
+                        </label>
+                        <label class="radio-inline" for="s1protocol-1">
+                            <input
+                                type="radio"
+                                name="s1protocol"
+                                id="s1protocol-1"
+                                value="udp"
+                            />
+                            UDP
                         </label>
                     </div>
                 </div>
-            </div>
-            <div class="form-group rotateStreamTimeout">
-                <label class="col-md-4 control-label" for="rotateStreamTimeout">Time (in sec) to show each
-                    stream</label>
-                <div class="col-md-4">
-                    <input id="rotateStreamTimeout" name="rotateStreamTimeout" type="text" placeholder="10" value="10"
-                        class="form-control input-md">
-                    <span class="help-block">Only applies when the first option above is selected.</span>
-                </div>
-            </div>
-            <div class="form-group">
-                <label class="col-md-4 control-label" for="showSnapWhenPaused">Show snapshot images when the stream(s)
-                    is paused</label>
-                <div class="col-md-4">
-                    <label class="radio-inline" for="showSnapWhenPaused-0">
-                        <input type="radio" name="showSnapWhenPaused" id="showSnapWhenPaused-0" value="true"
-                            checked="checked"> Yes
-                    </label>
-                    <label class="radio-inline" for="showSnapWhenPaused-1">
-                        <input type="radio" name="showSnapWhenPaused" id="showSnapWhenPaused-1" value="false"> No
-                    </label>
-                    <p class="help-block">If your camera supports timed snapshot images via URL or saving to a file
-                        location, the module can display these when the stream is paused.</p>
-                </div>
-            </div>
-            <div class="form-group">
-                <label class="col-md-4 control-label" for="localPlayer">Local Screen Player to Use</label>
-                <div class="col-md-4">
-                    <select id="localPlayer" name="localPlayer" class="form-control">
-                        <option value="vlc">VLC Player (HW-accelerated)</option>
-                        <option value="omxplayer">OMXPlayer (HW-accelerated)</option>
-                        <option value="ffmpeg">FFPMEG (SW decoder)</option>
-                    </select>
-                </div>
-            </div>
-            <div class="form-group">
-                <label class="col-md-4 control-label" for="remotePlayer">Remote Browser/VNC Player to Use</label>
-                <div class="col-md-4">
-                    <select id="remotePlayer" name="remotePlayer" class="form-control">
-                        <option value="none">None / N/A</option>
-                        <option value="ffmpeg">FFPMEG</option>
-                    </select>
-                </div>
-            </div>
-            <div class="form-group">
-                <label class="col-md-4 control-label" for="remoteSnaps">Show Snapshots on Remote?</label>
-                <div class="col-md-4">
-                    <label class="radio-inline" for="remoteSnaps-0">
-                        <input type="radio" name="remoteSnaps" id="remoteSnaps-0" value="true" checked="checked"> Yes
-                    </label>
-                    <label class="radio-inline" for="remoteSnaps-1">
-                        <input type="radio" name="remoteSnaps" id="remoteSnaps-1" value="false"> No
-                    </label>
-                    <p class="help-block">When using OMXPlayer for local player and None for remote player, no video
-                        will be visible if you open the Mirror on a remote web browser or view through VNC.
-                        Selecting yes for this option will show snapshots to the remote viewers (saves resources over
-                        using FFMPEG for Remote Player)</p>
-                </div>
-            </div>
-            <div class="form-group">
-                <label class="col-md-4 control-label" for="moduleWidth">Module Width</label>
-                <div class="col-md-4">
-                    <div class="input-group">
-                        <input id="moduleWidth" name="moduleWidth" class="form-control" placeholder="354" value='354'
-                            type="text">
-                        <span class="input-group-addon">px</span>
-                    </div>
-                    <p class="help-block">When rotateStreams is false and multiple streams are used, adjust this value
-                        to adjust the number of streams shown side by side. E.G. to show 2 streams side by side, this
-                        value should be = 2*(Stream Width + 2*1px (border) + 2*15px (margin))</p>
-                </div>
-            </div>
-            <div class="form-group">
-                <label class="col-md-4 control-label" for="moduleHeight">Module Height</label>
-                <div class="col-md-4">
-                    <div class="input-group">
-                        <input id="moduleHeight" name="moduleHeight" class="form-control" placeholder="240" value="240"
-                            type="text">
-                        <span class="input-group-addon">px</span>
-                    </div>
-                    <p class="help-block">Similar (but less critical) to moduleWidth. Adjust to the number of streams
-                        high to ensure other modules clear.</p>
-                </div>
-            </div>
-            <div class="form-group omxplayer vlc">
-                <label class="col-md-4 control-label" for="moduleOffset">Module Offset - Only applies when using
-                    OMXPlayer/VLC. </label>
-                <div class="col-md-4">
-                    <textarea class="form-control" id="moduleOffset" name="moduleOffset"></textarea>
-                    <p class="help-block">On some displays, the video does not properly line up with the box on the
-                        screen. Entering a pixel value will shift the video over by that amount. Default: 0 Values: Any
-                        number (no units) by itself will adjust both top/left the same amount, or you can specify left
-                        &amp; top adjustments separately (e.g. { left: 10, top: -10 })</p>
-                </div>
-            </div>
-            <div class="form-group ffmpeg">
-                <label class="col-md-4 control-label" for="s1shutdownDelay">Shutdown Delay</label>
-                <div class="col-md-4">
-                    <div class="input-group">
-                        <input id="s1shutdownDelay" name="s1shutdownDelay" class="form-control" placeholder="12"
-                            value="12" type="text">
-                        <span class="input-group-addon">ms</span>
-                    </div>
-                    <p class="help-block">The time delay (in sec) between when the stream is hidden/closed and when the
-                        stream actually stops. When rotating through multiple streams this prevents closing the
-                        connection to a stream only to re-open a few seconds later when it comes back through the loop
-                        (which reduces the time delay when restarting a stream). To conserve resources on a slow device,
-                        you can set this to 0</p>
-                </div>
-            </div>
-        </fieldset>
-        <fieldset>
-            <legend>Step 2. Video Stream Configurations</legend>
-            <div class="form-group count-1">
-                <label class="col-md-4 control-label" for="streamCount">Number of Streams</label>
-                <div class="col-md-4">
-                    <label class="radio-inline" for="streamCount-0">
-                        <input type="radio" name="streamCount" id="streamCount-0" value="1" checked="checked"> 1
-                    </label>
-                    <label class="radio-inline" for="streamCount-1">
-                        <input type="radio" name="streamCount" id="streamCount-1" value="2"> 2
-                    </label>
-                    <label class="radio-inline" for="streamCount-2">
-                        <input type="radio" name="streamCount" id="streamCount-2" value="3"> 3
-                    </label>
-                    <label class="radio-inline" for="streamCount-3">
-                        <input type="radio" name="streamCount" id="streamCount-3" value="4"> 4
-                    </label>
-                </div>
-            </div>
-            <!-- Stream #1 Start -->
-            <div class="form-group count-1">
-                <label class="col-md-4 control-label" for="sName">Stream #1 Name</label>
-                <div class="col-md-4">
-                    <input id="s1Name" name="s1Name" type="text" placeholder="Camera 1" class="form-control input-md">
-                    <span class="help-block">Enter the name for the camera</span>
-                </div>
-            </div>
-            <div class="form-group count-1">
-                <label class="col-md-4 control-label" for="url">Feed #1 URL</label>
-                <div class="col-md-4">
-                    <input id="s1url" name="s1url" type="text"
-                        placeholder="rtsp://184.72.239.149/vod/mp4:BigBuckBunny_115k.mov" class="form-control input-md">
-                    <span class="help-block">The url of the RTSP stream. See <a
-                            href="https://github.com/shbatm/MMM-RTSPStream/wiki/Stream-URLs-for-Various-Cameras">this
-                            list</a> for paths for some common security cameras. Also see below for how to test for a
-                        valid url Username and password should be passed in the url if required:
-                        rtsp://&lt;username&gt;:&lt;password&gt;@&lt;hostname&gt;:&lt;port&gt;/&lt;path></span>
-                </div>
-            </div>
-            <div class="form-group count-1">
-                <label class="col-md-4 control-label" for="s1protocol">Network Protocol #1</label>
-                <div class="col-md-4">
-                    <label class="radio-inline" for="s1protocol-0">
-                        <input type="radio" name="s1protocol" id="s1protocol-0" value="tcp" checked="checked"> TCP
-                    </label>
-                    <label class="radio-inline" for="s1protocol-1">
-                        <input type="radio" name="s1protocol" id="s1protocol-1" value="udp"> UDP
-                    </label>
-                </div>
-            </div>
-            <div class="form-group count-1">
-                <label class="col-md-4 control-label" for="s1hdUrl">Feed #1 HD URL</label>
-                <div class="col-md-4">
-                    <input id="s1hdUrl" name="s1hdUrl" type="text" placeholder="" class="form-control input-md">
-                    <span class="help-block">The url of the HD RTSP stream for full screen OMXPlayer/VLC use.</span>
-                </div>
-            </div>
-            <div class="form-group count-1 snapshotDetails">
-                <label class="col-md-4 control-label" for="s1snapshotUrl">Snapshot URL or File Path #1</label>
-                <div class="col-md-4">
-                    <input id="s1snapshotUrl" name="s1snapshotUrl" type="text" placeholder=""
-                        class="form-control input-md">
-                    <span class="help-block">The url or filepath of the snapshot images.</span>
-                </div>
-            </div>
-            <div class="form-group count-1 snapshotDetails">
-                <label class="col-md-4 control-label" for="s1snapshotType">Snapshot #1 Type</label>
-                <div class="col-md-4">
-                    <label class="radio-inline" for="s1snapshotType-0">
-                        <input type="radio" name="s1snapshotType" id="s1snapshotType-0" value="url" checked="checked">
-                        URL
-                    </label>
-                    <label class="radio-inline" for="s1snapshotType-1">
-                        <input type="radio" name="s1snapshotType" id="s1snapshotType-1" value="file"> File Path
-                    </label>
-                </div>
-            </div>
-            <div class="form-group count-1 snapshotDetails">
-                <label class="col-md-4 control-label" for="s1snapshotRefresh">Snapshot #1 Refresh Rate</label>
-                <div class="col-md-4">
-                    <div class="input-group">
-                        <input id="s1snapshotRefresh" name="s1snapshotRefresh" class="form-control" placeholder="10"
-                            value="10" type="text">
-                        <span class="input-group-addon">seconds</span>
-                    </div>
-                    <p class="help-block">Time between fetching new snapshot images</p>
-                </div>
-            </div>
-            <div class="form-group count-1">
-                <label class="col-md-4 control-label" for="s1width">Stream #1 Width</label>
-                <div class="col-md-4">
-                    <div class="input-group">
-                        <input id="s1width" name="s1width" class="form-control" placeholder="undefined (auto)"
-                            type="text">
-                        <span class="input-group-addon">px</span>
-                    </div>
-                    <p class="help-block">The width in px of the stream.</p>
-                </div>
-            </div>
-            <div class="form-group count-1">
-                <label class="col-md-4 control-label" for="s1height">Stream #1 Height</label>
-                <div class="col-md-4">
-                    <div class="input-group">
-                        <input id="s1height" name="s1height" class="form-control" placeholder="undefined (auto)"
-                            type="text">
-                        <span class="input-group-addon">px</span>
-                    </div>
-                    <p class="help-block">The height in px of the stream</p>
-                </div>
-            </div>
-            <div class="form-group count-1 omxplayer vlc">
-                <label class="col-md-4 control-label" for="s1absPosition">Absolute Position</label>
-                <div class="col-md-4">
-                    <input id="s1absPosition" name="s1absPosition" type="text" placeholder="optional"
-                        class="form-control input-md">
-                    <span class="help-block">Required only for OMXPlayer or VLC. Use this to set an exact position for
-                        the video instead of getting it automatically. Format: "{ top: XX, right: XX, bottom: XX, left:
-                        XX }"</span>
-                </div>
-            </div>
-            <div class="form-group count-1 omxplayer vlc">
-                <label class="col-md-4 control-label" for="s1muted">Mute Audio from Stream?</label>
-                <div class="col-md-4">
-                    <label class="radio-inline" for="s1muted-0">
-                        <input type="radio" name="s1muted" id="s1muted-0" value="true" checked="checked"> Yes
-                    </label>
-                    <label class="radio-inline" for="s1muted-1">
-                        <input type="radio" name="s1muted" id="s1muted-1" value="false"> No
-                    </label>
-                    <span class="help-block">Required only for OMXPlayer or VLC. Use this to mute the stream.</span>
-                </div>
-            </div>
-            <div class="form-group count-1 ffmpeg">
-                <label class="col-md-4 control-label" for="s1ffmpegPort">FFMPEG WebSocket Port</label>
-                <div class="col-md-4">
-                    <input id="s1ffmpegPort" name="s1ffmpegPort" type="text" placeholder="9999" value="9999"
-                        class="form-control input-md">
-                    <span class="help-block"><i>Only required for `ffmpeg`</i> Any available port to use for the ffmpeg
-                        websocket.<br><strong><i>Notes:</i> THIS IS NOT THE PORT FOR YOUR CAMERA</strong> Camera
-                        stream's port must be included in the URL above. This port must be unqiue for each stream added
-                        and cannot be used by another service on the server. This is a separate WebSocket from the the
-                        Socket.IO connection between the module's script and it's `node_helper.js`.</span>
-                </div>
-            </div>
-            <!-- Strem #1 Stop -->
-            <!-- Stream #2 Start -->
-            <div class="form-group count-2">
-                <label class="col-md-4 control-label" for="sName">Stream #2 Name</label>
-                <div class="col-md-4">
-                    <input id="s2Name" name="s2Name" type="text" placeholder="Camera 2" class="form-control input-md">
-                    <span class="help-block">Enter the name for the camera</span>
-                </div>
-            </div>
-            <div class="form-group count-2">
-                <label class="col-md-4 control-label" for="url">Feed #2 URL</label>
-                <div class="col-md-4">
-                    <input id="s2url" name="s2url" type="text"
-                        placeholder="rtsp://184.72.239.149/vod/mp4:BigBuckBunny_115k.mov" class="form-control input-md">
-                </div>
-            </div>
-            <div class="form-group count-2">
-                <label class="col-md-4 control-label" for="s2protocol">Network Protocol #2</label>
-                <div class="col-md-4">
-                    <label class="radio-inline" for="s2protocol-0">
-                        <input type="radio" name="s2protocol" id="s2protocol-0" value="tcp" checked="checked"> TCP
-                    </label>
-                    <label class="radio-inline" for="s2protocol-1">
-                        <input type="radio" name="s2protocol" id="s2protocol-1" value="udp"> UDP
-                    </label>
-                </div>
-            </div>
-            <div class="form-group count-2">
-                <label class="col-md-4 control-label" for="s2hdUrl">Feed #2 HD URL</label>
-                <div class="col-md-4">
-                    <input id="s2hdUrl" name="s2hdUrl" type="text" placeholder="" class="form-control input-md">
-                </div>
-            </div>
-            <div class="form-group count-2 snapshotDetails">
-                <label class="col-md-4 control-label" for="s2snapshotUrl">Snapshot URL or File Path #2</label>
-                <div class="col-md-4">
-                    <input id="s2snapshotUrl" name="s2snapshotUrl" type="text" placeholder=""
-                        class="form-control input-md">
-                </div>
-            </div>
-            <div class="form-group count-2 snapshotDetails">
-                <label class="col-md-4 control-label" for="s2snapshotType">Snapshot #2 Type</label>
-                <div class="col-md-4">
-                    <label class="radio-inline" for="s2snapshotType-0">
-                        <input type="radio" name="s2snapshotType" id="s2snapshotType-0" value="url" checked="checked">
-                        URL
-                    </label>
-                    <label class="radio-inline" for="s2snapshotType-1">
-                        <input type="radio" name="s2snapshotType" id="s2snapshotType-1" value="file"> File Path
-                    </label>
-                </div>
-            </div>
-            <div class="form-group count-2 snapshotDetails">
-                <label class="col-md-4 control-label" for="s2snapshotRefresh">Snapshot #2 Refresh Rate</label>
-                <div class="col-md-4">
-                    <div class="input-group">
-                        <input id="s2snapshotRefresh" name="s2snapshotRefresh" class="form-control" placeholder="10"
-                            value="10" type="text">
-                        <span class="input-group-addon">seconds</span>
+                <div class="form-group count-1">
+                    <label class="col-md-4 control-label" for="s1hdUrl"
+                        >Feed #1 HD URL</label
+                    >
+                    <div class="col-md-4">
+                        <input
+                            id="s1hdUrl"
+                            name="s1hdUrl"
+                            type="text"
+                            placeholder=""
+                            class="form-control input-md"
+                        />
+                        <span class="help-block"
+                            >The url of the HD RTSP stream for full screen
+                            OMXPlayer/VLC use.</span
+                        >
                     </div>
                 </div>
-            </div>
-            <div class="form-group count-2">
-                <label class="col-md-4 control-label" for="s2width">Stream #2 Width</label>
-                <div class="col-md-4">
-                    <div class="input-group">
-                        <input id="s2width" name="s2width" class="form-control" placeholder="undefined (auto)"
-                            type="text">
-                        <span class="input-group-addon">px</span>
+                <div class="form-group count-1 snapshotDetails">
+                    <label class="col-md-4 control-label" for="s1snapshotUrl"
+                        >Snapshot URL or File Path #1</label
+                    >
+                    <div class="col-md-4">
+                        <input
+                            id="s1snapshotUrl"
+                            name="s1snapshotUrl"
+                            type="text"
+                            placeholder=""
+                            class="form-control input-md"
+                        />
+                        <span class="help-block"
+                            >The url or filepath of the snapshot images.</span
+                        >
                     </div>
                 </div>
-            </div>
-            <div class="form-group count-2">
-                <label class="col-md-4 control-label" for="s2height">Stream #2 Height</label>
-                <div class="col-md-4">
-                    <div class="input-group">
-                        <input id="s2height" name="s2height" class="form-control" placeholder="undefined (auto)"
-                            type="text">
-                        <span class="input-group-addon">px</span>
+                <div class="form-group count-1 snapshotDetails">
+                    <label class="col-md-4 control-label" for="s1snapshotType"
+                        >Snapshot #1 Type</label
+                    >
+                    <div class="col-md-4">
+                        <label class="radio-inline" for="s1snapshotType-0">
+                            <input
+                                type="radio"
+                                name="s1snapshotType"
+                                id="s1snapshotType-0"
+                                value="url"
+                                checked="checked"
+                            />
+                            URL
+                        </label>
+                        <label class="radio-inline" for="s1snapshotType-1">
+                            <input
+                                type="radio"
+                                name="s1snapshotType"
+                                id="s1snapshotType-1"
+                                value="file"
+                            />
+                            File Path
+                        </label>
                     </div>
                 </div>
-            </div>
-            <div class="form-group count-2 omxplayer vlc">
-                <label class="col-md-4 control-label" for="s2absPosition">Absolute Position</label>
-                <div class="col-md-4">
-                    <input id="s2absPosition" name="s2absPosition" type="text" placeholder="optional"
-                        class="form-control input-md">
-                </div>
-            </div>
-            <div class="form-group count-2 omxplayer vlc">
-                <label class="col-md-4 control-label" for="s2muted">Mute Audio from Stream?</label>
-                <div class="col-md-4">
-                    <label class="radio-inline" for="s2muted-0">
-                        <input type="radio" name="s2muted" id="s2muted-0" value="true" checked="checked"> Yes
-                    </label>
-                    <label class="radio-inline" for="s2muted-1">
-                        <input type="radio" name="s2muted" id="s2muted-1" value="false"> No
-                    </label>
-                    <span class="help-block">Required only for OMXPlayer or VLC. Use this to mute the stream.</span>
-                </div>
-            </div>
-            <div class="form-group count-2 ffmpeg">
-                <label class="col-md-4 control-label" for="s2ffmpegPort">FFMPEG WebSocket Port</label>
-                <div class="col-md-4">
-                    <input id="s2ffmpegPort" name="s2ffmpegPort" type="text" placeholder="10000" value="10000"
-                        class="form-control input-md">
-                </div>
-            </div>
-            <!-- Stream #2 Stop -->
-            <!-- Stream #3 Start -->
-            <div class="form-group count-3">
-                <label class="col-md-4 control-label" for="sName">Stream #3 Name</label>
-                <div class="col-md-4">
-                    <input id="s3Name" name="s3Name" type="text" placeholder="Camera 3" class="form-control input-md">
-                    <span class="help-block">Enter the name for the camera</span>
-                </div>
-            </div>
-            <div class="form-group count-3">
-                <label class="col-md-4 control-label" for="url">Feed #3 URL</label>
-                <div class="col-md-4">
-                    <input id="s3url" name="s3url" type="text"
-                        placeholder="rtsp://184.72.239.149/vod/mp4:BigBuckBunny_115k.mov" class="form-control input-md">
-                </div>
-            </div>
-            <div class="form-group count-3">
-                <label class="col-md-4 control-label" for="s3protocol">Network Protocol #3</label>
-                <div class="col-md-4">
-                    <label class="radio-inline" for="s3protocol-0">
-                        <input type="radio" name="s3protocol" id="s3protocol-0" value="tcp" checked="checked"> TCP
-                    </label>
-                    <label class="radio-inline" for="s3protocol-1">
-                        <input type="radio" name="s3protocol" id="s3protocol-1" value="udp"> UDP
-                    </label>
-                </div>
-            </div>
-            <div class="form-group count-3">
-                <label class="col-md-4 control-label" for="s3hdUrl">Feed #3 HD URL</label>
-                <div class="col-md-4">
-                    <input id="s3hdUrl" name="s3hdUrl" type="text" placeholder="" class="form-control input-md">
-                </div>
-            </div>
-            <div class="form-group count-3 snapshotDetails">
-                <label class="col-md-4 control-label" for="s3snapshotUrl">Snapshot URL or File Path #3</label>
-                <div class="col-md-4">
-                    <input id="s3snapshotUrl" name="s3snapshotUrl" type="text" placeholder=""
-                        class="form-control input-md">
-                </div>
-            </div>
-            <div class="form-group count-3 snapshotDetails">
-                <label class="col-md-4 control-label" for="s3snapshotType">Snapshot #3 Type</label>
-                <div class="col-md-4">
-                    <label class="radio-inline" for="s3snapshotType-0">
-                        <input type="radio" name="s3snapshotType" id="s3snapshotType-0" value="url" checked="checked">
-                        URL
-                    </label>
-                    <label class="radio-inline" for="s3snapshotType-1">
-                        <input type="radio" name="s3snapshotType" id="s3snapshotType-1" value="file"> File Path
-                    </label>
-                </div>
-            </div>
-            <div class="form-group count-3 snapshotDetails">
-                <label class="col-md-4 control-label" for="s3snapshotRefresh">Snapshot #3 Refresh Rate</label>
-                <div class="col-md-4">
-                    <div class="input-group">
-                        <input id="s3snapshotRefresh" name="s3snapshotRefresh" class="form-control" placeholder="10"
-                            value="10" type="text">
-                        <span class="input-group-addon">seconds</span>
+                <div class="form-group count-1 snapshotDetails">
+                    <label
+                        class="col-md-4 control-label"
+                        for="s1snapshotRefresh"
+                        >Snapshot #1 Refresh Rate</label
+                    >
+                    <div class="col-md-4">
+                        <div class="input-group">
+                            <input
+                                id="s1snapshotRefresh"
+                                name="s1snapshotRefresh"
+                                class="form-control"
+                                placeholder="10"
+                                value="10"
+                                type="text"
+                            />
+                            <span class="input-group-addon">seconds</span>
+                        </div>
+                        <p class="help-block">
+                            Time between fetching new snapshot images
+                        </p>
                     </div>
                 </div>
-            </div>
-            <div class="form-group count-3">
-                <label class="col-md-4 control-label" for="s3width">Stream #3 Width</label>
-                <div class="col-md-4">
-                    <div class="input-group">
-                        <input id="s3width" name="s3width" class="form-control" placeholder="undefined (auto)"
-                            type="text">
-                        <span class="input-group-addon">px</span>
+                <div class="form-group count-1">
+                    <label class="col-md-4 control-label" for="s1width"
+                        >Stream #1 Width</label
+                    >
+                    <div class="col-md-4">
+                        <div class="input-group">
+                            <input
+                                id="s1width"
+                                name="s1width"
+                                class="form-control"
+                                placeholder="undefined (auto)"
+                                type="text"
+                            />
+                            <span class="input-group-addon">px</span>
+                        </div>
+                        <p class="help-block">The width in px of the stream.</p>
                     </div>
                 </div>
-            </div>
-            <div class="form-group count-3">
-                <label class="col-md-4 control-label" for="s3height">Stream #3 Height</label>
-                <div class="col-md-4">
-                    <div class="input-group">
-                        <input id="s3height" name="s3height" class="form-control" placeholder="undefined (auto)"
-                            type="text">
-                        <span class="input-group-addon">px</span>
+                <div class="form-group count-1">
+                    <label class="col-md-4 control-label" for="s1height"
+                        >Stream #1 Height</label
+                    >
+                    <div class="col-md-4">
+                        <div class="input-group">
+                            <input
+                                id="s1height"
+                                name="s1height"
+                                class="form-control"
+                                placeholder="undefined (auto)"
+                                type="text"
+                            />
+                            <span class="input-group-addon">px</span>
+                        </div>
+                        <p class="help-block">The height in px of the stream</p>
                     </div>
                 </div>
-            </div>
-            <div class="form-group count-3 omxplayer vlc">
-                <label class="col-md-4 control-label" for="s3absPosition">Absolute Position</label>
-                <div class="col-md-4">
-                    <input id="s3absPosition" name="s3absPosition" type="text" placeholder="optional"
-                        class="form-control input-md">
-                </div>
-            </div>
-            <div class="form-group count-3 omxplayer vlc">
-                <label class="col-md-4 control-label" for="s3muted">Mute Audio from Stream?</label>
-                <div class="col-md-4">
-                    <label class="radio-inline" for="s3muted-0">
-                        <input type="radio" name="s3muted" id="s3muted-0" value="true" checked="checked"> Yes
-                    </label>
-                    <label class="radio-inline" for="s3muted-1">
-                        <input type="radio" name="s3muted" id="s3muted-1" value="false"> No
-                    </label>
-                    <span class="help-block">Required only for OMXPlayer or VLC. Use this to mute the stream.</span>
-                </div>
-            </div>
-            <div class="form-group count-3 ffmpeg">
-                <label class="col-md-4 control-label" for="s3ffmpegPort">FFMPEG WebSocket Port</label>
-                <div class="col-md-4">
-                    <input id="s3ffmpegPort" name="s3ffmpegPort" type="text" placeholder="10001" value="10001"
-                        class="form-control input-md">
-                </div>
-            </div>
-            <!-- Stream #3 Stop -->
-            <!-- Stream #4 Start -->
-            <div class="form-group count-4">
-                <label class="col-md-4 control-label" for="sName">Stream #4 Name</label>
-                <div class="col-md-4">
-                    <input id="s4Name" name="s4Name" type="text" placeholder="Camera 4" class="form-control input-md">
-                    <span class="help-block">Enter the name for the camera</span>
-                </div>
-            </div>
-            <div class="form-group count-4">
-                <label class="col-md-4 control-label" for="url">Feed #4 URL</label>
-                <div class="col-md-4">
-                    <input id="s4url" name="s4url" type="text"
-                        placeholder="rtsp://184.72.239.149/vod/mp4:BigBuckBunny_115k.mov" class="form-control input-md">
-                </div>
-            </div>
-            <div class="form-group count-4">
-                <label class="col-md-4 control-label" for="s4protocol">Network Protocol #4</label>
-                <div class="col-md-4">
-                    <label class="radio-inline" for="s4protocol-0">
-                        <input type="radio" name="s4protocol" id="s4protocol-0" value="tcp" checked="checked"> TCP
-                    </label>
-                    <label class="radio-inline" for="s4protocol-1">
-                        <input type="radio" name="s4protocol" id="s4protocol-1" value="udp"> UDP
-                    </label>
-                </div>
-            </div>
-            <div class="form-group count-4">
-                <label class="col-md-4 control-label" for="s4hdUrl">Feed #4 HD URL</label>
-                <div class="col-md-4">
-                    <input id="s4hdUrl" name="s4hdUrl" type="text" placeholder="" class="form-control input-md">
-                </div>
-            </div>
-            <div class="form-group count-4 snapshotDetails">
-                <label class="col-md-4 control-label" for="s4snapshotUrl">Snapshot URL or File Path #4</label>
-                <div class="col-md-4">
-                    <input id="s4snapshotUrl" name="s4snapshotUrl" type="text" placeholder=""
-                        class="form-control input-md">
-                </div>
-            </div>
-            <div class="form-group count-4 snapshotDetails">
-                <label class="col-md-4 control-label" for="s4snapshotType">Snapshot #4 Type</label>
-                <div class="col-md-4">
-                    <label class="radio-inline" for="s4snapshotType-0">
-                        <input type="radio" name="s4snapshotType" id="s4snapshotType-0" value="url" checked="checked">
-                        URL
-                    </label>
-                    <label class="radio-inline" for="s4snapshotType-1">
-                        <input type="radio" name="s4snapshotType" id="s4snapshotType-1" value="file"> File Path
-                    </label>
-                </div>
-            </div>
-            <div class="form-group count-4 snapshotDetails">
-                <label class="col-md-4 control-label" for="s4snapshotRefresh">Snapshot #4 Refresh Rate</label>
-                <div class="col-md-4">
-                    <div class="input-group">
-                        <input id="s4snapshotRefresh" name="s4snapshotRefresh" class="form-control" placeholder="10"
-                            value="10" type="text">
-                        <span class="input-group-addon">seconds</span>
+                <div class="form-group count-1 omxplayer vlc">
+                    <label class="col-md-4 control-label" for="s1absPosition"
+                        >Absolute Position</label
+                    >
+                    <div class="col-md-4">
+                        <input
+                            id="s1absPosition"
+                            name="s1absPosition"
+                            type="text"
+                            placeholder="optional"
+                            class="form-control input-md"
+                        />
+                        <span class="help-block"
+                            >Required only for OMXPlayer or VLC. Use this to set
+                            an exact position for the video instead of getting
+                            it automatically. Format: "{ top: XX, right: XX,
+                            bottom: XX, left: XX }"</span
+                        >
                     </div>
                 </div>
-            </div>
-            <div class="form-group count-4">
-                <label class="col-md-4 control-label" for="s4width">Stream #4 Width</label>
-                <div class="col-md-4">
-                    <div class="input-group">
-                        <input id="s4width" name="s4width" class="form-control" placeholder="undefined (auto)"
-                            type="text">
-                        <span class="input-group-addon">px</span>
+                <div class="form-group count-1 omxplayer vlc">
+                    <label class="col-md-4 control-label" for="s1muted"
+                        >Mute Audio from Stream?</label
+                    >
+                    <div class="col-md-4">
+                        <label class="radio-inline" for="s1muted-0">
+                            <input
+                                type="radio"
+                                name="s1muted"
+                                id="s1muted-0"
+                                value="true"
+                                checked="checked"
+                            />
+                            Yes
+                        </label>
+                        <label class="radio-inline" for="s1muted-1">
+                            <input
+                                type="radio"
+                                name="s1muted"
+                                id="s1muted-1"
+                                value="false"
+                            />
+                            No
+                        </label>
+                        <span class="help-block"
+                            >Required only for OMXPlayer or VLC. Use this to
+                            mute the stream.</span
+                        >
                     </div>
                 </div>
-            </div>
-            <div class="form-group count-4">
-                <label class="col-md-4 control-label" for="s4height">Stream #4 Height</label>
-                <div class="col-md-4">
-                    <div class="input-group">
-                        <input id="s4height" name="s4height" class="form-control" placeholder="undefined (auto)"
-                            type="text">
-                        <span class="input-group-addon">px</span>
+                <div class="form-group count-1 ffmpeg">
+                    <label class="col-md-4 control-label" for="s1ffmpegPort"
+                        >FFMPEG WebSocket Port</label
+                    >
+                    <div class="col-md-4">
+                        <input
+                            id="s1ffmpegPort"
+                            name="s1ffmpegPort"
+                            type="text"
+                            placeholder="9999"
+                            value="9999"
+                            class="form-control input-md"
+                        />
+                        <span class="help-block"
+                            ><i>Only required for `ffmpeg`</i> Any available
+                            port to use for the ffmpeg websocket.<br /><strong
+                                ><i>Notes:</i> THIS IS NOT THE PORT FOR YOUR
+                                CAMERA</strong
+                            >
+                            Camera stream's port must be included in the URL
+                            above. This port must be unqiue for each stream
+                            added and cannot be used by another service on the
+                            server. This is a separate WebSocket from the the
+                            Socket.IO connection between the module's script and
+                            it's `node_helper.js`.</span
+                        >
                     </div>
                 </div>
-            </div>
-            <div class="form-group count-4 omxplayer vlc">
-                <label class="col-md-4 control-label" for="s4absPosition">Absolute Position</label>
-                <div class="col-md-4">
-                    <input id="s4absPosition" name="s4absPosition" type="text" placeholder="optional"
-                        class="form-control input-md">
+                <!-- Strem #1 Stop -->
+                <!-- Stream #2 Start -->
+                <div class="form-group count-2">
+                    <label class="col-md-4 control-label" for="sName"
+                        >Stream #2 Name</label
+                    >
+                    <div class="col-md-4">
+                        <input
+                            id="s2Name"
+                            name="s2Name"
+                            type="text"
+                            placeholder="Camera 2"
+                            class="form-control input-md"
+                        />
+                        <span class="help-block"
+                            >Enter the name for the camera</span
+                        >
+                    </div>
                 </div>
-            </div>
-            <div class="form-group count-4 omxplayer vlc">
-                <label class="col-md-4 control-label" for="s4muted">Mute Audio from Stream?</label>
-                <div class="col-md-4">
-                    <label class="radio-inline" for="s4muted-0">
-                        <input type="radio" name="s4muted" id="s4muted-0" value="true" checked="checked"> Yes
-                    </label>
-                    <label class="radio-inline" for="s4muted-1">
-                        <input type="radio" name="s4muted" id="s4muted-1" value="false"> No
-                    </label>
-                    <span class="help-block">Required only for OMXPlayer or VLC. Use this to mute the stream.</span>
+                <div class="form-group count-2">
+                    <label class="col-md-4 control-label" for="url"
+                        >Feed #2 URL</label
+                    >
+                    <div class="col-md-4">
+                        <input
+                            id="s2url"
+                            name="s2url"
+                            type="text"
+                            placeholder="rtsp://184.72.239.149/vod/mp4:BigBuckBunny_115k.mov"
+                            class="form-control input-md"
+                        />
+                    </div>
                 </div>
-            </div>
-            <div class="form-group count-4 ffmpeg">
-                <label class="col-md-4 control-label" for="s4ffmpegPort">FFMPEG WebSocket Port</label>
-                <div class="col-md-4">
-                    <input id="s4ffmpegPort" name="s4ffmpegPort" type="text" placeholder="10002" value="10002"
-                        class="form-control input-md">
+                <div class="form-group count-2">
+                    <label class="col-md-4 control-label" for="s2protocol"
+                        >Network Protocol #2</label
+                    >
+                    <div class="col-md-4">
+                        <label class="radio-inline" for="s2protocol-0">
+                            <input
+                                type="radio"
+                                name="s2protocol"
+                                id="s2protocol-0"
+                                value="tcp"
+                                checked="checked"
+                            />
+                            TCP
+                        </label>
+                        <label class="radio-inline" for="s2protocol-1">
+                            <input
+                                type="radio"
+                                name="s2protocol"
+                                id="s2protocol-1"
+                                value="udp"
+                            />
+                            UDP
+                        </label>
+                    </div>
                 </div>
-            </div>
-            <!-- Stream #4 Stop -->
-        </fieldset>
-        <fieldset>
-            <legend>Step 3. Copy to MagicMirror Configuration File</legend>
-            <div class="form-group">
-                <label class="col-md-4 control-label" for="generate">Generate Config File</label>
-                <div class="col-md-4">
-                    <input type="button" id="generate" name="generate" class="btn btn-primary"
-                        onclick="generateConfig();" value="Generate" />
+                <div class="form-group count-2">
+                    <label class="col-md-4 control-label" for="s2hdUrl"
+                        >Feed #2 HD URL</label
+                    >
+                    <div class="col-md-4">
+                        <input
+                            id="s2hdUrl"
+                            name="s2hdUrl"
+                            type="text"
+                            placeholder=""
+                            class="form-control input-md"
+                        />
+                    </div>
                 </div>
-            </div>
-            <div class="form-group">
-                <label class="col-md-4 control-label" for="configResult">Configuration</label>
-                <div class="col-md-4">
-                    <textarea class="form-control" id="configResult"
-                        name="configResult">Click Generate button Above</textarea>
-                    <p class="help-block">Copy the above section to your configuration file.</p>
+                <div class="form-group count-2 snapshotDetails">
+                    <label class="col-md-4 control-label" for="s2snapshotUrl"
+                        >Snapshot URL or File Path #2</label
+                    >
+                    <div class="col-md-4">
+                        <input
+                            id="s2snapshotUrl"
+                            name="s2snapshotUrl"
+                            type="text"
+                            placeholder=""
+                            class="form-control input-md"
+                        />
+                    </div>
                 </div>
-            </div>
-        </fieldset>
-    </form>
-    <script type="text/javascript">
-        /* jshint esversion:6 */
-        function generateConfig() {
-            var s = `{
+                <div class="form-group count-2 snapshotDetails">
+                    <label class="col-md-4 control-label" for="s2snapshotType"
+                        >Snapshot #2 Type</label
+                    >
+                    <div class="col-md-4">
+                        <label class="radio-inline" for="s2snapshotType-0">
+                            <input
+                                type="radio"
+                                name="s2snapshotType"
+                                id="s2snapshotType-0"
+                                value="url"
+                                checked="checked"
+                            />
+                            URL
+                        </label>
+                        <label class="radio-inline" for="s2snapshotType-1">
+                            <input
+                                type="radio"
+                                name="s2snapshotType"
+                                id="s2snapshotType-1"
+                                value="file"
+                            />
+                            File Path
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group count-2 snapshotDetails">
+                    <label
+                        class="col-md-4 control-label"
+                        for="s2snapshotRefresh"
+                        >Snapshot #2 Refresh Rate</label
+                    >
+                    <div class="col-md-4">
+                        <div class="input-group">
+                            <input
+                                id="s2snapshotRefresh"
+                                name="s2snapshotRefresh"
+                                class="form-control"
+                                placeholder="10"
+                                value="10"
+                                type="text"
+                            />
+                            <span class="input-group-addon">seconds</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group count-2">
+                    <label class="col-md-4 control-label" for="s2width"
+                        >Stream #2 Width</label
+                    >
+                    <div class="col-md-4">
+                        <div class="input-group">
+                            <input
+                                id="s2width"
+                                name="s2width"
+                                class="form-control"
+                                placeholder="undefined (auto)"
+                                type="text"
+                            />
+                            <span class="input-group-addon">px</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group count-2">
+                    <label class="col-md-4 control-label" for="s2height"
+                        >Stream #2 Height</label
+                    >
+                    <div class="col-md-4">
+                        <div class="input-group">
+                            <input
+                                id="s2height"
+                                name="s2height"
+                                class="form-control"
+                                placeholder="undefined (auto)"
+                                type="text"
+                            />
+                            <span class="input-group-addon">px</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group count-2 omxplayer vlc">
+                    <label class="col-md-4 control-label" for="s2absPosition"
+                        >Absolute Position</label
+                    >
+                    <div class="col-md-4">
+                        <input
+                            id="s2absPosition"
+                            name="s2absPosition"
+                            type="text"
+                            placeholder="optional"
+                            class="form-control input-md"
+                        />
+                    </div>
+                </div>
+                <div class="form-group count-2 omxplayer vlc">
+                    <label class="col-md-4 control-label" for="s2muted"
+                        >Mute Audio from Stream?</label
+                    >
+                    <div class="col-md-4">
+                        <label class="radio-inline" for="s2muted-0">
+                            <input
+                                type="radio"
+                                name="s2muted"
+                                id="s2muted-0"
+                                value="true"
+                                checked="checked"
+                            />
+                            Yes
+                        </label>
+                        <label class="radio-inline" for="s2muted-1">
+                            <input
+                                type="radio"
+                                name="s2muted"
+                                id="s2muted-1"
+                                value="false"
+                            />
+                            No
+                        </label>
+                        <span class="help-block"
+                            >Required only for OMXPlayer or VLC. Use this to
+                            mute the stream.</span
+                        >
+                    </div>
+                </div>
+                <div class="form-group count-2 ffmpeg">
+                    <label class="col-md-4 control-label" for="s2ffmpegPort"
+                        >FFMPEG WebSocket Port</label
+                    >
+                    <div class="col-md-4">
+                        <input
+                            id="s2ffmpegPort"
+                            name="s2ffmpegPort"
+                            type="text"
+                            placeholder="10000"
+                            value="10000"
+                            class="form-control input-md"
+                        />
+                    </div>
+                </div>
+                <!-- Stream #2 Stop -->
+                <!-- Stream #3 Start -->
+                <div class="form-group count-3">
+                    <label class="col-md-4 control-label" for="sName"
+                        >Stream #3 Name</label
+                    >
+                    <div class="col-md-4">
+                        <input
+                            id="s3Name"
+                            name="s3Name"
+                            type="text"
+                            placeholder="Camera 3"
+                            class="form-control input-md"
+                        />
+                        <span class="help-block"
+                            >Enter the name for the camera</span
+                        >
+                    </div>
+                </div>
+                <div class="form-group count-3">
+                    <label class="col-md-4 control-label" for="url"
+                        >Feed #3 URL</label
+                    >
+                    <div class="col-md-4">
+                        <input
+                            id="s3url"
+                            name="s3url"
+                            type="text"
+                            placeholder="rtsp://184.72.239.149/vod/mp4:BigBuckBunny_115k.mov"
+                            class="form-control input-md"
+                        />
+                    </div>
+                </div>
+                <div class="form-group count-3">
+                    <label class="col-md-4 control-label" for="s3protocol"
+                        >Network Protocol #3</label
+                    >
+                    <div class="col-md-4">
+                        <label class="radio-inline" for="s3protocol-0">
+                            <input
+                                type="radio"
+                                name="s3protocol"
+                                id="s3protocol-0"
+                                value="tcp"
+                                checked="checked"
+                            />
+                            TCP
+                        </label>
+                        <label class="radio-inline" for="s3protocol-1">
+                            <input
+                                type="radio"
+                                name="s3protocol"
+                                id="s3protocol-1"
+                                value="udp"
+                            />
+                            UDP
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group count-3">
+                    <label class="col-md-4 control-label" for="s3hdUrl"
+                        >Feed #3 HD URL</label
+                    >
+                    <div class="col-md-4">
+                        <input
+                            id="s3hdUrl"
+                            name="s3hdUrl"
+                            type="text"
+                            placeholder=""
+                            class="form-control input-md"
+                        />
+                    </div>
+                </div>
+                <div class="form-group count-3 snapshotDetails">
+                    <label class="col-md-4 control-label" for="s3snapshotUrl"
+                        >Snapshot URL or File Path #3</label
+                    >
+                    <div class="col-md-4">
+                        <input
+                            id="s3snapshotUrl"
+                            name="s3snapshotUrl"
+                            type="text"
+                            placeholder=""
+                            class="form-control input-md"
+                        />
+                    </div>
+                </div>
+                <div class="form-group count-3 snapshotDetails">
+                    <label class="col-md-4 control-label" for="s3snapshotType"
+                        >Snapshot #3 Type</label
+                    >
+                    <div class="col-md-4">
+                        <label class="radio-inline" for="s3snapshotType-0">
+                            <input
+                                type="radio"
+                                name="s3snapshotType"
+                                id="s3snapshotType-0"
+                                value="url"
+                                checked="checked"
+                            />
+                            URL
+                        </label>
+                        <label class="radio-inline" for="s3snapshotType-1">
+                            <input
+                                type="radio"
+                                name="s3snapshotType"
+                                id="s3snapshotType-1"
+                                value="file"
+                            />
+                            File Path
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group count-3 snapshotDetails">
+                    <label
+                        class="col-md-4 control-label"
+                        for="s3snapshotRefresh"
+                        >Snapshot #3 Refresh Rate</label
+                    >
+                    <div class="col-md-4">
+                        <div class="input-group">
+                            <input
+                                id="s3snapshotRefresh"
+                                name="s3snapshotRefresh"
+                                class="form-control"
+                                placeholder="10"
+                                value="10"
+                                type="text"
+                            />
+                            <span class="input-group-addon">seconds</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group count-3">
+                    <label class="col-md-4 control-label" for="s3width"
+                        >Stream #3 Width</label
+                    >
+                    <div class="col-md-4">
+                        <div class="input-group">
+                            <input
+                                id="s3width"
+                                name="s3width"
+                                class="form-control"
+                                placeholder="undefined (auto)"
+                                type="text"
+                            />
+                            <span class="input-group-addon">px</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group count-3">
+                    <label class="col-md-4 control-label" for="s3height"
+                        >Stream #3 Height</label
+                    >
+                    <div class="col-md-4">
+                        <div class="input-group">
+                            <input
+                                id="s3height"
+                                name="s3height"
+                                class="form-control"
+                                placeholder="undefined (auto)"
+                                type="text"
+                            />
+                            <span class="input-group-addon">px</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group count-3 omxplayer vlc">
+                    <label class="col-md-4 control-label" for="s3absPosition"
+                        >Absolute Position</label
+                    >
+                    <div class="col-md-4">
+                        <input
+                            id="s3absPosition"
+                            name="s3absPosition"
+                            type="text"
+                            placeholder="optional"
+                            class="form-control input-md"
+                        />
+                    </div>
+                </div>
+                <div class="form-group count-3 omxplayer vlc">
+                    <label class="col-md-4 control-label" for="s3muted"
+                        >Mute Audio from Stream?</label
+                    >
+                    <div class="col-md-4">
+                        <label class="radio-inline" for="s3muted-0">
+                            <input
+                                type="radio"
+                                name="s3muted"
+                                id="s3muted-0"
+                                value="true"
+                                checked="checked"
+                            />
+                            Yes
+                        </label>
+                        <label class="radio-inline" for="s3muted-1">
+                            <input
+                                type="radio"
+                                name="s3muted"
+                                id="s3muted-1"
+                                value="false"
+                            />
+                            No
+                        </label>
+                        <span class="help-block"
+                            >Required only for OMXPlayer or VLC. Use this to
+                            mute the stream.</span
+                        >
+                    </div>
+                </div>
+                <div class="form-group count-3 ffmpeg">
+                    <label class="col-md-4 control-label" for="s3ffmpegPort"
+                        >FFMPEG WebSocket Port</label
+                    >
+                    <div class="col-md-4">
+                        <input
+                            id="s3ffmpegPort"
+                            name="s3ffmpegPort"
+                            type="text"
+                            placeholder="10001"
+                            value="10001"
+                            class="form-control input-md"
+                        />
+                    </div>
+                </div>
+                <!-- Stream #3 Stop -->
+                <!-- Stream #4 Start -->
+                <div class="form-group count-4">
+                    <label class="col-md-4 control-label" for="sName"
+                        >Stream #4 Name</label
+                    >
+                    <div class="col-md-4">
+                        <input
+                            id="s4Name"
+                            name="s4Name"
+                            type="text"
+                            placeholder="Camera 4"
+                            class="form-control input-md"
+                        />
+                        <span class="help-block"
+                            >Enter the name for the camera</span
+                        >
+                    </div>
+                </div>
+                <div class="form-group count-4">
+                    <label class="col-md-4 control-label" for="url"
+                        >Feed #4 URL</label
+                    >
+                    <div class="col-md-4">
+                        <input
+                            id="s4url"
+                            name="s4url"
+                            type="text"
+                            placeholder="rtsp://184.72.239.149/vod/mp4:BigBuckBunny_115k.mov"
+                            class="form-control input-md"
+                        />
+                    </div>
+                </div>
+                <div class="form-group count-4">
+                    <label class="col-md-4 control-label" for="s4protocol"
+                        >Network Protocol #4</label
+                    >
+                    <div class="col-md-4">
+                        <label class="radio-inline" for="s4protocol-0">
+                            <input
+                                type="radio"
+                                name="s4protocol"
+                                id="s4protocol-0"
+                                value="tcp"
+                                checked="checked"
+                            />
+                            TCP
+                        </label>
+                        <label class="radio-inline" for="s4protocol-1">
+                            <input
+                                type="radio"
+                                name="s4protocol"
+                                id="s4protocol-1"
+                                value="udp"
+                            />
+                            UDP
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group count-4">
+                    <label class="col-md-4 control-label" for="s4hdUrl"
+                        >Feed #4 HD URL</label
+                    >
+                    <div class="col-md-4">
+                        <input
+                            id="s4hdUrl"
+                            name="s4hdUrl"
+                            type="text"
+                            placeholder=""
+                            class="form-control input-md"
+                        />
+                    </div>
+                </div>
+                <div class="form-group count-4 snapshotDetails">
+                    <label class="col-md-4 control-label" for="s4snapshotUrl"
+                        >Snapshot URL or File Path #4</label
+                    >
+                    <div class="col-md-4">
+                        <input
+                            id="s4snapshotUrl"
+                            name="s4snapshotUrl"
+                            type="text"
+                            placeholder=""
+                            class="form-control input-md"
+                        />
+                    </div>
+                </div>
+                <div class="form-group count-4 snapshotDetails">
+                    <label class="col-md-4 control-label" for="s4snapshotType"
+                        >Snapshot #4 Type</label
+                    >
+                    <div class="col-md-4">
+                        <label class="radio-inline" for="s4snapshotType-0">
+                            <input
+                                type="radio"
+                                name="s4snapshotType"
+                                id="s4snapshotType-0"
+                                value="url"
+                                checked="checked"
+                            />
+                            URL
+                        </label>
+                        <label class="radio-inline" for="s4snapshotType-1">
+                            <input
+                                type="radio"
+                                name="s4snapshotType"
+                                id="s4snapshotType-1"
+                                value="file"
+                            />
+                            File Path
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group count-4 snapshotDetails">
+                    <label
+                        class="col-md-4 control-label"
+                        for="s4snapshotRefresh"
+                        >Snapshot #4 Refresh Rate</label
+                    >
+                    <div class="col-md-4">
+                        <div class="input-group">
+                            <input
+                                id="s4snapshotRefresh"
+                                name="s4snapshotRefresh"
+                                class="form-control"
+                                placeholder="10"
+                                value="10"
+                                type="text"
+                            />
+                            <span class="input-group-addon">seconds</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group count-4">
+                    <label class="col-md-4 control-label" for="s4width"
+                        >Stream #4 Width</label
+                    >
+                    <div class="col-md-4">
+                        <div class="input-group">
+                            <input
+                                id="s4width"
+                                name="s4width"
+                                class="form-control"
+                                placeholder="undefined (auto)"
+                                type="text"
+                            />
+                            <span class="input-group-addon">px</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group count-4">
+                    <label class="col-md-4 control-label" for="s4height"
+                        >Stream #4 Height</label
+                    >
+                    <div class="col-md-4">
+                        <div class="input-group">
+                            <input
+                                id="s4height"
+                                name="s4height"
+                                class="form-control"
+                                placeholder="undefined (auto)"
+                                type="text"
+                            />
+                            <span class="input-group-addon">px</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group count-4 omxplayer vlc">
+                    <label class="col-md-4 control-label" for="s4absPosition"
+                        >Absolute Position</label
+                    >
+                    <div class="col-md-4">
+                        <input
+                            id="s4absPosition"
+                            name="s4absPosition"
+                            type="text"
+                            placeholder="optional"
+                            class="form-control input-md"
+                        />
+                    </div>
+                </div>
+                <div class="form-group count-4 omxplayer vlc">
+                    <label class="col-md-4 control-label" for="s4muted"
+                        >Mute Audio from Stream?</label
+                    >
+                    <div class="col-md-4">
+                        <label class="radio-inline" for="s4muted-0">
+                            <input
+                                type="radio"
+                                name="s4muted"
+                                id="s4muted-0"
+                                value="true"
+                                checked="checked"
+                            />
+                            Yes
+                        </label>
+                        <label class="radio-inline" for="s4muted-1">
+                            <input
+                                type="radio"
+                                name="s4muted"
+                                id="s4muted-1"
+                                value="false"
+                            />
+                            No
+                        </label>
+                        <span class="help-block"
+                            >Required only for OMXPlayer or VLC. Use this to
+                            mute the stream.</span
+                        >
+                    </div>
+                </div>
+                <div class="form-group count-4 ffmpeg">
+                    <label class="col-md-4 control-label" for="s4ffmpegPort"
+                        >FFMPEG WebSocket Port</label
+                    >
+                    <div class="col-md-4">
+                        <input
+                            id="s4ffmpegPort"
+                            name="s4ffmpegPort"
+                            type="text"
+                            placeholder="10002"
+                            value="10002"
+                            class="form-control input-md"
+                        />
+                    </div>
+                </div>
+                <!-- Stream #4 Stop -->
+            </fieldset>
+            <fieldset>
+                <legend>Step 3. Copy to MagicMirror Configuration File</legend>
+                <div class="form-group">
+                    <label class="col-md-4 control-label" for="generate"
+                        >Generate Config File</label
+                    >
+                    <div class="col-md-4">
+                        <input
+                            type="button"
+                            id="generate"
+                            name="generate"
+                            class="btn btn-primary"
+                            onclick="generateConfig();"
+                            value="Generate"
+                        />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-4 control-label" for="configResult"
+                        >Configuration</label
+                    >
+                    <div class="col-md-4">
+                        <textarea
+                            class="form-control"
+                            id="configResult"
+                            name="configResult"
+                        >
+Click Generate button Above</textarea
+                        >
+                        <p class="help-block">
+                            Copy the above section to your configuration file.
+                        </p>
+                    </div>
+                </div>
+            </fieldset>
+        </form>
+        <script type="text/javascript">
+            /* jshint esversion:6 */
+            function generateConfig() {
+                var s = `{
     module: "MMM-RTSPStream",
-    position: "${$('#position').val()}",
+    position: "${$("#position").val()}",
     `;
-            if ($('#headerText').val() !== '') {
-                s = s + `header: "${$('#headerText').val()}",
+                if ($("#headerText").val() !== "") {
+                    s =
+                        s +
+                        `header: "${$("#headerText").val()}",
         `;
-            }
-            s = s + `config: {
-        autoStart: ${$('input[name=autoStart]:checked').val()},
-        rotateStreams: ${$('input[name=rotateStreams]:checked').val()},
+                }
+                s =
+                    s +
+                    `config: {
+        autoStart: ${$("input[name=autoStart]:checked").val()},
+        rotateStreams: ${$("input[name=rotateStreams]:checked").val()},
         `;
-            if ($('input[name=rotateStreams]:checked').val()) {
-                s = s + `rotateStreamTimeout: ${$('#rotateStreamTimeout').val()},
+                if ($("input[name=rotateStreams]:checked").val()) {
+                    s =
+                        s +
+                        `rotateStreamTimeout: ${$(
+                            "#rotateStreamTimeout"
+                        ).val()},
         `;
-            }
-            s = s + `moduleWidth: ${$('#moduleWidth').val()},
-        moduleHeight: ${$('#moduleHeight').val()},
-        localPlayer: '${$('#localPlayer').val()}',
-        remotePlayer: '${$('#remotePlayer').val()}',
-        showSnapWhenPaused: ${$('input[name=showSnapWhenPaused]:checked').val()},
-        remoteSnaps: ${$('input[name=remoteSnaps]:checked').val()},
+                }
+                s =
+                    s +
+                    `moduleWidth: ${$("#moduleWidth").val()},
+        moduleHeight: ${$("#moduleHeight").val()},
+        localPlayer: '${$("#localPlayer").val()}',
+        remotePlayer: '${$("#remotePlayer").val()}',
+        showSnapWhenPaused: ${$(
+            "input[name=showSnapWhenPaused]:checked"
+        ).val()},
+        remoteSnaps: ${$("input[name=remoteSnaps]:checked").val()},
         `;
-            if ($('#moduleOffset').val() !== "") {
-                s = s + `moduleOffset: ${$('#moduleOffset').val()},
+                if ($("#moduleOffset").val() !== "") {
+                    s =
+                        s +
+                        `moduleOffset: ${$("#moduleOffset").val()},
         `;
-            }
-            if (["ffmpeg", "vlc"].indexOf($("select[name=localPlayer]").val()) !== -1 || $("select[name=remotePlayer]").val() === "ffmpeg") {
-                s = s + `shutdownDelay: ${$('#s1shutdownDelay').val()},
+                }
+                if (
+                    ["ffmpeg", "vlc"].indexOf(
+                        $("select[name=localPlayer]").val()
+                    ) !== -1 ||
+                    $("select[name=remotePlayer]").val() === "ffmpeg"
+                ) {
+                    s =
+                        s +
+                        `shutdownDelay: ${$("#s1shutdownDelay").val()},
         `;
-            }
-            s = s + `stream1: {
-            name: '${$('#s1Name').val()}',
-            url: '${$('#s1url').val()}',
+                }
+                s =
+                    s +
+                    `stream1: {
+            name: '${$("#s1Name").val()}',
+            url: '${$("#s1url").val()}',
             `;
-            if ($('#s1protocol').val() === "udp") {
-                s = s + `protocol: 'udp',
+                if ($("#s1protocol").val() === "udp") {
+                    s =
+                        s +
+                        `protocol: 'udp',
             `;
-            }
-            if ($('#s1frameRate') !== "") {
-                s = s + `frameRate: '${$('#s1frameRate').val()}',
+                }
+                if ($("#s1frameRate") !== "") {
+                    s =
+                        s +
+                        `frameRate: '${$("#s1frameRate").val()}',
             `;
-            }
-            if ($('#s1hdUrl').val() !== "") {
-                s = s + `hdUrl: '${$('#s1hdUrl').val()}',
+                }
+                if ($("#s1hdUrl").val() !== "") {
+                    s =
+                        s +
+                        `hdUrl: '${$("#s1hdUrl").val()}',
             `;
-            }
-            if ($("input[name=showSnapWhenPaused]:checked").val() === "true" && $('#s1snapshotUrl').val() !== "") {
-                s = s + `snapshotUrl: '${$('#s1snapshotUrl').val()}',
+                }
+                if (
+                    $("input[name=showSnapWhenPaused]:checked").val() ===
+                        "true" &&
+                    $("#s1snapshotUrl").val() !== ""
+                ) {
+                    s =
+                        s +
+                        `snapshotUrl: '${$("#s1snapshotUrl").val()}',
             `;
-            }
-            if ($("input[name=showSnapWhenPaused]:checked").val() === "true") {
-                s = s + `snapshotType: '${$('input[name=s1snapshotType]:checked').val()}',
+                }
+                if (
+                    $("input[name=showSnapWhenPaused]:checked").val() === "true"
+                ) {
+                    s =
+                        s +
+                        `snapshotType: '${$(
+                            "input[name=s1snapshotType]:checked"
+                        ).val()}',
             `;
-            }
-            if ($("input[name=showSnapWhenPaused]:checked").val() === "true" && $('#s1snapshotRefresh').val() !== "") {
-                s = s + `snapshotRefresh: ${$('#s1snapshotRefresh').val()},
+                }
+                if (
+                    $("input[name=showSnapWhenPaused]:checked").val() ===
+                        "true" &&
+                    $("#s1snapshotRefresh").val() !== ""
+                ) {
+                    s =
+                        s +
+                        `snapshotRefresh: ${$("#s1snapshotRefresh").val()},
             `;
-            }
-            if ($('#s1width').val() !== "") {
-                s = s + `width: ${$('#s1width').val()},
+                }
+                if ($("#s1width").val() !== "") {
+                    s =
+                        s +
+                        `width: ${$("#s1width").val()},
             `;
-            } else {
-                s = s + `width: undefined,
+                } else {
+                    s =
+                        s +
+                        `width: undefined,
             `;
-            }
-            if ($('#s1height').val() !== "") {
-                s = s + `height: ${$('#s1height').val()},
+                }
+                if ($("#s1height").val() !== "") {
+                    s =
+                        s +
+                        `height: ${$("#s1height").val()},
             `;
-            } else {
-                s = s + `height: undefined,
+                } else {
+                    s =
+                        s +
+                        `height: undefined,
             `;
-            }
-            if (['omxplayer', 'vlc'].indexOf($("select[name=localPlayer]").val()) && $('#s1absPosition').val() !== "") {
-                s = s + `absPosition: ${$('#s1absPosition').val()},
+                }
+                if (
+                    ["omxplayer", "vlc"].indexOf(
+                        $("select[name=localPlayer]").val()
+                    ) &&
+                    $("#s1absPosition").val() !== ""
+                ) {
+                    s =
+                        s +
+                        `absPosition: ${$("#s1absPosition").val()},
             `;
-            }
-            if (['omxplayer', 'vlc'].indexOf($("select[name=localPlayer]").val())) {
-                s = s + `muted: ${$('input[name=s1muted]:checked').val()},
+                }
+                if (
+                    ["omxplayer", "vlc"].indexOf(
+                        $("select[name=localPlayer]").val()
+                    )
+                ) {
+                    s =
+                        s +
+                        `muted: ${$("input[name=s1muted]:checked").val()},
             `;
-            }
-            if ($("select[name=localPlayer]").val() === "ffmpeg" || $("select[name=remotePlayer]").val() === "ffmpeg") {
-                s = s + `ffmpegPort: ${$('#s1ffmpegPort').val()},
+                }
+                if (
+                    $("select[name=localPlayer]").val() === "ffmpeg" ||
+                    $("select[name=remotePlayer]").val() === "ffmpeg"
+                ) {
+                    s =
+                        s +
+                        `ffmpegPort: ${$("#s1ffmpegPort").val()},
             `;
-            }
-            s = s + `},
+                }
+                s =
+                    s +
+                    `},
         `;
 
-            if (parseInt($('input[type=radio][name=streamCount]:checked').val()) >= 2) {
-                s = s + `stream2: {
-            name: '${$('#s2Name').val()}',
-            url: '${$('#s2url').val()}',
+                if (
+                    parseInt(
+                        $("input[type=radio][name=streamCount]:checked").val()
+                    ) >= 2
+                ) {
+                    s =
+                        s +
+                        `stream2: {
+            name: '${$("#s2Name").val()}',
+            url: '${$("#s2url").val()}',
             `;
-                if ($('#s2protocol').val() === "udp") {
-                    s = s + `protocol: 'udp',
+                    if ($("#s2protocol").val() === "udp") {
+                        s =
+                            s +
+                            `protocol: 'udp',
             `;
-                }
-                if ($('#s2frameRate') !== "") {
-                    s = s + `frameRate: '${$('#s2frameRate').val()}',
+                    }
+                    if ($("#s2frameRate") !== "") {
+                        s =
+                            s +
+                            `frameRate: '${$("#s2frameRate").val()}',
             `;
-                }
-                if ($('#s2hdUrl').val() !== "") {
-                    s = s + `hdUrl: '${$('#s2hdUrl').val()}',
+                    }
+                    if ($("#s2hdUrl").val() !== "") {
+                        s =
+                            s +
+                            `hdUrl: '${$("#s2hdUrl").val()}',
             `;
-                }
-                if ($("input[name=showSnapWhenPaused]:checked").val() === "true" && $('#s2snapshotUrl').val() !== "") {
-                    s = s + `snapshotUrl: '${$('#s2snapshotUrl').val()}',
+                    }
+                    if (
+                        $("input[name=showSnapWhenPaused]:checked").val() ===
+                            "true" &&
+                        $("#s2snapshotUrl").val() !== ""
+                    ) {
+                        s =
+                            s +
+                            `snapshotUrl: '${$("#s2snapshotUrl").val()}',
             `;
-                }
-                if ($("input[name=showSnapWhenPaused]:checked").val() === "true") {
-                    s = s + `snapshotType: '${$('input[name=s2snapshotType]:checked').val()}',
+                    }
+                    if (
+                        $("input[name=showSnapWhenPaused]:checked").val() ===
+                        "true"
+                    ) {
+                        s =
+                            s +
+                            `snapshotType: '${$(
+                                "input[name=s2snapshotType]:checked"
+                            ).val()}',
             `;
-                }
-                if ($("input[name=showSnapWhenPaused]:checked").val() === "true" && $('#s2snapshotRefresh').val() !== "") {
-                    s = s + `snapshotRefresh: ${$('#s2snapshotRefresh').val()},
+                    }
+                    if (
+                        $("input[name=showSnapWhenPaused]:checked").val() ===
+                            "true" &&
+                        $("#s2snapshotRefresh").val() !== ""
+                    ) {
+                        s =
+                            s +
+                            `snapshotRefresh: ${$("#s2snapshotRefresh").val()},
             `;
-                }
-                if ($('#s2width').val() !== "") {
-                    s = s + `width: ${$('#s2width').val()},
+                    }
+                    if ($("#s2width").val() !== "") {
+                        s =
+                            s +
+                            `width: ${$("#s2width").val()},
             `;
-                } else {
-                    s = s + `width: undefined,
+                    } else {
+                        s =
+                            s +
+                            `width: undefined,
             `;
-                }
-                if ($('#s2height').val() !== "") {
-                    s = s + `height: ${$('#s2height').val()},
+                    }
+                    if ($("#s2height").val() !== "") {
+                        s =
+                            s +
+                            `height: ${$("#s2height").val()},
             `;
-                } else {
-                    s = s + `height: undefined,
+                    } else {
+                        s =
+                            s +
+                            `height: undefined,
             `;
-                }
-                if (['omxplayer', 'vlc'].indexOf($("select[name=localPlayer]").val()) && $('#s2absPosition').val() !== "") {
-                    s = s + `absPosition: ${$('#s2absPosition').val()},
+                    }
+                    if (
+                        ["omxplayer", "vlc"].indexOf(
+                            $("select[name=localPlayer]").val()
+                        ) &&
+                        $("#s2absPosition").val() !== ""
+                    ) {
+                        s =
+                            s +
+                            `absPosition: ${$("#s2absPosition").val()},
             `;
-                }
-                if (['omxplayer', 'vlc'].indexOf($("select[name=localPlayer]").val())) {
-                    s = s + `muted: ${$('input[name=s2muted]:checked').val()},
+                    }
+                    if (
+                        ["omxplayer", "vlc"].indexOf(
+                            $("select[name=localPlayer]").val()
+                        )
+                    ) {
+                        s =
+                            s +
+                            `muted: ${$("input[name=s2muted]:checked").val()},
             `;
-                }
-                if ($("select[name=localPlayer]").val() === "ffmpeg" || $("select[name=localPlayer]").val() === "ffmpeg") {
-                    s = s + `ffmpegPort: ${$('#s2ffmpegPort').val()},
-            shutdownDelay: ${$('#s2shutdownDelay').val()},
-            hideFfmpegOutput: ${$('input[name=s2hideFfmpegOutput]:checked').val()},
+                    }
+                    if (
+                        $("select[name=localPlayer]").val() === "ffmpeg" ||
+                        $("select[name=localPlayer]").val() === "ffmpeg"
+                    ) {
+                        s =
+                            s +
+                            `ffmpegPort: ${$("#s2ffmpegPort").val()},
+            shutdownDelay: ${$("#s2shutdownDelay").val()},
+            hideFfmpegOutput: ${$(
+                "input[name=s2hideFfmpegOutput]:checked"
+            ).val()},
             `;
-                }
-                s = s + `},
+                    }
+                    s =
+                        s +
+                        `},
         `;
-            }
+                }
 
-            if (parseInt($('input[type=radio][name=streamCount]:checked').val()) >= 3) {
-                s = s + `stream3: {
-            name: '${$('#s3Name').val()}',
-            url: '${$('#s3url').val()}',
+                if (
+                    parseInt(
+                        $("input[type=radio][name=streamCount]:checked").val()
+                    ) >= 3
+                ) {
+                    s =
+                        s +
+                        `stream3: {
+            name: '${$("#s3Name").val()}',
+            url: '${$("#s3url").val()}',
             `;
-                if ($('#s3protocol').val() === "udp") {
-                    s = s + `protocol: 'udp',
+                    if ($("#s3protocol").val() === "udp") {
+                        s =
+                            s +
+                            `protocol: 'udp',
             `;
-                }
-                if ($('#s3frameRate') !== "") {
-                    s = s + `frameRate: '${$('#s3frameRate').val()}',
+                    }
+                    if ($("#s3frameRate") !== "") {
+                        s =
+                            s +
+                            `frameRate: '${$("#s3frameRate").val()}',
             `;
-                }
-                if ($('#s3hdUrl').val() !== "") {
-                    s = s + `hdUrl: '${$('#s3hdUrl').val()}',
+                    }
+                    if ($("#s3hdUrl").val() !== "") {
+                        s =
+                            s +
+                            `hdUrl: '${$("#s3hdUrl").val()}',
             `;
-                }
-                if ($("input[name=showSnapWhenPaused]:checked").val() === "true" && $('#s3snapshotUrl').val() !== "") {
-                    s = s + `snapshotUrl: '${$('#s3snapshotUrl').val()}',
+                    }
+                    if (
+                        $("input[name=showSnapWhenPaused]:checked").val() ===
+                            "true" &&
+                        $("#s3snapshotUrl").val() !== ""
+                    ) {
+                        s =
+                            s +
+                            `snapshotUrl: '${$("#s3snapshotUrl").val()}',
             `;
-                }
-                if ($("input[name=showSnapWhenPaused]:checked").val() === "true") {
-                    s = s + `snapshotType: '${$('input[name=s3snapshotType]:checked').val()}',
+                    }
+                    if (
+                        $("input[name=showSnapWhenPaused]:checked").val() ===
+                        "true"
+                    ) {
+                        s =
+                            s +
+                            `snapshotType: '${$(
+                                "input[name=s3snapshotType]:checked"
+                            ).val()}',
             `;
-                }
-                if ($("input[name=showSnapWhenPaused]:checked").val() === "true" && $('#s3snapshotRefresh').val() !== "") {
-                    s = s + `snapshotRefresh: ${$('#s3snapshotRefresh').val()},
+                    }
+                    if (
+                        $("input[name=showSnapWhenPaused]:checked").val() ===
+                            "true" &&
+                        $("#s3snapshotRefresh").val() !== ""
+                    ) {
+                        s =
+                            s +
+                            `snapshotRefresh: ${$("#s3snapshotRefresh").val()},
             `;
-                }
-                if ($('#s3width').val() !== "") {
-                    s = s + `width: ${$('#s3width').val()},
+                    }
+                    if ($("#s3width").val() !== "") {
+                        s =
+                            s +
+                            `width: ${$("#s3width").val()},
             `;
-                } else {
-                    s = s + `width: undefined,
+                    } else {
+                        s =
+                            s +
+                            `width: undefined,
             `;
-                }
-                if ($('#s3height').val() !== "") {
-                    s = s + `height: ${$('#s3height').val()},
+                    }
+                    if ($("#s3height").val() !== "") {
+                        s =
+                            s +
+                            `height: ${$("#s3height").val()},
             `;
-                } else {
-                    s = s + `height: undefined,
+                    } else {
+                        s =
+                            s +
+                            `height: undefined,
             `;
-                }
-                if (['omxplayer', 'vlc'].indexOf($("select[name=localPlayer]").val()) && $('#s3absPosition').val() !== "") {
-                    s = s + `absPosition: ${$('#s3absPosition').val()},
+                    }
+                    if (
+                        ["omxplayer", "vlc"].indexOf(
+                            $("select[name=localPlayer]").val()
+                        ) &&
+                        $("#s3absPosition").val() !== ""
+                    ) {
+                        s =
+                            s +
+                            `absPosition: ${$("#s3absPosition").val()},
             `;
-                }
-                if (['omxplayer', 'vlc'].indexOf($("select[name=localPlayer]").val())) {
-                    s = s + `muted: ${$('input[name=s3muted]:checked').val()},
+                    }
+                    if (
+                        ["omxplayer", "vlc"].indexOf(
+                            $("select[name=localPlayer]").val()
+                        )
+                    ) {
+                        s =
+                            s +
+                            `muted: ${$("input[name=s3muted]:checked").val()},
             `;
-                }
-                if ($("select[name=localPlayer]").val() === "ffmpeg" || $("select[name=localPlayer]").val() === "ffmpeg") {
-                    s = s + `ffmpegPort: ${$('#s3ffmpegPort').val()},
-            shutdownDelay: ${$('#s3shutdownDelay').val()},
-            hideFfmpegOutput: ${$('input[name=s3hideFfmpegOutput]:checked').val()},
+                    }
+                    if (
+                        $("select[name=localPlayer]").val() === "ffmpeg" ||
+                        $("select[name=localPlayer]").val() === "ffmpeg"
+                    ) {
+                        s =
+                            s +
+                            `ffmpegPort: ${$("#s3ffmpegPort").val()},
+            shutdownDelay: ${$("#s3shutdownDelay").val()},
+            hideFfmpegOutput: ${$(
+                "input[name=s3hideFfmpegOutput]:checked"
+            ).val()},
             `;
-                }
-                s = s + `},
+                    }
+                    s =
+                        s +
+                        `},
         `;
-            }
+                }
 
-
-            if (parseInt($('input[type=radio][name=streamCount]:checked').val()) >= 4) {
-                s = s + `stream4: {
-            name: '${$('#s4Name').val()}',
-            url: '${$('#s4url').val()}',
+                if (
+                    parseInt(
+                        $("input[type=radio][name=streamCount]:checked").val()
+                    ) >= 4
+                ) {
+                    s =
+                        s +
+                        `stream4: {
+            name: '${$("#s4Name").val()}',
+            url: '${$("#s4url").val()}',
             `;
-                if ($('#s4protocol').val() === "udp") {
-                    s = s + `protocol: 'udp',
+                    if ($("#s4protocol").val() === "udp") {
+                        s =
+                            s +
+                            `protocol: 'udp',
             `;
-                }
-                if ($('#s4frameRate') !== "") {
-                    s = s + `frameRate: '${$('#s4frameRate').val()}',
+                    }
+                    if ($("#s4frameRate") !== "") {
+                        s =
+                            s +
+                            `frameRate: '${$("#s4frameRate").val()}',
             `;
-                }
-                if ($('#s4hdUrl').val() !== "") {
-                    s = s + `hdUrl: '${$('#s4hdUrl').val()}',
+                    }
+                    if ($("#s4hdUrl").val() !== "") {
+                        s =
+                            s +
+                            `hdUrl: '${$("#s4hdUrl").val()}',
             `;
-                }
-                if ($("input[name=showSnapWhenPaused]:checked").val() === "true" && $('#s4snapshotUrl').val() !== "") {
-                    s = s + `snapshotUrl: '${$('#s4snapshotUrl').val()}',
+                    }
+                    if (
+                        $("input[name=showSnapWhenPaused]:checked").val() ===
+                            "true" &&
+                        $("#s4snapshotUrl").val() !== ""
+                    ) {
+                        s =
+                            s +
+                            `snapshotUrl: '${$("#s4snapshotUrl").val()}',
             `;
-                }
-                if ($("input[name=showSnapWhenPaused]:checked").val() === "true") {
-                    s = s + `snapshotType: '${$('input[name=s4snapshotType]:checked').val()}',
+                    }
+                    if (
+                        $("input[name=showSnapWhenPaused]:checked").val() ===
+                        "true"
+                    ) {
+                        s =
+                            s +
+                            `snapshotType: '${$(
+                                "input[name=s4snapshotType]:checked"
+                            ).val()}',
             `;
-                }
-                if ($("input[name=showSnapWhenPaused]:checked").val() === "true" && $('#s4snapshotRefresh').val() !== "") {
-                    s = s + `snapshotRefresh: ${$('#s4snapshotRefresh').val()},
+                    }
+                    if (
+                        $("input[name=showSnapWhenPaused]:checked").val() ===
+                            "true" &&
+                        $("#s4snapshotRefresh").val() !== ""
+                    ) {
+                        s =
+                            s +
+                            `snapshotRefresh: ${$("#s4snapshotRefresh").val()},
             `;
-                }
-                if ($('#s4width').val() !== "") {
-                    s = s + `width: ${$('#s4width').val()},
+                    }
+                    if ($("#s4width").val() !== "") {
+                        s =
+                            s +
+                            `width: ${$("#s4width").val()},
             `;
-                } else {
-                    s = s + `width: undefined,
+                    } else {
+                        s =
+                            s +
+                            `width: undefined,
             `;
-                }
-                if ($('#s4height').val() !== "") {
-                    s = s + `height: ${$('#s4height').val()},
+                    }
+                    if ($("#s4height").val() !== "") {
+                        s =
+                            s +
+                            `height: ${$("#s4height").val()},
             `;
-                } else {
-                    s = s + `height: undefined,
+                    } else {
+                        s =
+                            s +
+                            `height: undefined,
             `;
-                }
-                if (['omxplayer', 'vlc'].indexOf($("select[name=localPlayer]").val()) && $('#s4absPosition').val() !== "") {
-                    s = s + `absPosition: ${$('#s4absPosition').val()},
+                    }
+                    if (
+                        ["omxplayer", "vlc"].indexOf(
+                            $("select[name=localPlayer]").val()
+                        ) &&
+                        $("#s4absPosition").val() !== ""
+                    ) {
+                        s =
+                            s +
+                            `absPosition: ${$("#s4absPosition").val()},
             `;
-                }
-                if (['omxplayer', 'vlc'].indexOf($("select[name=localPlayer]").val())) {
-                    s = s + `muted: ${$('input[name=s4muted]:checked').val()},
+                    }
+                    if (
+                        ["omxplayer", "vlc"].indexOf(
+                            $("select[name=localPlayer]").val()
+                        )
+                    ) {
+                        s =
+                            s +
+                            `muted: ${$("input[name=s4muted]:checked").val()},
             `;
-                }
-                if ($("select[name=localPlayer]").val() === "ffmpeg" || $("select[name=localPlayer]").val() === "ffmpeg") {
-                    s = s + `ffmpegPort: ${$('#s4ffmpegPort').val()},
-            shutdownDelay: ${$('#s4shutdownDelay').val()},
-            hideFfmpegOutput: ${$('input[name=s4hideFfmpegOutput]:checked').val()},
+                    }
+                    if (
+                        $("select[name=localPlayer]").val() === "ffmpeg" ||
+                        $("select[name=localPlayer]").val() === "ffmpeg"
+                    ) {
+                        s =
+                            s +
+                            `ffmpegPort: ${$("#s4ffmpegPort").val()},
+            shutdownDelay: ${$("#s4shutdownDelay").val()},
+            hideFfmpegOutput: ${$(
+                "input[name=s4hideFfmpegOutput]:checked"
+            ).val()},
             `;
-                }
-                s = s + `},
+                    }
+                    s =
+                        s +
+                        `},
         `;
-            }
+                }
 
-            s = s + `}
+                s =
+                    s +
+                    `}
 }`;
 
-            $('#configResult').val(s);
-        }
+                $("#configResult").val(s);
+            }
 
+            $(document).ready(function () {
+                $(".ffmpeg").hide();
+                $(".count-2").hide();
+                $(".count-3").hide();
+                $(".count-4").hide();
 
-        $(document).ready(function () {
-            $('.ffmpeg').hide();
-            $('.count-2').hide();
-            $('.count-3').hide();
-            $('.count-4').hide();
-
-            $("input[name=rotateStreams]").on("change", function () {
-                if ($(this).val() === "true") {
-                    $('.rotateStreamTimeout').show();
-                } else {
-                    $('.rotateStreamTimeout').hide();
-                }
+                $("input[name=rotateStreams]").on("change", function () {
+                    if ($(this).val() === "true") {
+                        $(".rotateStreamTimeout").show();
+                    } else {
+                        $(".rotateStreamTimeout").hide();
+                    }
+                });
+                $("input[name=showSnapWhenPaused]").on("change", function () {
+                    if ($(this).val() === "true") {
+                        $(".snapshotDetails").show();
+                    } else {
+                        $(".snapshotDetails").hide();
+                    }
+                });
+                $("select[name=remotePlayer]").on("change", function () {
+                    console.log(
+                        $(this).val(),
+                        $("select[name=localPlayer]").val()
+                    );
+                    if (
+                        $(this).val() === "ffmpeg" ||
+                        $("select[name=localPlayer]").val() === "ffmpeg"
+                    ) {
+                        $(".ffmpeg").show();
+                    } else {
+                        $(".ffmpeg").hide();
+                    }
+                });
+                $("select[name=localPlayer]").on("change", function () {
+                    if (
+                        $(this).val() === "ffmpeg" ||
+                        $("select[name=remotePlayer]").val() === "ffmpeg"
+                    ) {
+                        $(".ffmpeg").show();
+                    } else {
+                        $(".ffmpeg").hide();
+                    }
+                    if (
+                        $(this).val() === "omxplayer" ||
+                        $(this).val() === "vlc"
+                    ) {
+                        $(".omxplayer").show();
+                    } else {
+                        $(".omxplayer").hide();
+                    }
+                });
+                $("input[type=radio][name=streamCount]").change(function () {
+                    if (this.value === "1") {
+                        $(".count-2").hide();
+                        $(".count-3").hide();
+                        $(".count-4").hide();
+                    } else if (this.value === "2") {
+                        $(".count-2").show();
+                        $(".count-3").hide();
+                        $(".count-4").hide();
+                    } else if (this.value === "3") {
+                        $(".count-2").show();
+                        $(".count-3").show();
+                        $(".count-4").hide();
+                    } else if (this.value === "4") {
+                        $(".count-2").show();
+                        $(".count-3").show();
+                        $(".count-4").show();
+                    }
+                });
             });
-            $("input[name=showSnapWhenPaused]").on("change", function () {
-                if ($(this).val() === "true") {
-                    $('.snapshotDetails').show();
-                } else {
-                    $('.snapshotDetails').hide();
-                }
-            });
-            $("select[name=remotePlayer]").on("change", function () {
-                console.log($(this).val(), $("select[name=localPlayer]").val());
-                if ($(this).val() === "ffmpeg" || $("select[name=localPlayer]").val() === "ffmpeg") {
-                    $('.ffmpeg').show();
-                } else {
-                    $('.ffmpeg').hide();
-                }
-            });
-            $("select[name=localPlayer]").on("change", function () {
-                if ($(this).val() === "ffmpeg" || $("select[name=remotePlayer]").val() === "ffmpeg") {
-                    $('.ffmpeg').show();
-                } else {
-                    $('.ffmpeg').hide();
-                }
-                if ($(this).val() === "omxplayer" || $(this).val() === "vlc") {
-                    $('.omxplayer').show();
-                } else {
-                    $('.omxplayer').hide();
-                }
-            });
-            $('input[type=radio][name=streamCount]').change(function () {
-                if (this.value === '1') {
-                    $('.count-2').hide();
-                    $('.count-3').hide();
-                    $('.count-4').hide();
-                } else if (this.value === '2') {
-                    $('.count-2').show();
-                    $('.count-3').hide();
-                    $('.count-4').hide();
-                } else if (this.value === '3') {
-                    $('.count-2').show();
-                    $('.count-3').show();
-                    $('.count-4').hide();
-                } else if (this.value === '4') {
-                    $('.count-2').show();
-                    $('.count-3').show();
-                    $('.count-4').show();
-                }
-            });
-        });
-    </script>
-</body>
-
+        </script>
+    </body>
 </html>
