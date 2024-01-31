@@ -1,6 +1,6 @@
 # MMM-RTSPStream - Video Streaming from Live Feeds (Security Cameras)
 
-This is a module for the [MagicMirror²](https://github.com/MichMich/MagicMirror/).
+This is a module for the [MagicMirror²](https://github.com/MagicMirrorOrg/MagicMirror/).
 
 This module will show a live RTSP video stream and/or periodic snapshots on the MagicMirror² from any IP Security Camera which supports the [RTSP protocol](https://github.com/shbatm/MMM-RTSPStream/wiki/Stream-URLs-for-Various-Cameras) and/or can serve a snapshot periodically.
 
@@ -43,7 +43,7 @@ This module will show a live RTSP video stream and/or periodic snapshots on the 
 
 ### Quick install
 
-If you followed the default installation instructions for the [MagicMirror²](https://github.com/MichMich/MagicMirror) project, you should be able to use the automatic installer.
+If you followed the default installation instructions for the [MagicMirror²](https://github.com/MagicMirrorOrg/MagicMirror) project, you should be able to use the automatic installer.
 The following command will download the installer and execute it:
 
 ```bash
