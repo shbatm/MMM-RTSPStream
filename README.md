@@ -9,7 +9,6 @@ This module will show a live RTSP video stream and/or periodic snapshots on the 
 > Why?
 >
 > -   I am no longer using this module on my own mirror. After several years, I found that I use the snapshots much more frequently than I streamed the actual cameras, which can be performed by much simpler modules and methods. To enable streaming, WebRTC (like [MMM-HomeAssistant-WebRTC](https://github.com/Anonym-tsk/MMM-HomeAssistant-WebRTC)) is a newer and better standard with much lower server overhead and latency for delivering RTSP Streams to the frontend than any of the options used here, in the future, this will be the method I focus on and I will not try to shoehorn another technology into this module.
-> -   Update 5-Oct-2022: See alternative module [MMM-RTSPtoWeb](https://github.com/shbatm/MMM-RTSPtoWeb) for a drastically simplified module relying on WebRTC and a backend server.
 
 ## Features
 
