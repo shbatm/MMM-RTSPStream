@@ -9,95 +9,95 @@
  *
  */
 .MMM-RTSPStream .wrapper {
-    position: relative;
-    left: 50%;
-    vertical-align: middle;
-    text-align: center;
-    -webkit-transform: translateX(-50%); /* translateX(-30px); */
-    transform: translateX(-50%); /* translateX(-30px); */
+  position: relative;
+  left: 50%;
+  vertical-align: middle;
+  text-align: center;
+  -webkit-transform: translateX(-50%); /* translateX(-30px); */
+  transform: translateX(-50%); /* translateX(-30px); */
 }
 
 .MMM-RTSPStream .wrapper br {
-    clear: both;
+  clear: both;
 }
 
 .MMM-RTSPStream .innerWrapper {
-    position: relative;
-    width: 352px; /* Video width + 2*border + 2*padding */
-    height: 242px;
-    border: 1px solid white;
-    /* float: left; */
-    display: inline-block;
-    text-align: center;
-    margin: 2px;
+  position: relative;
+  width: 352px; /* Video width + 2*border + 2*padding */
+  height: 242px;
+  border: 1px solid white;
+  /* float: left; */
+  display: inline-block;
+  text-align: center;
+  margin: 2px;
 }
 
 .MMM-RTSPStream .canvas {
-    position: absolute;
-    z-index: 10;
-    left: 50%;
-    top: 50%;
-    /* width: 352px;
+  position: absolute;
+  z-index: 10;
+  left: 50%;
+  top: 50%;
+  /* width: 352px;
   height: 240px; */
-    -webkit-transform: translate(-50%, -50%);
-    transform: translate(-50%, -50%);
-    width: 100%;
-    height: 100%;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
 }
 
 .MMM-RTSPStream .snapshot {
-    position: absolute;
-    z-index: 1;
-    left: 50%;
-    top: 50%;
-    /* width: 352px;
+  position: absolute;
+  z-index: 1;
+  left: 50%;
+  top: 50%;
+  /* width: 352px;
   height: 240px; */
-    -webkit-transform: translate(-50%, -50%);
-    transform: translate(-50%, -50%);
-    width: 100%;
-    height: 100%;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
 }
 
 /* Next and Previous arrow */
 .MMM-RTSPStream .control {
-    z-index: 55;
-    /* opacity: 0.0; */
-    display: inline-block;
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    line-height: 50%;
-    width: 100%;
-    height: 100%;
-    vertical-align: middle;
-    -webkit-transform: translate(-50%, -50%);
-    transform: translate(-50%, -50%);
+  z-index: 55;
+  /* opacity: 0.0; */
+  display: inline-block;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  line-height: 50%;
+  width: 100%;
+  height: 100%;
+  vertical-align: middle;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
 }
 
 /* Show button when you hover near */
 .MMM-RTSPStream .control:hover label {
-    opacity: 0.6;
-    cursor: pointer !important;
+  opacity: 0.6;
+  cursor: pointer !important;
 }
 
 .MMM-RTSPStream .control:hover {
-    opacity: 0.6;
-    cursor: pointer !important;
+  opacity: 0.6;
+  cursor: pointer !important;
 }
 
 .MMM-RTSPStream .control label {
-    z-index: 100;
-    display: block;
-    text-align: center;
-    line-height: 50px;
-    width: 100px;
-    height: 100px;
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    -webkit-transform: translate(-50%, -50%);
-    transform: translate(-50%, -50%);
-    font-size: 100px;
-    color: #fff;
-    opacity: 0;
+  z-index: 100;
+  display: block;
+  text-align: center;
+  line-height: 50px;
+  width: 100px;
+  height: 100px;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+  font-size: 100px;
+  color: #fff;
+  opacity: 0;
 }

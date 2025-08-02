@@ -25,10 +25,10 @@ A clear and concise description of what you expected to happen.
 **Configuration**
 Please include:
 
--   The configuration section for this module
--   The configuration section for any affected modules
+- The configuration section for this module
+- The configuration section for any affected modules
 
--   It may be easier to post these in a [Gist](https://gist.github.com) and post the link here.
+- It may be easier to post these in a [Gist](https://gist.github.com) and post the link here.
 
 **Logs**
 If applicable, please include the relevant logs to help explain your problem. + From the console or `~/.pm2/logs/` + From the web console using DevTools (<key>Ctrl</key>+<key>Shift</key>+<key>I</key>)

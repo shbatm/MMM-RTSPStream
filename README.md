@@ -8,32 +8,32 @@ This module will show a live RTSP video stream and/or periodic snapshots on the 
 >
 > Why?
 >
-> -   I am no longer using this module on my own mirror. After several years, I found that I use the snapshots much more frequently than I streamed the actual cameras, which can be performed by much simpler modules and methods. To enable streaming, WebRTC (like [MMM-HomeAssistant-WebRTC](https://github.com/Anonym-tsk/MMM-HomeAssistant-WebRTC)) is a newer and better standard with much lower server overhead and latency for delivering RTSP Streams to the frontend than any of the options used here, in the future, this will be the method I focus on and I will not try to shoehorn another technology into this module.
+> - I am no longer using this module on my own mirror. After several years, I found that I use the snapshots much more frequently than I streamed the actual cameras, which can be performed by much simpler modules and methods. To enable streaming, WebRTC (like [MMM-HomeAssistant-WebRTC](https://github.com/Anonym-tsk/MMM-HomeAssistant-WebRTC)) is a newer and better standard with much lower server overhead and latency for delivering RTSP Streams to the frontend than any of the options used here, in the future, this will be the method I focus on and I will not try to shoehorn another technology into this module.
 
 ## Features
 
--   Supports single or multiple camera streams/snapshots
--   For multiple streams: supports rotating through streams in a single window or displaying multiple windows (with customizeable layout)
--   Supports fetching snapshots from a file or url when not actively streaming
--   Flexible configurations to limit resource use on Raspberry Pi --
-    -   Stops all streams when module is hidden
-    -   Option for AutoPlay or manual starting of stream
-    -   Plays one or all streams (when displaying multiple)
-    -   _Note:_ 3 simultaneous streams on a RaspberryPi 3 is about the limit for usability.
--   Support for [MMM-KeyBindings](https://github.com/shbatm/MMM-KeyBindings) module for Play/Pause Remote Control and navigation of multiple streams
--   Hardware-Accelerated Playback on the main screen, with option to use software playback on a remote browser window.
--   When using `omxplayer` or `vlc`, double-clicking the play button (or longpressing PlayPause key if using MMM-KeyBindings) will play the video fullscreen. Click anywhere once (or Pause with MMM-KeyBindings) to exit.
+- Supports single or multiple camera streams/snapshots
+- For multiple streams: supports rotating through streams in a single window or displaying multiple windows (with customizeable layout)
+- Supports fetching snapshots from a file or url when not actively streaming
+- Flexible configurations to limit resource use on Raspberry Pi --
+  - Stops all streams when module is hidden
+  - Option for AutoPlay or manual starting of stream
+  - Plays one or all streams (when displaying multiple)
+  - _Note:_ 3 simultaneous streams on a RaspberryPi 3 is about the limit for usability.
+- Support for [MMM-KeyBindings](https://github.com/shbatm/MMM-KeyBindings) module for Play/Pause Remote Control and navigation of multiple streams
+- Hardware-Accelerated Playback on the main screen, with option to use software playback on a remote browser window.
+- When using `omxplayer` or `vlc`, double-clicking the play button (or longpressing PlayPause key if using MMM-KeyBindings) will play the video fullscreen. Click anywhere once (or Pause with MMM-KeyBindings) to exit.
 
 ## Dependencies
 
--   The following packages are required for the module to function fully and the installer will attempt to install them with `apt`:
-    -   `ffmpeg`, `omxplayer`, `vlc`, `devilspie2`, `wmctrl`
--   For hardware-accelerated streaming, `vlc` or `omxplayer` is required.
--   For manipulating VLC's windows, `devilspie2` and `wmctrl` are used.
--   For software-decoded streaming and/or remote browser viewing:
-    -   Requires `jsmpeg` for front-end display of stream.
-    -   Requires `node-rtsp-stream-es6` Node.js module and `ffmpeg` for backend.
-    -   Video flow using `'ffmpeg'`: Camera RTSP Stream → `ffmpeg` pre-processor → MM module's `node_helper.js` (via `node-rtsp-stream-es6`) → Web Socket (`ws`) → MagicMirror² (via `jsmpeg`)
+- The following packages are required for the module to function fully and the installer will attempt to install them with `apt`:
+  - `ffmpeg`, `omxplayer`, `vlc`, `devilspie2`, `wmctrl`
+- For hardware-accelerated streaming, `vlc` or `omxplayer` is required.
+- For manipulating VLC's windows, `devilspie2` and `wmctrl` are used.
+- For software-decoded streaming and/or remote browser viewing:
+  - Requires `jsmpeg` for front-end display of stream.
+  - Requires `node-rtsp-stream-es6` Node.js module and `ffmpeg` for backend.
+  - Video flow using `'ffmpeg'`: Camera RTSP Stream → `ffmpeg` pre-processor → MM module's `node_helper.js` (via `node-rtsp-stream-es6`) → Web Socket (`ws`) → MagicMirror² (via `jsmpeg`)
 
 ## Screenshot
 
@@ -67,15 +67,15 @@ npm install
 1. Install the module (see above).
 2. Add the following to your config:
 
-    ```js
-        {
-            module: 'MMM-RTSPStream',
-            position: 'middle_center',
-            config: {
-                initialSetup: true,
-            }
-        }
-    ```
+   ```js
+       {
+           module: 'MMM-RTSPStream',
+           position: 'middle_center',
+           config: {
+               initialSetup: true,
+           }
+       }
+   ```
 
 3. Open a web-browser and navigate to: <http://your-mirror-ip:8080/MMM-RTSPStream/config.html>
 4. Use the tool to generate your config details.
@@ -162,8 +162,8 @@ this.sendNotification("RTSP-PLAY", "all"); // Play all streams (or current strea
 this.sendNotification("RTSP-PLAY", "streamX"); // Play a particular stream (when not rotating)
 this.sendNotification("RTSP-PLAY-FULLSCREEN", "streamX"); // Play a particular stream fullscreen (when using OMXPLAYER)
 this.sendNotification("RTSP-PLAY-WINDOW", {
-    name: "streamX",
-    box: { top: XX, right: XX, bottom: XX, left: XX }
+  name: "streamX",
+  box: { top: XX, right: XX, bottom: XX, left: XX }
 }); // Play a particular stream in a custom window (when using OMXPLAYER)
 this.sendNotification("RTSP-STOP", "all"); // Stop the streams
 this.sendNotification("RTSP-STOP", "streamX"); // Stop a particular stream
@@ -192,9 +192,9 @@ keyBindings: {
 
 ## To-do
 
--   Add better touchscreen support (use an OnTouch method to play/pause instead of OnClick).
--   KNOWN ISSUE: snapshots can be stopped by another "instance" of the mirror running in a different window. Expected behavior: should only affect the local window.
--   KNOWN ISSUE: `omxplayer` will only play a certain maximum number of streams at a time. On a RPi3, this appears to be a max of 3. It won't error, it just won't play another stream. To fix: adjust the memory split of the GPU/CPU using the `raspi-config` command.
+- Add better touchscreen support (use an OnTouch method to play/pause instead of OnClick).
+- KNOWN ISSUE: snapshots can be stopped by another "instance" of the mirror running in a different window. Expected behavior: should only affect the local window.
+- KNOWN ISSUE: `omxplayer` will only play a certain maximum number of streams at a time. On a RPi3, this appears to be a max of 3. It won't error, it just won't play another stream. To fix: adjust the memory split of the GPU/CPU using the `raspi-config` command.
 
 ## Experimentation
 
