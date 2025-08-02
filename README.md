@@ -74,7 +74,7 @@ npm install
            config: {
                initialSetup: true,
            }
-       }
+       },
    ```
 
 3. Open a web-browser and navigate to: <http://your-mirror-ip:8080/MMM-RTSPStream/config.html>
