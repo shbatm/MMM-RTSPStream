@@ -12,7 +12,6 @@ const DataURI = require("datauri");
 const NodeHelper = require("node_helper");
 const Stream = require("node-rtsp-stream-es6");
 
-const datauri = new DataURI();
 const psTree = require("ps-tree");
 
 const environ = Object.assign(process.env, { DISPLAY: ":0" });
@@ -103,7 +102,8 @@ module.exports = NodeHelper.create({
       typeof this.config[name].snapshotType !== "undefined" &&
       this.config[name].snapshotType === "file"
     ) {
-      datauri.encode(this.config[name].snapshotUrl, (err, content) => {
+      const datauri = new DataURI();
+      datauri.encode(snapUrl, (err, content) => {
         if (err) {
           throw err;
         }
