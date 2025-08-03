@@ -1,14 +1,19 @@
 # MMM-RTSPStream - Video Streaming from Live Feeds (Security Cameras)
 
-This is a module for the [MagicMirror²](https://github.com/MagicMirrorOrg/MagicMirror/).
+This is a module for [MagicMirror²](https://github.com/MagicMirrorOrg/MagicMirror/).
 
 This module will show a live RTSP video stream and/or periodic snapshots on the MagicMirror² from any IP Security Camera which supports the [RTSP protocol](https://github.com/shbatm/MMM-RTSPStream/wiki/Stream-URLs-for-Various-Cameras) and/or can serve a snapshot periodically.
 
-> :warning: This module is no longer being actively developed. I will accept PRs and leave the repo active, but will not be directly supporting any issues. If anyone is interested in assuming ownership of the module, please contact @shbatm. :warning:
+> :warning: **Project Status**: This module is maintained on a best-effort basis with occasional updates for technical interest. No dedicated support is provided. The module works as-is, but users should be prepared to troubleshoot issues independently. :warning:
 >
-> Why?
+> **Background:**
 >
 > - I am no longer using this module on my own mirror. After several years, I found that I use the snapshots much more frequently than I streamed the actual cameras, which can be performed by much simpler modules and methods. To enable streaming, WebRTC (like [MMM-HomeAssistant-WebRTC](https://github.com/Anonym-tsk/MMM-HomeAssistant-WebRTC)) is a newer and better standard with much lower server overhead and latency for delivering RTSP Streams to the frontend than any of the options used here, in the future, this will be the method I focus on and I will not try to shoehorn another technology into this module.
+
+## Maintainer
+
+- [shbatm](https://github.com/shbatm) - does not actively maintain this module anymore
+- [KristjanESPERANTO](https://github.com/KristjanESPERANTO) - neither actively maintains this module, but accepts community contributions
 
 ## Features
 
@@ -210,9 +215,15 @@ keyBindings: {
 
 ## To-do
 
+Feel free to contribute to the module by adding any of the following features or fixing any of the known issues:
+
 - Add better touchscreen support (use an OnTouch method to play/pause instead of OnClick).
-- KNOWN ISSUE: snapshots can be stopped by another "instance" of the mirror running in a different window. Expected behavior: should only affect the local window.
-- Known Issue: `ffmpeg` streams can sometimes start and stop erratically when using a WiFi connection. For best results, use a hard-wired Ethernet connection.
+
+### Known Issues
+
+- snapshots can be stopped by another "instance" of the mirror running in a different window. Expected behavior: should only affect the local window.
+- `ffmpeg` streams can sometimes start and stop erratically when using a WiFi connection. For best results, use a hard-wired Ethernet connection.
+- Positioning of the VLC window seems not to work on Wayland-based systems. If you are using a Wayland compositor, you may need to use the `ffmpeg` option instead of `vlc` for local playback.
 
 ## Experimentation
 
@@ -227,6 +238,20 @@ ffmpeg -i {RTSP_SOURCE} -f image2 -vf fps=fps=1/{x} -update 1 thumb.png
 // Grab the first frame from a stream and save as thumb.jpg
 ffmpeg -i {RTSP_SOURCE} -ss 00:00:01.500 -f image2 -vframes 1 thumb.png
 ```
+
+## Getting Help
+
+**Important:** This module is maintained on a best-effort basis without dedicated support. When seeking help:
+
+1. **Search existing issues** first - your problem may already be documented
+2. **Check the [MagicMirror² Forum](https://forum.magicmirror.builders)** for community discussions
+3. **When opening an issue**, include:
+   - Your complete module configuration
+   - Relevant error logs from both console and browser DevTools (`Ctrl+Shift+I`)
+   - Your system information (OS, MagicMirror version, etc.)
+4. **Be prepared to troubleshoot independently** - responses are not guaranteed
+
+For the best experience, consider using modern alternatives like WebRTC-based solutions for new installations.
 
 ## Contributing
 
@@ -254,4 +279,3 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE.md) f
 
 All notable changes to this project will be documented in the [CHANGELOG.md](CHANGELOG.md) file.
 
-([source](https://superuser.com/questions/663928/ffmpeg-to-capture-stills-from-h-264-stream))
