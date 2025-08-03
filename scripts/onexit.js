@@ -1,7 +1,5 @@
 #!/usr/bin/env node
 
-/* jshint esversion: 6 */
-
 const pm2 = require('pm2');
 
 const stopAllOmxplayers = function() {

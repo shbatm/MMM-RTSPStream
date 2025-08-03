@@ -6,7 +6,6 @@
  * By shbatm
  * MIT Licensed.
  */
-/* jshint esversion: 6 */
 const global = this;
 
 Module.register("MMM-RTSPStream", {
