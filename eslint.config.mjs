@@ -7,8 +7,8 @@ import markdown from "@eslint/markdown";
 import stylistic from "@stylistic/eslint-plugin";
 
 export default defineConfig([
-  globalIgnores(["public/bootstrap.min.css", "scripts/jsmpeg.min.js"]),
-  {files: ["**/*.css"], plugins: {css}, language: "css/css", extends: ["css/recommended"], rules: {"css/no-important": "off"}},
+  globalIgnores(["scripts/jsmpeg.min.js"]),
+  {files: ["**/*.css"], plugins: {css}, language: "css/css", extends: ["css/recommended"], rules: {"css/no-important": "off", "css/use-baseline": "off"}},
   {
     files: ["**/*.{js,mjs}"],
     languageOptions: {

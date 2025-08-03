@@ -1,1728 +1,382 @@
 <!doctype html>
-<html>
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>MMM-RTSPStream Configuration Builder</title>
-    <link rel="stylesheet" href="bootstrap.min.css" type="text/css" />
-    <style type="text/css">
-      body {
-        margin: 30px;
-      }
-    </style>
+    <link rel="stylesheet" href="styles.css">
   </head>
-
   <body>
-    <form class="form-horizontal">
-      <fieldset>
-        <legend>Step 1. MMM-RTSPStream Core Configuration Builder</legend>
-        <div class="form-group">
-          <label class="col-md-4 control-label" for="position"
-            >Module Position</label
-          >
-          <div class="col-md-4">
-            <select id="position" name="position" class="form-control">
-              <option value="top_bar">top_bar</option>
-              <option value="top_left">top_left</option>
-              <option value="top_center">top_center</option>
-              <option value="top_right">top_right</option>
-              <option value="upper_third">upper_third</option>
-              <option value="middle_center" selected>middle_center</option>
-              <option value="lower_third">lower_third</option>
-              <option value="bottom_left">bottom_left</option>
-              <option value="bottom_center">bottom_center</option>
-              <option value="bottom_right">bottom_right</option>
-              <option value="bottom_bar">bottom_bar</option>
-              <option value="fullscreen_above">fullscreen_above</option>
-              <option value="fullscreen_below">fullscreen_below</option>
-            </select>
+    <div class="container">
+      <div class="header">
+        <h1>MMM-RTSPStream Configuration Builder</h1>
+        <p>Create your RTSP stream configuration with ease</p>
+      </div>
+
+      <form class="form">
+        <div class="section">
+          <div class="section-header">
+            <h2 class="section-title">Step 1. Core Configuration</h2>
           </div>
-        </div>
-        <div class="form-group">
-          <label class="col-md-4 control-label" for="headerText"
-            >Module Header Text</label
-          >
-          <div class="col-md-4">
-            <input
-              id="headerText"
-              name="headerText"
-              type="text"
-              placeholder="Camera Streams"
-              class="form-control input-md"
-            />
-            <span class="help-block">Leave blank for no header.</span>
-          </div>
-        </div>
-        <div class="form-group">
-          <label class="col-md-4 control-label" for="autoStart"
-            >Auto Start Streams?</label
-          >
-          <div class="col-md-4">
-            <label class="radio-inline" for="autoStart-0">
-              <input
-                type="radio"
-                name="autoStart"
-                id="autoStart-0"
-                value="true"
-                checked="checked"
-              />
-              Yes
-            </label>
-            <label class="radio-inline" for="autoStart-1">
-              <input
-                type="radio"
-                name="autoStart"
-                id="autoStart-1"
-                value="false"
-              />
-              No
-            </label>
-            <p class="help-block">
-              Yes will start the streams automatically when the mirror starts,
-              no will show snapshots (if available) or a blank window until the
-              stream is started by a notification from another app or by
-              clicking the play button.
-            </p>
-          </div>
-        </div>
-        <div class="form-group">
-          <label class="col-md-4 control-label" for="rotateStreams"
-            >Rotate Through Streams or Individual Windows?</label
-          >
-          <div class="col-md-4">
-            <div class="radio">
-              <label for="rotateStreams-0">
+          <div class="section-content">
+            
+            <div class="form-group">
+              <label class="label" for="position">Module Position</label>
+              <div>
+                <select id="position" name="position" class="select">
+                  <option value="top_bar">top_bar</option>
+                  <option value="top_left">top_left</option>
+                  <option value="top_center">top_center</option>
+                  <option value="top_right">top_right</option>
+                  <option value="upper_third">upper_third</option>
+                  <option value="middle_center" selected>middle_center</option>
+                  <option value="lower_third">lower_third</option>
+                  <option value="bottom_left">bottom_left</option>
+                  <option value="bottom_center">bottom_center</option>
+                  <option value="bottom_right">bottom_right</option>
+                  <option value="bottom_bar">bottom_bar</option>
+                  <option value="fullscreen_above">fullscreen_above</option>
+                  <option value="fullscreen_below">fullscreen_below</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="label" for="headerText">Module Header Text</label>
+              <div>
                 <input
-                  type="radio"
-                  name="rotateStreams"
-                  id="rotateStreams-0"
-                  value="true"
-                  checked="checked"
+                  id="headerText"
+                  name="headerText"
+                  type="text"
+                  placeholder="Camera Streams"
+                  class="input"
                 />
-                Rotate through all streams in a single window
-              </label>
+                <div class="help">Leave blank for no header.</div>
+              </div>
             </div>
-            <div class="radio">
-              <label for="rotateStreams-1">
+
+            <div class="form-group">
+              <label class="label">Auto Start Streams?</label>
+              <div>
+                <div class="radio-group">
+                  <label class="radio-item" for="autoStart-0">
+                    <input type="radio" name="autoStart" id="autoStart-0" value="true" checked />
+                    Yes
+                  </label>
+                  <label class="radio-item" for="autoStart-1">
+                    <input type="radio" name="autoStart" id="autoStart-1" value="false" />
+                    No
+                  </label>
+                </div>
+                <div class="help">
+                  Yes will start the streams automatically when the mirror starts,
+                  no will show snapshots (if available) or a blank window until the
+                  stream is started by a notification from another app or by
+                  clicking the play button.
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="label">Rotate Through Streams or Individual Windows?</label>
+              <div>
+                <div class="radio-block">
+                  <label for="rotateStreams-0">
+                    <input type="radio" name="rotateStreams" id="rotateStreams-0" value="true" checked />
+                    Rotate through all streams in a single window
+                  </label>
+                </div>
+                <div class="radio-block">
+                  <label for="rotateStreams-1">
+                    <input type="radio" name="rotateStreams" id="rotateStreams-1" value="false" />
+                    Display an individual window for each stream
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group rotateStreamTimeout">
+              <label class="label" for="rotateStreamTimeout">Time (in sec) to show each stream</label>
+              <div>
                 <input
-                  type="radio"
-                  name="rotateStreams"
-                  id="rotateStreams-1"
-                  value="false"
+                  id="rotateStreamTimeout"
+                  name="rotateStreamTimeout"
+                  type="text"
+                  placeholder="10"
+                  value="10"
+                  class="input"
                 />
-                Display an individual window for each stream
-              </label>
+                <div class="help">Only applies when the first option above is selected.</div>
+              </div>
             </div>
-          </div>
-        </div>
-        <div class="form-group rotateStreamTimeout">
-          <label class="col-md-4 control-label" for="rotateStreamTimeout"
-            >Time (in sec) to show each stream</label
-          >
-          <div class="col-md-4">
-            <input
-              id="rotateStreamTimeout"
-              name="rotateStreamTimeout"
-              type="text"
-              placeholder="10"
-              value="10"
-              class="form-control input-md"
-            />
-            <span class="help-block"
-              >Only applies when the first option above is selected.</span
-            >
-          </div>
-        </div>
-        <div class="form-group">
-          <label class="col-md-4 control-label" for="showSnapWhenPaused"
-            >Show snapshot images when the stream(s) is paused</label
-          >
-          <div class="col-md-4">
-            <label class="radio-inline" for="showSnapWhenPaused-0">
-              <input
-                type="radio"
-                name="showSnapWhenPaused"
-                id="showSnapWhenPaused-0"
-                value="true"
-                checked="checked"
-              />
-              Yes
-            </label>
-            <label class="radio-inline" for="showSnapWhenPaused-1">
-              <input
-                type="radio"
-                name="showSnapWhenPaused"
-                id="showSnapWhenPaused-1"
-                value="false"
-              />
-              No
-            </label>
-            <p class="help-block">
-              If your camera supports timed snapshot images via URL or saving to
-              a file location, the module can display these when the stream is
-              paused.
-            </p>
-          </div>
-        </div>
-        <div class="form-group">
-          <label class="col-md-4 control-label" for="localPlayer"
-            >Local Screen Player to Use</label
-          >
-          <div class="col-md-4">
-            <select id="localPlayer" name="localPlayer" class="form-control">
-              <option value="vlc">VLC Player (HW-accelerated)</option>
-              <option value="ffmpeg">FFPMEG (SW decoder)</option>
-            </select>
-          </div>
-        </div>
-        <div class="form-group">
-          <label class="col-md-4 control-label" for="remotePlayer"
-            >Remote Browser/VNC Player to Use</label
-          >
-          <div class="col-md-4">
-            <select id="remotePlayer" name="remotePlayer" class="form-control">
-              <option value="none">None / N/A</option>
-              <option value="ffmpeg">FFPMEG</option>
-            </select>
-          </div>
-        </div>
-        <div class="form-group">
-          <label class="col-md-4 control-label" for="remoteSnaps"
-            >Show Snapshots on Remote?</label
-          >
-          <div class="col-md-4">
-            <label class="radio-inline" for="remoteSnaps-0">
-              <input
-                type="radio"
-                name="remoteSnaps"
-                id="remoteSnaps-0"
-                value="true"
-                checked="checked"
-              />
-              Yes
-            </label>
-            <label class="radio-inline" for="remoteSnaps-1">
-              <input
-                type="radio"
-                name="remoteSnaps"
-                id="remoteSnaps-1"
-                value="false"
-              />
-              No
-            </label>
-            <p class="help-block">
-              When using VLC for local player and None for remote player,
-              no video will be visible if you open the Mirror on a remote web
-              browser or view through VNC. Selecting yes for this option will
-              show snapshots to the remote viewers (saves resources over using
-              FFMPEG for Remote Player)
-            </p>
-          </div>
-        </div>
-        <div class="form-group">
-          <label class="col-md-4 control-label" for="moduleWidth"
-            >Module Width</label
-          >
-          <div class="col-md-4">
-            <div class="input-group">
-              <input
-                id="moduleWidth"
-                name="moduleWidth"
-                class="form-control"
-                placeholder="354"
-                value="354"
-                type="text"
-              />
-              <span class="input-group-addon">px</span>
-            </div>
-            <p class="help-block">
-              When rotateStreams is false and multiple streams are used, adjust
-              this value to adjust the number of streams shown side by side.
-              E.G. to show 2 streams side by side, this value should be =
-              2*(Stream Width + 2*1px (border) + 2*15px (margin))
-            </p>
-          </div>
-        </div>
-        <div class="form-group">
-          <label class="col-md-4 control-label" for="moduleHeight"
-            >Module Height</label
-          >
-          <div class="col-md-4">
-            <div class="input-group">
-              <input
-                id="moduleHeight"
-                name="moduleHeight"
-                class="form-control"
-                placeholder="240"
-                value="240"
-                type="text"
-              />
-              <span class="input-group-addon">px</span>
-            </div>
-            <p class="help-block">
-              Similar (but less critical) to moduleWidth. Adjust to the number
-              of streams high to ensure other modules clear.
-            </p>
-          </div>
-        </div>
-        <div class="form-group vlc">
-          <label class="col-md-4 control-label" for="moduleOffset"
-            >Module Offset - Only applies when using VLC.
-          </label>
-          <div class="col-md-4">
-            <textarea
-              class="form-control"
-              id="moduleOffset"
-              name="moduleOffset"
-            ></textarea>
-            <p class="help-block">
-              On some displays, the video does not properly line up with the box
-              on the screen. Entering a pixel value will shift the video over by
-              that amount. Default: 0 Values: Any number (no units) by itself
-              will adjust both top/left the same amount, or you can specify left
-              &amp; top adjustments separately (e.g. { left: 10, top: -10 })
-            </p>
-          </div>
-        </div>
-        <div class="form-group ffmpeg">
-          <label class="col-md-4 control-label" for="s1shutdownDelay"
-            >Shutdown Delay</label
-          >
-          <div class="col-md-4">
-            <div class="input-group">
-              <input
-                id="s1shutdownDelay"
-                name="s1shutdownDelay"
-                class="form-control"
-                placeholder="12"
-                value="12"
-                type="text"
-              />
-              <span class="input-group-addon">ms</span>
-            </div>
-            <p class="help-block">
-              The time delay (in sec) between when the stream is hidden/closed
-              and when the stream actually stops. When rotating through multiple
-              streams this prevents closing the connection to a stream only to
-              re-open a few seconds later when it comes back through the loop
-              (which reduces the time delay when restarting a stream). To
-              conserve resources on a slow device, you can set this to 0
-            </p>
-          </div>
-        </div>
-      </fieldset>
-      <fieldset>
-        <legend>Step 2. Video Stream Configurations</legend>
-        <div class="form-group count-1">
-          <label class="col-md-4 control-label" for="streamCount"
-            >Number of Streams</label
-          >
-          <div class="col-md-4">
-            <label class="radio-inline" for="streamCount-0">
-              <input
-                type="radio"
-                name="streamCount"
-                id="streamCount-0"
-                value="1"
-                checked="checked"
-              />
-              1
-            </label>
-            <label class="radio-inline" for="streamCount-1">
-              <input
-                type="radio"
-                name="streamCount"
-                id="streamCount-1"
-                value="2"
-              />
-              2
-            </label>
-            <label class="radio-inline" for="streamCount-2">
-              <input
-                type="radio"
-                name="streamCount"
-                id="streamCount-2"
-                value="3"
-              />
-              3
-            </label>
-            <label class="radio-inline" for="streamCount-3">
-              <input
-                type="radio"
-                name="streamCount"
-                id="streamCount-3"
-                value="4"
-              />
-              4
-            </label>
-          </div>
-        </div>
-        <!-- Stream #1 Start -->
-        <div class="form-group count-1">
-          <label class="col-md-4 control-label" for="sName"
-            >Stream #1 Name</label
-          >
-          <div class="col-md-4">
-            <input
-              id="s1Name"
-              name="s1Name"
-              type="text"
-              placeholder="Camera 1"
-              class="form-control input-md"
-            />
-            <span class="help-block">Enter the name for the camera</span>
-          </div>
-        </div>
-        <div class="form-group count-1">
-          <label class="col-md-4 control-label" for="url">Feed #1 URL</label>
-          <div class="col-md-4">
-            <input
-              id="s1url"
-              name="s1url"
-              type="text"
-              placeholder="rtsp://184.72.239.149/vod/mp4:BigBuckBunny_115k.mov"
-              class="form-control input-md"
-            />
-            <span class="help-block"
-              >The url of the RTSP stream. See
-              <a
-                href="https://github.com/shbatm/MMM-RTSPStream/wiki/Stream-URLs-for-Various-Cameras"
-                >this list</a
-              >
-              for paths for some common security cameras. Also see below for how
-              to test for a valid url Username and password should be passed in
-              the url if required:
-              rtsp://&lt;username&gt;:&lt;password&gt;@&lt;hostname&gt;:&lt;port&gt;/&lt;path></span
-            >
-          </div>
-        </div>
-        <div class="form-group count-1">
-          <label class="col-md-4 control-label" for="s1protocol"
-            >Network Protocol #1</label
-          >
-          <div class="col-md-4">
-            <label class="radio-inline" for="s1protocol-0">
-              <input
-                type="radio"
-                name="s1protocol"
-                id="s1protocol-0"
-                value="tcp"
-                checked="checked"
-              />
-              TCP
-            </label>
-            <label class="radio-inline" for="s1protocol-1">
-              <input
-                type="radio"
-                name="s1protocol"
-                id="s1protocol-1"
-                value="udp"
-              />
-              UDP
-            </label>
-          </div>
-        </div>
-        <div class="form-group count-1">
-          <label class="col-md-4 control-label" for="s1hdUrl"
-            >Feed #1 HD URL</label
-          >
-          <div class="col-md-4">
-            <input
-              id="s1hdUrl"
-              name="s1hdUrl"
-              type="text"
-              placeholder=""
-              class="form-control input-md"
-            />
-            <span class="help-block"
-              >The url of the HD RTSP stream for full screen VLC
-              use.</span
-            >
-          </div>
-        </div>
-        <div class="form-group count-1 snapshotDetails">
-          <label class="col-md-4 control-label" for="s1snapshotUrl"
-            >Snapshot URL or File Path #1</label
-          >
-          <div class="col-md-4">
-            <input
-              id="s1snapshotUrl"
-              name="s1snapshotUrl"
-              type="text"
-              placeholder=""
-              class="form-control input-md"
-            />
-            <span class="help-block"
-              >The url or filepath of the snapshot images.</span
-            >
-          </div>
-        </div>
-        <div class="form-group count-1 snapshotDetails">
-          <label class="col-md-4 control-label" for="s1snapshotType"
-            >Snapshot #1 Type</label
-          >
-          <div class="col-md-4">
-            <label class="radio-inline" for="s1snapshotType-0">
-              <input
-                type="radio"
-                name="s1snapshotType"
-                id="s1snapshotType-0"
-                value="url"
-                checked="checked"
-              />
-              URL
-            </label>
-            <label class="radio-inline" for="s1snapshotType-1">
-              <input
-                type="radio"
-                name="s1snapshotType"
-                id="s1snapshotType-1"
-                value="file"
-              />
-              File Path
-            </label>
-          </div>
-        </div>
-        <div class="form-group count-1 snapshotDetails">
-          <label class="col-md-4 control-label" for="s1snapshotRefresh"
-            >Snapshot #1 Refresh Rate</label
-          >
-          <div class="col-md-4">
-            <div class="input-group">
-              <input
-                id="s1snapshotRefresh"
-                name="s1snapshotRefresh"
-                class="form-control"
-                placeholder="10"
-                value="10"
-                type="text"
-              />
-              <span class="input-group-addon">seconds</span>
-            </div>
-            <p class="help-block">Time between fetching new snapshot images</p>
-          </div>
-        </div>
-        <div class="form-group count-1">
-          <label class="col-md-4 control-label" for="s1width"
-            >Stream #1 Width</label
-          >
-          <div class="col-md-4">
-            <div class="input-group">
-              <input
-                id="s1width"
-                name="s1width"
-                class="form-control"
-                placeholder="undefined (auto)"
-                type="text"
-              />
-              <span class="input-group-addon">px</span>
-            </div>
-            <p class="help-block">The width in px of the stream.</p>
-          </div>
-        </div>
-        <div class="form-group count-1">
-          <label class="col-md-4 control-label" for="s1height"
-            >Stream #1 Height</label
-          >
-          <div class="col-md-4">
-            <div class="input-group">
-              <input
-                id="s1height"
-                name="s1height"
-                class="form-control"
-                placeholder="undefined (auto)"
-                type="text"
-              />
-              <span class="input-group-addon">px</span>
-            </div>
-            <p class="help-block">The height in px of the stream</p>
-          </div>
-        </div>
-        <div class="form-group count-1 vlc">
-          <label class="col-md-4 control-label" for="s1absPosition"
-            >Absolute Position</label
-          >
-          <div class="col-md-4">
-            <input
-              id="s1absPosition"
-              name="s1absPosition"
-              type="text"
-              placeholder="optional"
-              class="form-control input-md"
-            />
-            <span class="help-block"
-              >Required only for VLC. Use this to set an exact
-              position for the video instead of getting it automatically.
-              Format: "{ top: XX, right: XX, bottom: XX, left: XX }"</span
-            >
-          </div>
-        </div>
-        <div class="form-group count-1 vlc">
-          <label class="col-md-4 control-label" for="s1muted"
-            >Mute Audio from Stream?</label
-          >
-          <div class="col-md-4">
-            <label class="radio-inline" for="s1muted-0">
-              <input
-                type="radio"
-                name="s1muted"
-                id="s1muted-0"
-                value="true"
-                checked="checked"
-              />
-              Yes
-            </label>
-            <label class="radio-inline" for="s1muted-1">
-              <input type="radio" name="s1muted" id="s1muted-1" value="false" />
-              No
-            </label>
-            <span class="help-block"
-              >Required only for VLC. Use this to mute the
-              stream.</span
-            >
-          </div>
-        </div>
-        <div class="form-group count-1 ffmpeg">
-          <label class="col-md-4 control-label" for="s1ffmpegPort"
-            >FFMPEG WebSocket Port</label
-          >
-          <div class="col-md-4">
-            <input
-              id="s1ffmpegPort"
-              name="s1ffmpegPort"
-              type="text"
-              placeholder="9999"
-              value="9999"
-              class="form-control input-md"
-            />
-            <span class="help-block"
-              ><i>Only required for `ffmpeg`</i> Any available port to use for
-              the ffmpeg websocket.<br /><strong
-                ><i>Notes:</i> THIS IS NOT THE PORT FOR YOUR CAMERA</strong
-              >
-              Camera stream's port must be included in the URL above. This port
-              must be unqiue for each stream added and cannot be used by another
-              service on the server. This is a separate WebSocket from the the
-              Socket.IO connection between the module's script and it's
-              `node_helper.js`.</span
-            >
-          </div>
-        </div>
-        <!-- Strem #1 Stop -->
-        <!-- Stream #2 Start -->
-        <div class="form-group count-2">
-          <label class="col-md-4 control-label" for="sName"
-            >Stream #2 Name</label
-          >
-          <div class="col-md-4">
-            <input
-              id="s2Name"
-              name="s2Name"
-              type="text"
-              placeholder="Camera 2"
-              class="form-control input-md"
-            />
-            <span class="help-block">Enter the name for the camera</span>
-          </div>
-        </div>
-        <div class="form-group count-2">
-          <label class="col-md-4 control-label" for="url">Feed #2 URL</label>
-          <div class="col-md-4">
-            <input
-              id="s2url"
-              name="s2url"
-              type="text"
-              placeholder="rtsp://184.72.239.149/vod/mp4:BigBuckBunny_115k.mov"
-              class="form-control input-md"
-            />
-          </div>
-        </div>
-        <div class="form-group count-2">
-          <label class="col-md-4 control-label" for="s2protocol"
-            >Network Protocol #2</label
-          >
-          <div class="col-md-4">
-            <label class="radio-inline" for="s2protocol-0">
-              <input
-                type="radio"
-                name="s2protocol"
-                id="s2protocol-0"
-                value="tcp"
-                checked="checked"
-              />
-              TCP
-            </label>
-            <label class="radio-inline" for="s2protocol-1">
-              <input
-                type="radio"
-                name="s2protocol"
-                id="s2protocol-1"
-                value="udp"
-              />
-              UDP
-            </label>
-          </div>
-        </div>
-        <div class="form-group count-2">
-          <label class="col-md-4 control-label" for="s2hdUrl"
-            >Feed #2 HD URL</label
-          >
-          <div class="col-md-4">
-            <input
-              id="s2hdUrl"
-              name="s2hdUrl"
-              type="text"
-              placeholder=""
-              class="form-control input-md"
-            />
-          </div>
-        </div>
-        <div class="form-group count-2 snapshotDetails">
-          <label class="col-md-4 control-label" for="s2snapshotUrl"
-            >Snapshot URL or File Path #2</label
-          >
-          <div class="col-md-4">
-            <input
-              id="s2snapshotUrl"
-              name="s2snapshotUrl"
-              type="text"
-              placeholder=""
-              class="form-control input-md"
-            />
-          </div>
-        </div>
-        <div class="form-group count-2 snapshotDetails">
-          <label class="col-md-4 control-label" for="s2snapshotType"
-            >Snapshot #2 Type</label
-          >
-          <div class="col-md-4">
-            <label class="radio-inline" for="s2snapshotType-0">
-              <input
-                type="radio"
-                name="s2snapshotType"
-                id="s2snapshotType-0"
-                value="url"
-                checked="checked"
-              />
-              URL
-            </label>
-            <label class="radio-inline" for="s2snapshotType-1">
-              <input
-                type="radio"
-                name="s2snapshotType"
-                id="s2snapshotType-1"
-                value="file"
-              />
-              File Path
-            </label>
-          </div>
-        </div>
-        <div class="form-group count-2 snapshotDetails">
-          <label class="col-md-4 control-label" for="s2snapshotRefresh"
-            >Snapshot #2 Refresh Rate</label
-          >
-          <div class="col-md-4">
-            <div class="input-group">
-              <input
-                id="s2snapshotRefresh"
-                name="s2snapshotRefresh"
-                class="form-control"
-                placeholder="10"
-                value="10"
-                type="text"
-              />
-              <span class="input-group-addon">seconds</span>
-            </div>
-          </div>
-        </div>
-        <div class="form-group count-2">
-          <label class="col-md-4 control-label" for="s2width"
-            >Stream #2 Width</label
-          >
-          <div class="col-md-4">
-            <div class="input-group">
-              <input
-                id="s2width"
-                name="s2width"
-                class="form-control"
-                placeholder="undefined (auto)"
-                type="text"
-              />
-              <span class="input-group-addon">px</span>
-            </div>
-          </div>
-        </div>
-        <div class="form-group count-2">
-          <label class="col-md-4 control-label" for="s2height"
-            >Stream #2 Height</label
-          >
-          <div class="col-md-4">
-            <div class="input-group">
-              <input
-                id="s2height"
-                name="s2height"
-                class="form-control"
-                placeholder="undefined (auto)"
-                type="text"
-              />
-              <span class="input-group-addon">px</span>
-            </div>
-          </div>
-        </div>
-        <div class="form-group count-2 vlc">
-          <label class="col-md-4 control-label" for="s2absPosition"
-            >Absolute Position</label
-          >
-          <div class="col-md-4">
-            <input
-              id="s2absPosition"
-              name="s2absPosition"
-              type="text"
-              placeholder="optional"
-              class="form-control input-md"
-            />
-          </div>
-        </div>
-        <div class="form-group count-2 vlc">
-          <label class="col-md-4 control-label" for="s2muted"
-            >Mute Audio from Stream?</label
-          >
-          <div class="col-md-4">
-            <label class="radio-inline" for="s2muted-0">
-              <input
-                type="radio"
-                name="s2muted"
-                id="s2muted-0"
-                value="true"
-                checked="checked"
-              />
-              Yes
-            </label>
-            <label class="radio-inline" for="s2muted-1">
-              <input type="radio" name="s2muted" id="s2muted-1" value="false" />
-              No
-            </label>
-            <span class="help-block"
-              >Required only for VLC. Use this to mute the
-              stream.</span
-            >
-          </div>
-        </div>
-        <div class="form-group count-2 ffmpeg">
-          <label class="col-md-4 control-label" for="s2ffmpegPort"
-            >FFMPEG WebSocket Port</label
-          >
-          <div class="col-md-4">
-            <input
-              id="s2ffmpegPort"
-              name="s2ffmpegPort"
-              type="text"
-              placeholder="10000"
-              value="10000"
-              class="form-control input-md"
-            />
-          </div>
-        </div>
-        <!-- Stream #2 Stop -->
-        <!-- Stream #3 Start -->
-        <div class="form-group count-3">
-          <label class="col-md-4 control-label" for="sName"
-            >Stream #3 Name</label
-          >
-          <div class="col-md-4">
-            <input
-              id="s3Name"
-              name="s3Name"
-              type="text"
-              placeholder="Camera 3"
-              class="form-control input-md"
-            />
-            <span class="help-block">Enter the name for the camera</span>
-          </div>
-        </div>
-        <div class="form-group count-3">
-          <label class="col-md-4 control-label" for="url">Feed #3 URL</label>
-          <div class="col-md-4">
-            <input
-              id="s3url"
-              name="s3url"
-              type="text"
-              placeholder="rtsp://184.72.239.149/vod/mp4:BigBuckBunny_115k.mov"
-              class="form-control input-md"
-            />
-          </div>
-        </div>
-        <div class="form-group count-3">
-          <label class="col-md-4 control-label" for="s3protocol"
-            >Network Protocol #3</label
-          >
-          <div class="col-md-4">
-            <label class="radio-inline" for="s3protocol-0">
-              <input
-                type="radio"
-                name="s3protocol"
-                id="s3protocol-0"
-                value="tcp"
-                checked="checked"
-              />
-              TCP
-            </label>
-            <label class="radio-inline" for="s3protocol-1">
-              <input
-                type="radio"
-                name="s3protocol"
-                id="s3protocol-1"
-                value="udp"
-              />
-              UDP
-            </label>
-          </div>
-        </div>
-        <div class="form-group count-3">
-          <label class="col-md-4 control-label" for="s3hdUrl"
-            >Feed #3 HD URL</label
-          >
-          <div class="col-md-4">
-            <input
-              id="s3hdUrl"
-              name="s3hdUrl"
-              type="text"
-              placeholder=""
-              class="form-control input-md"
-            />
-          </div>
-        </div>
-        <div class="form-group count-3 snapshotDetails">
-          <label class="col-md-4 control-label" for="s3snapshotUrl"
-            >Snapshot URL or File Path #3</label
-          >
-          <div class="col-md-4">
-            <input
-              id="s3snapshotUrl"
-              name="s3snapshotUrl"
-              type="text"
-              placeholder=""
-              class="form-control input-md"
-            />
-          </div>
-        </div>
-        <div class="form-group count-3 snapshotDetails">
-          <label class="col-md-4 control-label" for="s3snapshotType"
-            >Snapshot #3 Type</label
-          >
-          <div class="col-md-4">
-            <label class="radio-inline" for="s3snapshotType-0">
-              <input
-                type="radio"
-                name="s3snapshotType"
-                id="s3snapshotType-0"
-                value="url"
-                checked="checked"
-              />
-              URL
-            </label>
-            <label class="radio-inline" for="s3snapshotType-1">
-              <input
-                type="radio"
-                name="s3snapshotType"
-                id="s3snapshotType-1"
-                value="file"
-              />
-              File Path
-            </label>
-          </div>
-        </div>
-        <div class="form-group count-3 snapshotDetails">
-          <label class="col-md-4 control-label" for="s3snapshotRefresh"
-            >Snapshot #3 Refresh Rate</label
-          >
-          <div class="col-md-4">
-            <div class="input-group">
-              <input
-                id="s3snapshotRefresh"
-                name="s3snapshotRefresh"
-                class="form-control"
-                placeholder="10"
-                value="10"
-                type="text"
-              />
-              <span class="input-group-addon">seconds</span>
-            </div>
-          </div>
-        </div>
-        <div class="form-group count-3">
-          <label class="col-md-4 control-label" for="s3width"
-            >Stream #3 Width</label
-          >
-          <div class="col-md-4">
-            <div class="input-group">
-              <input
-                id="s3width"
-                name="s3width"
-                class="form-control"
-                placeholder="undefined (auto)"
-                type="text"
-              />
-              <span class="input-group-addon">px</span>
-            </div>
-          </div>
-        </div>
-        <div class="form-group count-3">
-          <label class="col-md-4 control-label" for="s3height"
-            >Stream #3 Height</label
-          >
-          <div class="col-md-4">
-            <div class="input-group">
-              <input
-                id="s3height"
-                name="s3height"
-                class="form-control"
-                placeholder="undefined (auto)"
-                type="text"
-              />
-              <span class="input-group-addon">px</span>
-            </div>
-          </div>
-        </div>
-        <div class="form-group count-3 vlc">
-          <label class="col-md-4 control-label" for="s3absPosition"
-            >Absolute Position</label
-          >
-          <div class="col-md-4">
-            <input
-              id="s3absPosition"
-              name="s3absPosition"
-              type="text"
-              placeholder="optional"
-              class="form-control input-md"
-            />
-          </div>
-        </div>
-        <div class="form-group count-3 vlc">
-          <label class="col-md-4 control-label" for="s3muted"
-            >Mute Audio from Stream?</label
-          >
-          <div class="col-md-4">
-            <label class="radio-inline" for="s3muted-0">
-              <input
-                type="radio"
-                name="s3muted"
-                id="s3muted-0"
-                value="true"
-                checked="checked"
-              />
-              Yes
-            </label>
-            <label class="radio-inline" for="s3muted-1">
-              <input type="radio" name="s3muted" id="s3muted-1" value="false" />
-              No
-            </label>
-            <span class="help-block"
-              >Required only for VLC. Use this to mute the
-              stream.</span
-            >
-          </div>
-        </div>
-        <div class="form-group count-3 ffmpeg">
-          <label class="col-md-4 control-label" for="s3ffmpegPort"
-            >FFMPEG WebSocket Port</label
-          >
-          <div class="col-md-4">
-            <input
-              id="s3ffmpegPort"
-              name="s3ffmpegPort"
-              type="text"
-              placeholder="10001"
-              value="10001"
-              class="form-control input-md"
-            />
-          </div>
-        </div>
-        <!-- Stream #3 Stop -->
-        <!-- Stream #4 Start -->
-        <div class="form-group count-4">
-          <label class="col-md-4 control-label" for="sName"
-            >Stream #4 Name</label
-          >
-          <div class="col-md-4">
-            <input
-              id="s4Name"
-              name="s4Name"
-              type="text"
-              placeholder="Camera 4"
-              class="form-control input-md"
-            />
-            <span class="help-block">Enter the name for the camera</span>
-          </div>
-        </div>
-        <div class="form-group count-4">
-          <label class="col-md-4 control-label" for="url">Feed #4 URL</label>
-          <div class="col-md-4">
-            <input
-              id="s4url"
-              name="s4url"
-              type="text"
-              placeholder="rtsp://184.72.239.149/vod/mp4:BigBuckBunny_115k.mov"
-              class="form-control input-md"
-            />
-          </div>
-        </div>
-        <div class="form-group count-4">
-          <label class="col-md-4 control-label" for="s4protocol"
-            >Network Protocol #4</label
-          >
-          <div class="col-md-4">
-            <label class="radio-inline" for="s4protocol-0">
-              <input
-                type="radio"
-                name="s4protocol"
-                id="s4protocol-0"
-                value="tcp"
-                checked="checked"
-              />
-              TCP
-            </label>
-            <label class="radio-inline" for="s4protocol-1">
-              <input
-                type="radio"
-                name="s4protocol"
-                id="s4protocol-1"
-                value="udp"
-              />
-              UDP
-            </label>
-          </div>
-        </div>
-        <div class="form-group count-4">
-          <label class="col-md-4 control-label" for="s4hdUrl"
-            >Feed #4 HD URL</label
-          >
-          <div class="col-md-4">
-            <input
-              id="s4hdUrl"
-              name="s4hdUrl"
-              type="text"
-              placeholder=""
-              class="form-control input-md"
-            />
-          </div>
-        </div>
-        <div class="form-group count-4 snapshotDetails">
-          <label class="col-md-4 control-label" for="s4snapshotUrl"
-            >Snapshot URL or File Path #4</label
-          >
-          <div class="col-md-4">
-            <input
-              id="s4snapshotUrl"
-              name="s4snapshotUrl"
-              type="text"
-              placeholder=""
-              class="form-control input-md"
-            />
-          </div>
-        </div>
-        <div class="form-group count-4 snapshotDetails">
-          <label class="col-md-4 control-label" for="s4snapshotType"
-            >Snapshot #4 Type</label
-          >
-          <div class="col-md-4">
-            <label class="radio-inline" for="s4snapshotType-0">
-              <input
-                type="radio"
-                name="s4snapshotType"
-                id="s4snapshotType-0"
-                value="url"
-                checked="checked"
-              />
-              URL
-            </label>
-            <label class="radio-inline" for="s4snapshotType-1">
-              <input
-                type="radio"
-                name="s4snapshotType"
-                id="s4snapshotType-1"
-                value="file"
-              />
-              File Path
-            </label>
-          </div>
-        </div>
-        <div class="form-group count-4 snapshotDetails">
-          <label class="col-md-4 control-label" for="s4snapshotRefresh"
-            >Snapshot #4 Refresh Rate</label
-          >
-          <div class="col-md-4">
-            <div class="input-group">
-              <input
-                id="s4snapshotRefresh"
-                name="s4snapshotRefresh"
-                class="form-control"
-                placeholder="10"
-                value="10"
-                type="text"
-              />
-              <span class="input-group-addon">seconds</span>
-            </div>
-          </div>
-        </div>
-        <div class="form-group count-4">
-          <label class="col-md-4 control-label" for="s4width"
-            >Stream #4 Width</label
-          >
-          <div class="col-md-4">
-            <div class="input-group">
-              <input
-                id="s4width"
-                name="s4width"
-                class="form-control"
-                placeholder="undefined (auto)"
-                type="text"
-              />
-              <span class="input-group-addon">px</span>
-            </div>
-          </div>
-        </div>
-        <div class="form-group count-4">
-          <label class="col-md-4 control-label" for="s4height"
-            >Stream #4 Height</label
-          >
-          <div class="col-md-4">
-            <div class="input-group">
-              <input
-                id="s4height"
-                name="s4height"
-                class="form-control"
-                placeholder="undefined (auto)"
-                type="text"
-              />
-              <span class="input-group-addon">px</span>
-            </div>
-          </div>
-        </div>
-        <div class="form-group count-4 vlc">
-          <label class="col-md-4 control-label" for="s4absPosition"
-            >Absolute Position</label
-          >
-          <div class="col-md-4">
-            <input
-              id="s4absPosition"
-              name="s4absPosition"
-              type="text"
-              placeholder="optional"
-              class="form-control input-md"
-            />
-          </div>
-        </div>
-        <div class="form-group count-4 vlc">
-          <label class="col-md-4 control-label" for="s4muted"
-            >Mute Audio from Stream?</label
-          >
-          <div class="col-md-4">
-            <label class="radio-inline" for="s4muted-0">
-              <input
-                type="radio"
-                name="s4muted"
-                id="s4muted-0"
-                value="true"
-                checked="checked"
-              />
-              Yes
-            </label>
-            <label class="radio-inline" for="s4muted-1">
-              <input type="radio" name="s4muted" id="s4muted-1" value="false" />
-              No
-            </label>
-            <span class="help-block"
-              >Required only for VLC. Use this to mute the
-              stream.</span
-            >
-          </div>
-        </div>
-        <div class="form-group count-4 ffmpeg">
-          <label class="col-md-4 control-label" for="s4ffmpegPort"
-            >FFMPEG WebSocket Port</label
-          >
-          <div class="col-md-4">
-            <input
-              id="s4ffmpegPort"
-              name="s4ffmpegPort"
-              type="text"
-              placeholder="10002"
-              value="10002"
-              class="form-control input-md"
-            />
-          </div>
-        </div>
-        <!-- Stream #4 Stop -->
-      </fieldset>
-      <fieldset>
-        <legend>Step 3. Copy to MagicMirror Configuration File</legend>
-        <div class="form-group">
-          <label class="col-md-4 control-label" for="generate"
-            >Generate Config File</label
-          >
-          <div class="col-md-4">
-            <input
-              type="button"
-              id="generate"
-              name="generate"
-              class="btn btn-primary"
-              onclick="generateConfig();"
-              value="Generate"
-            />
-          </div>
-        </div>
-        <div class="form-group">
-          <label class="col-md-4 control-label" for="configResult"
-            >Configuration</label
-          >
-          <div class="col-md-4">
-            <textarea
-              class="form-control"
-              id="configResult"
-              name="configResult"
-            >
-Click Generate button Above</textarea
-            >
-            <p class="help-block">
-              Copy the above section to your configuration file.
-            </p>
-          </div>
-        </div>
-      </fieldset>
-    </form>
-    <script type="text/javascript">
-      // Helper functions to replace jQuery functionality
-      function getValue(selector) {
-        const element = document.querySelector(selector);
-        return element ? element.value : "";
-      }
 
-      function getCheckedValue(selector) {
-        const element = document.querySelector(selector);
-        return element ? element.value : "";
-      }
+            <div class="form-group">
+              <label class="label">Show snapshot images when the stream(s) is paused</label>
+              <div>
+                <div class="radio-group">
+                  <label class="radio-item" for="showSnapWhenPaused-0">
+                    <input type="radio" name="showSnapWhenPaused" id="showSnapWhenPaused-0" value="true" checked />
+                    Yes
+                  </label>
+                  <label class="radio-item" for="showSnapWhenPaused-1">
+                    <input type="radio" name="showSnapWhenPaused" id="showSnapWhenPaused-1" value="false" />
+                    No
+                  </label>
+                </div>
+                <div class="help">
+                  If your camera supports timed snapshot images via URL or saving to
+                  a file location, the module can display these when the stream is
+                  paused.
+                </div>
+              </div>
+            </div>
 
-      function hideElements(className) {
-        const elements = document.querySelectorAll(className);
-        elements.forEach(el => el.style.display = "none");
-      }
+            <div class="form-group">
+              <label class="label" for="localPlayer">Local Screen Player to Use</label>
+              <div>
+                <select id="localPlayer" name="localPlayer" class="select">
+                  <option value="vlc">VLC Player (HW-accelerated)</option>
+                  <option value="ffmpeg">FFMPEG (SW decoder)</option>
+                </select>
+              </div>
+            </div>
 
-      function showElements(className) {
-        const elements = document.querySelectorAll(className);
-        elements.forEach(el => el.style.display = "block");
-      }
+            <div class="form-group">
+              <label class="label" for="remotePlayer">Remote Browser/VNC Player to Use</label>
+              <div>
+                <select id="remotePlayer" name="remotePlayer" class="select">
+                  <option value="none">None / N/A</option>
+                  <option value="ffmpeg">FFMPEG</option>
+                </select>
+              </div>
+            </div>
 
-      function generateConfig() {
-        let s = `{
-    module: "MMM-RTSPStream",
-    position: "${getValue("#position")}",
-    `;
-        if (getValue("#headerText") !== "") {
-          s += `header: "${getValue("#headerText")}",
-        `;
-        }
-        s += `config: {
-        autoStart: ${getCheckedValue("input[name=autoStart]:checked")},
-        rotateStreams: ${getCheckedValue("input[name=rotateStreams]:checked")},
-        `;
-        if (getCheckedValue("input[name=rotateStreams]:checked") === "true") {
-          s += `rotateStreamTimeout: ${getValue("#rotateStreamTimeout")},
-        `;
-        }
-        s += `moduleWidth: ${getValue("#moduleWidth")},
-        moduleHeight: ${getValue("#moduleHeight")},
-        localPlayer: '${getValue("#localPlayer")}',
-        remotePlayer: '${getValue("#remotePlayer")}',
-        showSnapWhenPaused: ${getCheckedValue("input[name=showSnapWhenPaused]:checked")},
-        remoteSnaps: ${getCheckedValue("input[name=remoteSnaps]:checked")},
-        `;
-        if (getValue("#moduleOffset") !== "") {
-          s += `moduleOffset: ${getValue("#moduleOffset")},
-        `;
-        }
-        if (
-          ["ffmpeg", "vlc"].indexOf(getValue("#localPlayer")) !== -1 ||
-          getValue("#remotePlayer") === "ffmpeg"
-        ) {
-          s += `shutdownDelay: ${getValue("#s1shutdownDelay")},
-        `;
-        }
-        s += `stream1: {
-            name: '${getValue("#s1Name")}',
-            url: '${getValue("#s1url")}',
-            `;
-        if (getCheckedValue("input[name=s1protocol]:checked") === "udp") {
-          s += `protocol: 'udp',
-            `;
-        }
-        if (getValue("#s1frameRate") !== "") {
-          s += `frameRate: '${getValue("#s1frameRate")}',
-            `;
-        }
-        if (getValue("#s1hdUrl") !== "") {
-          s += `hdUrl: '${getValue("#s1hdUrl")}',
-            `;
-        }
-        if (
-          getCheckedValue("input[name=showSnapWhenPaused]:checked") === "true" &&
-          getValue("#s1snapshotUrl") !== ""
-        ) {
-          s += `snapshotUrl: '${getValue("#s1snapshotUrl")}',
-            `;
-        }
-        if (getCheckedValue("input[name=showSnapWhenPaused]:checked") === "true") {
-          s += `snapshotType: '${getCheckedValue("input[name=s1snapshotType]:checked")}',
-            `;
-        }
-        if (
-          getCheckedValue("input[name=showSnapWhenPaused]:checked") === "true" &&
-          getValue("#s1snapshotRefresh") !== ""
-        ) {
-          s += `snapshotRefresh: ${getValue("#s1snapshotRefresh")},
-            `;
-        }
-        if (getValue("#s1width") !== "") {
-          s += `width: ${getValue("#s1width")},
-            `;
-        } else {
-          s += `width: undefined,
-            `;
-        }
-        if (getValue("#s1height") !== "") {
-          s += `height: ${getValue("#s1height")},
-            `;
-        } else {
-          s += `height: undefined,
-            `;
-        }
-        if (
-          getValue("#localPlayer") === "vlc" &&
-          getValue("#s1absPosition") !== ""
-        ) {
-          s += `absPosition: ${getValue("#s1absPosition")},
-            `;
-        }
-        if (getValue("#localPlayer") === "vlc") {
-          s += `muted: ${getCheckedValue("input[name=s1muted]:checked")},
-            `;
-        }
-        if (
-          getValue("#localPlayer") === "ffmpeg" ||
-          getValue("#remotePlayer") === "ffmpeg"
-        ) {
-          s += `ffmpegPort: ${getValue("#s1ffmpegPort")},
-            `;
-        }
-        s += `},
-        `;
+            <div class="form-group">
+              <label class="label">Show Snapshots on Remote?</label>
+              <div>
+                <div class="radio-group">
+                  <label class="radio-item" for="remoteSnaps-0">
+                    <input type="radio" name="remoteSnaps" id="remoteSnaps-0" value="true" checked />
+                    Yes
+                  </label>
+                  <label class="radio-item" for="remoteSnaps-1">
+                    <input type="radio" name="remoteSnaps" id="remoteSnaps-1" value="false" />
+                    No
+                  </label>
+                </div>
+                <div class="help">
+                  When using VLC for local player and None for remote player,
+                  no video will be visible if you open the Mirror on a remote web
+                  browser or view through VNC. Selecting yes for this option will
+                  show snapshots to the remote viewers (saves resources over using
+                  FFMPEG for Remote Player)
+                </div>
+              </div>
+            </div>
 
-        if (parseInt(getCheckedValue("input[name=streamCount]:checked")) >= 2) {
-          s += `stream2: {
-            name: '${getValue("#s2Name")}',
-            url: '${getValue("#s2url")}',
-            `;
-          if (getCheckedValue("input[name=s2protocol]:checked") === "udp") {
-            s += `protocol: 'udp',
-            `;
-          }
-          if (getValue("#s2frameRate") !== "") {
-            s += `frameRate: '${getValue("#s2frameRate")}',
-            `;
-          }
-          if (getValue("#s2hdUrl") !== "") {
-            s += `hdUrl: '${getValue("#s2hdUrl")}',
-            `;
-          }
-          if (
-            getCheckedValue("input[name=showSnapWhenPaused]:checked") === "true" &&
-            getValue("#s2snapshotUrl") !== ""
-          ) {
-            s += `snapshotUrl: '${getValue("#s2snapshotUrl")}',
-            `;
-          }
-          if (getCheckedValue("input[name=showSnapWhenPaused]:checked") === "true") {
-            s += `snapshotType: '${getCheckedValue("input[name=s2snapshotType]:checked")}',
-            `;
-          }
-          if (
-            getCheckedValue("input[name=showSnapWhenPaused]:checked") === "true" &&
-            getValue("#s2snapshotRefresh") !== ""
-          ) {
-            s += `snapshotRefresh: ${getValue("#s2snapshotRefresh")},
-            `;
-          }
-          if (getValue("#s2width") !== "") {
-            s += `width: ${getValue("#s2width")},
-            `;
-          } else {
-            s += `width: undefined,
-            `;
-          }
-          if (getValue("#s2height") !== "") {
-            s += `height: ${getValue("#s2height")},
-            `;
-          } else {
-            s += `height: undefined,
-            `;
-          }
-          if (
-            getValue("#localPlayer") === "vlc" &&
-            getValue("#s2absPosition") !== ""
-          ) {
-            s += `absPosition: ${getValue("#s2absPosition")},
-            `;
-          }
-          if (getValue("#localPlayer") === "vlc") {
-            s += `muted: ${getCheckedValue("input[name=s2muted]:checked")},
-            `;
-          }
-          if (
-            getValue("#localPlayer") === "ffmpeg" ||
-            getValue("#remotePlayer") === "ffmpeg"
-          ) {
-            s += `ffmpegPort: ${getValue("#s2ffmpegPort")},
-            `;
-          }
-          s += `},
-        `;
-        }
+            <div class="form-group">
+              <label class="label" for="moduleWidth">Module Width</label>
+              <div>
+                <div class="input-group">
+                  <input id="moduleWidth" name="moduleWidth" class="input" placeholder="354" value="354" type="text" />
+                  <span class="addon">px</span>
+                </div>
+                <div class="help">
+                  When rotateStreams is false and multiple streams are used, adjust
+                  this value to adjust the number of streams shown side by side.
+                  E.G. to show 2 streams side by side, this value should be =
+                  2*(Stream Width + 2*1px (border) + 2*15px (margin))
+                </div>
+              </div>
+            </div>
 
-        if (parseInt(getCheckedValue("input[name=streamCount]:checked")) >= 3) {
-          s += `stream3: {
-            name: '${getValue("#s3Name")}',
-            url: '${getValue("#s3url")}',
-            `;
-          if (getCheckedValue("input[name=s3protocol]:checked") === "udp") {
-            s += `protocol: 'udp',
-            `;
-          }
-          if (getValue("#s3frameRate") !== "") {
-            s += `frameRate: '${getValue("#s3frameRate")}',
-            `;
-          }
-          if (getValue("#s3hdUrl") !== "") {
-            s += `hdUrl: '${getValue("#s3hdUrl")}',
-            `;
-          }
-          if (
-            getCheckedValue("input[name=showSnapWhenPaused]:checked") === "true" &&
-            getValue("#s3snapshotUrl") !== ""
-          ) {
-            s += `snapshotUrl: '${getValue("#s3snapshotUrl")}',
-            `;
-          }
-          if (getCheckedValue("input[name=showSnapWhenPaused]:checked") === "true") {
-            s += `snapshotType: '${getCheckedValue("input[name=s3snapshotType]:checked")}',
-            `;
-          }
-          if (
-            getCheckedValue("input[name=showSnapWhenPaused]:checked") === "true" &&
-            getValue("#s3snapshotRefresh") !== ""
-          ) {
-            s += `snapshotRefresh: ${getValue("#s3snapshotRefresh")},
-            `;
-          }
-          if (getValue("#s3width") !== "") {
-            s += `width: ${getValue("#s3width")},
-            `;
-          } else {
-            s += `width: undefined,
-            `;
-          }
-          if (getValue("#s3height") !== "") {
-            s += `height: ${getValue("#s3height")},
-            `;
-          } else {
-            s += `height: undefined,
-            `;
-          }
-          if (
-            getValue("#localPlayer") === "vlc" &&
-            getValue("#s3absPosition") !== ""
-          ) {
-            s += `absPosition: ${getValue("#s3absPosition")},
-            `;
-          }
-          if (getValue("#localPlayer") === "vlc") {
-            s += `muted: ${getCheckedValue("input[name=s3muted]:checked")},
-            `;
-          }
-          if (
-            getValue("#localPlayer") === "ffmpeg" ||
-            getValue("#remotePlayer") === "ffmpeg"
-          ) {
-            s += `ffmpegPort: ${getValue("#s3ffmpegPort")},
-            `;
-          }
-          s += `},
-        `;
-        }
+            <div class="form-group">
+              <label class="label" for="moduleHeight">Module Height</label>
+              <div>
+                <div class="input-group">
+                  <input id="moduleHeight" name="moduleHeight" class="input" placeholder="240" value="240" type="text" />
+                  <span class="addon">px</span>
+                </div>
+                <div class="help">
+                  Similar (but less critical) to moduleWidth. Adjust to the number
+                  of streams high to ensure other modules clear.
+                </div>
+              </div>
+            </div>
 
-        if (parseInt(getCheckedValue("input[name=streamCount]:checked")) >= 4) {
-          s += `stream4: {
-            name: '${getValue("#s4Name")}',
-            url: '${getValue("#s4url")}',
-            `;
-          if (getCheckedValue("input[name=s4protocol]:checked") === "udp") {
-            s += `protocol: 'udp',
-            `;
-          }
-          if (getValue("#s4frameRate") !== "") {
-            s += `frameRate: '${getValue("#s4frameRate")}',
-            `;
-          }
-          if (getValue("#s4hdUrl") !== "") {
-            s += `hdUrl: '${getValue("#s4hdUrl")}',
-            `;
-          }
-          if (
-            getCheckedValue("input[name=showSnapWhenPaused]:checked") === "true" &&
-            getValue("#s4snapshotUrl") !== ""
-          ) {
-            s += `snapshotUrl: '${getValue("#s4snapshotUrl")}',
-            `;
-          }
-          if (getCheckedValue("input[name=showSnapWhenPaused]:checked") === "true") {
-            s += `snapshotType: '${getCheckedValue("input[name=s4snapshotType]:checked")}',
-            `;
-          }
-          if (
-            getCheckedValue("input[name=showSnapWhenPaused]:checked") === "true" &&
-            getValue("#s4snapshotRefresh") !== ""
-          ) {
-            s += `snapshotRefresh: ${getValue("#s4snapshotRefresh")},
-            `;
-          }
-          if (getValue("#s4width") !== "") {
-            s += `width: ${getValue("#s4width")},
-            `;
-          } else {
-            s += `width: undefined,
-            `;
-          }
-          if (getValue("#s4height") !== "") {
-            s += `height: ${getValue("#s4height")},
-            `;
-          } else {
-            s += `height: undefined,
-            `;
-          }
-          if (
-            getValue("#localPlayer") === "vlc" &&
-            getValue("#s4absPosition") !== ""
-          ) {
-            s += `absPosition: ${getValue("#s4absPosition")},
-            `;
-          }
-          if (getValue("#localPlayer") === "vlc") {
-            s += `muted: ${getCheckedValue("input[name=s4muted]:checked")},
-            `;
-          }
-          if (
-            getValue("#localPlayer") === "ffmpeg" ||
-            getValue("#remotePlayer") === "ffmpeg"
-          ) {
-            s += `ffmpegPort: ${getValue("#s4ffmpegPort")},
-            `;
-          }
-          s += `},
-        `;
-        }
+            <div class="form-group vlc">
+              <label class="label" for="moduleOffset">Module Offset - Only applies when using VLC</label>
+              <div>
+                <textarea class="textarea" id="moduleOffset" name="moduleOffset" rows="3"></textarea>
+                <div class="help">
+                  On some displays, the video does not properly line up with the box
+                  on the screen. Entering a pixel value will shift the video over by
+                  that amount. Default: 0 Values: Any number (no units) by itself
+                  will adjust both top/left the same amount, or you can specify left
+                  & top adjustments separately (e.g. { left: 10, top: -10 })
+                </div>
+              </div>
+            </div>
 
-        s += `}
-},`;
+            <div class="form-group ffmpeg">
+              <label class="label" for="s1shutdownDelay">Shutdown Delay</label>
+              <div>
+                <div class="input-group">
+                  <input id="s1shutdownDelay" name="s1shutdownDelay" class="input" placeholder="12" value="12" type="text" />
+                  <span class="addon">ms</span>
+                </div>
+                <div class="help">
+                  The time delay (in sec) between when the stream is hidden/closed
+                  and when the stream actually stops. When rotating through multiple
+                  streams this prevents closing the connection to a stream only to
+                  re-open a few seconds later when it comes back through the loop
+                  (which reduces the time delay when restarting a stream). To
+                  conserve resources on a slow device, you can set this to 0
+                </div>
+              </div>
+            </div>
 
-        document.querySelector("#configResult").value = s;
-      }
+          </div>
+        </div>
 
-      // Document ready replacement
-      document.addEventListener("DOMContentLoaded", function() {
-        // Hide elements initially
-        hideElements(".ffmpeg");
-        hideElements(".count-2");
-        hideElements(".count-3");
-        hideElements(".count-4");
+        <div class="section">
+          <div class="section-header">
+            <h2 class="section-title">Step 2. Video Stream Configurations</h2>
+          </div>
+          <div class="section-content">
+            
+            <div class="form-group count-1">
+              <label class="label">Number of Streams</label>
+              <div>
+                <div class="radio-group">
+                  <label class="radio-item" for="streamCount-0">
+                    <input type="radio" name="streamCount" id="streamCount-0" value="1" checked />
+                    1
+                  </label>
+                  <label class="radio-item" for="streamCount-1">
+                    <input type="radio" name="streamCount" id="streamCount-1" value="2" />
+                    2
+                  </label>
+                  <label class="radio-item" for="streamCount-2">
+                    <input type="radio" name="streamCount" id="streamCount-2" value="3" />
+                    3
+                  </label>
+                  <label class="radio-item" for="streamCount-3">
+                    <input type="radio" name="streamCount" id="streamCount-3" value="4" />
+                    4
+                  </label>
+                </div>
+              </div>
+            </div>
 
-        // Event listeners for rotateStreams
-        const rotateStreamsInputs = document.querySelectorAll("input[name=rotateStreams]");
-        rotateStreamsInputs.forEach(input => {
-          input.addEventListener("change", function() {
-            if (this.value === "true") {
-              showElements(".rotateStreamTimeout");
-            } else {
-              hideElements(".rotateStreamTimeout");
-            }
-          });
-        });
+            <!-- Stream 1 Configuration -->
+            <div class="form-group count-1">
+              <label class="label" for="s1Name">Stream #1 Name</label>
+              <div>
+                <input id="s1Name" name="s1Name" type="text" placeholder="Camera 1" class="input" />
+                <div class="help">Enter the name for the camera</div>
+              </div>
+            </div>
 
-        // Event listeners for showSnapWhenPaused
-        const showSnapInputs = document.querySelectorAll("input[name=showSnapWhenPaused]");
-        showSnapInputs.forEach(input => {
-          input.addEventListener("change", function() {
-            if (this.value === "true") {
-              showElements(".snapshotDetails");
-            } else {
-              hideElements(".snapshotDetails");
-            }
-          });
-        });
+            <div class="form-group count-1">
+              <label class="label" for="s1url">Feed #1 URL</label>
+              <div>
+                <input id="s1url" name="s1url" type="text" placeholder="rtsp://184.72.239.149/vod/mp4:BigBuckBunny_115k.mov" class="input" />
+                <div class="help">
+                  The url of the RTSP stream. See
+                  <a href="https://github.com/shbatm/MMM-RTSPStream/wiki/Stream-URLs-for-Various-Cameras">this list</a>
+                  for paths for some common security cameras. Username and password should be passed in
+                  the url if required: rtsp://username:password@hostname:port/path
+                </div>
+              </div>
+            </div>
 
-        // Event listeners for remotePlayer
-        const remotePlayerSelect = document.querySelector("select[name=remotePlayer]");
-        if (remotePlayerSelect) {
-          remotePlayerSelect.addEventListener("change", function() {
-            const localPlayerValue = getValue("#localPlayer");
-            console.log(this.value, localPlayerValue);
-            if (this.value === "ffmpeg" || localPlayerValue === "ffmpeg") {
-              showElements(".ffmpeg");
-            } else {
-              hideElements(".ffmpeg");
-            }
-          });
-        }
+            <!-- Stream 2 Configuration -->
+            <div class="form-group count-2 hidden">
+              <label class="label" for="s2Name">Stream #2 Name</label>
+              <div>
+                <input id="s2Name" name="s2Name" type="text" placeholder="Camera 2" class="input" />
+                <div class="help">Enter the name for the camera</div>
+              </div>
+            </div>
 
-        // Event listeners for localPlayer
-        const localPlayerSelect = document.querySelector("select[name=localPlayer]");
-        if (localPlayerSelect) {
-          localPlayerSelect.addEventListener("change", function() {
-            const remotePlayerValue = getValue("#remotePlayer");
-            if (this.value === "ffmpeg" || remotePlayerValue === "ffmpeg") {
-              showElements(".ffmpeg");
-            } else {
-              hideElements(".ffmpeg");
-            }
-            if (this.value === "vlc") {
-              showElements(".vlc");
-            } else {
-              hideElements(".vlc");
-            }
-          });
-        }
+            <div class="form-group count-2 hidden">
+              <label class="label" for="s2url">Feed #2 URL</label>
+              <div>
+                <input id="s2url" name="s2url" type="text" placeholder="rtsp://your-camera-url" class="input" />
+                <div class="help">
+                  The url of the RTSP stream for camera 2
+                </div>
+              </div>
+            </div>
 
-        // Event listeners for streamCount
-        const streamCountInputs = document.querySelectorAll("input[name=streamCount]");
-        streamCountInputs.forEach(input => {
-          input.addEventListener("change", function() {
-            if (this.value === "1") {
-              hideElements(".count-2");
-              hideElements(".count-3");
-              hideElements(".count-4");
-            } else if (this.value === "2") {
-              showElements(".count-2");
-              hideElements(".count-3");
-              hideElements(".count-4");
-            } else if (this.value === "3") {
-              showElements(".count-2");
-              showElements(".count-3");
-              hideElements(".count-4");
-            } else if (this.value === "4") {
-              showElements(".count-2");
-              showElements(".count-3");
-              showElements(".count-4");
-            }
-          });
-        });
-      });
-    </script>
+            <!-- Stream 3 Configuration -->
+            <div class="form-group count-3 hidden">
+              <label class="label" for="s3Name">Stream #3 Name</label>
+              <div>
+                <input id="s3Name" name="s3Name" type="text" placeholder="Camera 3" class="input" />
+                <div class="help">Enter the name for the camera</div>
+              </div>
+            </div>
+
+            <div class="form-group count-3 hidden">
+              <label class="label" for="s3url">Feed #3 URL</label>
+              <div>
+                <input id="s3url" name="s3url" type="text" placeholder="rtsp://your-camera-url" class="input" />
+                <div class="help">
+                  The url of the RTSP stream for camera 3
+                </div>
+              </div>
+            </div>
+
+            <!-- Stream 4 Configuration -->
+            <div class="form-group count-4 hidden">
+              <label class="label" for="s4Name">Stream #4 Name</label>
+              <div>
+                <input id="s4Name" name="s4Name" type="text" placeholder="Camera 4" class="input" />
+                <div class="help">Enter the name for the camera</div>
+              </div>
+            </div>
+
+            <div class="form-group count-4 hidden">
+              <label class="label" for="s4url">Feed #4 URL</label>
+              <div>
+                <input id="s4url" name="s4url" type="text" placeholder="rtsp://your-camera-url" class="input" />
+                <div class="help">
+                  The url of the RTSP stream for camera 4
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-header">
+            <h2 class="section-title">Step 3. Copy to MagicMirror Configuration File</h2>
+          </div>
+          <div class="section-content">
+            
+            <div class="form-group">
+              <label class="label" for="generate">Generate Config File</label>
+              <div>
+                <input type="button" id="generate" name="generate" class="btn" value="Generate Configuration" />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="label" for="configResult">Configuration</label>
+              <div>
+                <textarea class="config-result" id="configResult" name="configResult">Click Generate button above</textarea>
+                <div class="help">Copy the above section to your configuration file.</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <script type="module" src="script.js"></script>
   </body>
 </html>
