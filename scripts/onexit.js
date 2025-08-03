@@ -22,7 +22,7 @@ const stopAllOmxplayers = function() {
 
             const stopProcs = () => {
                 if (toStop.length > 0) {
-                    pm2.stop(toStop[toStop.length - 1], (e, p) => {
+                    pm2.stop(toStop[toStop.length - 1], (e) => {
                         if (e) { console.log(e); throw e; }
                         toStop.pop();
                         stopProcs();

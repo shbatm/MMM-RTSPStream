@@ -625,7 +625,7 @@ Module.register("MMM-RTSPStream", {
     return [`${this.name}.css`, "font-awesome.css"];
   },
 
-  notificationReceived(notification, payload, sender) {
+  notificationReceived(notification, payload) {
     let ps = [];
 
     if (notification === "DOM_OBJECTS_CREATED") {

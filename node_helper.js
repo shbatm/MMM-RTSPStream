@@ -12,8 +12,6 @@ const DataURI = require("datauri");
 const NodeHelper = require("node_helper");
 const Stream = require("node-rtsp-stream-es6");
 
-const psTree = require("ps-tree");
-
 const environ = Object.assign(process.env, { DISPLAY: ":0" });
 const pm2 = require("pm2");
 
@@ -147,7 +145,6 @@ module.exports = NodeHelper.create({
   },
 
   getVlcPlayer(payload) {
-    const self = this;
     const opts = {
       detached: false,
       env: environ,
@@ -165,7 +162,7 @@ module.exports = NodeHelper.create({
         child_process.exec(
           `wmctrl -r ${s.name} -b remove,hidden && wmctrl -a ${s.name}`,
           { env: environ },
-          (error, stdout, stderr) => {
+          (error) => {
             if (error) {
               console.error(`exec error: ${error}`);
             }
@@ -205,7 +202,7 @@ module.exports = NodeHelper.create({
 
         this.vlcStream[s.name] = child_process.spawn(vlcCmd, args, opts);
 
-        this.vlcStream[s.name].on("error", (err) => {
+        this.vlcStream[s.name].on("error", () => {
           console.error(
             `Failed to start subprocess: ${this.vlcStream[s.name]}.`
           );
@@ -255,7 +252,7 @@ end
       }
       console.info("DP2: Running window resizers...");
       this.dp2 = child_process.spawn(dp2Cmd, dp2Args, opts);
-      this.dp2.on("error", (err) => {
+      this.dp2.on("error", () => {
         console.error("DP2: Failed to start.");
       });
     };
@@ -319,7 +316,7 @@ end
           child_process.exec(
             `wmctrl -r ${name} -b add,hidden`,
             { env: environ },
-            (error, stdout, stderr) => {
+            (error) => {
               if (error) {
                 console.error(`exec error: ${error}`);
               }
@@ -363,8 +360,6 @@ end
   },
 
   getOmxplayer(payload) {
-    const self = this;
-
     if (this.pm2Connected) {
       // Busy doing something, wait a half sec.
       setTimeout(() => {
@@ -372,8 +367,6 @@ end
       }, 500);
       return;
     }
-
-    const opts = { detached: false, stdio: "ignore" };
 
     const omxCmd = `omxplayer`;
 
@@ -440,7 +433,7 @@ end
 
       // Stops the Daemon if it's already started
       pm2.list((err, list) => {
-        const errCB = (err, apps) => {
+        const errCB = (err) => {
           if (err) {
             console.log(err);
             pm2.disconnect();
@@ -461,7 +454,7 @@ end
                 args: argsM[namesM.length - 1]
                 // max_memory_restart : '100M'   // Optional: Restarts your app if it reaches 100Mo
               },
-              (err, proc) => {
+              (err) => {
                 console.log(`PM2 started for ${namesM[namesM.length - 1]}`);
                 this.omxStream[namesM[namesM.length - 1]] =
                   namesM[namesM.length - 1];
@@ -531,7 +524,7 @@ end
       this.pm2Connected = true;
 
       console.log(`Stopping PM2 process: omx_${name}`);
-      pm2.stop(`omx_${name}`, (err2, apps) => {
+      pm2.stop(`omx_${name}`, (err2) => {
         if (!err2) {
           clearTimeout(this.omxStreamTimeouts[name]);
           delete this.omxStream[name];
@@ -578,7 +571,7 @@ end
 
         const stopProcs = () => {
           if (toStop.length > 0) {
-            pm2.stop(toStop[toStop.length - 1], (e, p) => {
+            pm2.stop(toStop[toStop.length - 1], (e) => {
               if (e) {
                 console.log(e);
                 throw e;
@@ -637,7 +630,6 @@ end
    * argument payload mixed - The payload of the notification.
    */
   socketNotificationReceived(notification, payload) {
-    const self = this;
     if (notification === "CONFIG") {
       this.config = payload;
       const streams = Object.keys(this.config).filter((key) =>
