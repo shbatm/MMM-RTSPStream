@@ -20,6 +20,7 @@ OMXPlayer is no longer actively developed and has been deprecated. This release 
 
 ### Changed
 
+- chore: remove `vlc.lua` file from repository
 - feat!: removed all OMXPlayer-related code and configuration options
   - docs: updated documentation to reflect VLC-only hardware acceleration
   - refactor: simplified installation (no more PM2 setup required)

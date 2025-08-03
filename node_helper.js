@@ -241,8 +241,14 @@ end
       });
     };
 
+    const vlcLuaPath = path.resolve(`${__dirname}/scripts/vlc.lua`);
+    // Check if the vlc.lua file exists, if not, create it.
+    if (!fs.existsSync(vlcLuaPath)) {
+      Log.log("DP2: Creating vlc.lua file...");
+      fs.writeFileSync(vlcLuaPath, "");
+    }
     fs.readFile(
-      path.resolve(`${__dirname}/scripts/vlc.lua`),
+      vlcLuaPath,
       "utf8",
       (err, data) => {
         if (err) {
@@ -252,7 +258,7 @@ end
         // Only write the new DevilsPie2 config if we need to.
         if (data !== dp2Config) {
           fs.writeFile(
-            path.resolve(`${__dirname}/scripts/vlc.lua`),
+            vlcLuaPath,
             dp2Config,
             (innerErr) => {
               // throws an error, you could also catch it here
