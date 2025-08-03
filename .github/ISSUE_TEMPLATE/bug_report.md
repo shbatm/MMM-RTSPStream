@@ -31,7 +31,7 @@ Please include:
 - It may be easier to post these in a [Gist](https://gist.github.com) and post the link here.
 
 **Logs**
-If applicable, please include the relevant logs to help explain your problem. + From the console or `~/.pm2/logs/` + From the web console using DevTools (<key>Ctrl</key>+<key>Shift</key>+<key>I</key>)
+If applicable, please include the relevant logs to help explain your problem. + From the console (MagicMirror logs) + From the web console using DevTools (<key>Ctrl</key>+<key>Shift</key>+<key>I</key>)
 
 **Additional context**
 Add any other context about the problem here.

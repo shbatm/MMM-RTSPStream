@@ -26,7 +26,7 @@ fi
 
 echo ""
 echo ""
-echo -e "\033[1;32mPlease ensure you have installed ffmpeg, omxplayer, or vlc depending on your"
+echo -e "\033[1;32mPlease ensure you have installed ffmpeg or vlc depending on your"
 echo -e "specific platform and use case. This script won't do that for you.\033[0m"
 echo ""
 echo ""

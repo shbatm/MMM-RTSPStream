@@ -1,14 +1,19 @@
 # MMM-RTSPStream - Video Streaming from Live Feeds (Security Cameras)
 
-This is a module for the [MagicMirror²](https://github.com/MagicMirrorOrg/MagicMirror/).
+This is a module for [MagicMirror²](https://github.com/MagicMirrorOrg/MagicMirror/).
 
 This module will show a live RTSP video stream and/or periodic snapshots on the MagicMirror² from any IP Security Camera which supports the [RTSP protocol](https://github.com/shbatm/MMM-RTSPStream/wiki/Stream-URLs-for-Various-Cameras) and/or can serve a snapshot periodically.
 
-> :warning: This module is no longer being actively developed. I will accept PRs and leave the repo active, but will not be directly supporting any issues. If anyone is interested in assuming ownership of the module, please contact @shbatm. :warning:
+> :warning: **Project Status**: This module is maintained on a best-effort basis with occasional updates for technical interest. No dedicated support is provided. The module works as-is, but users should be prepared to troubleshoot issues independently. :warning:
 >
-> Why?
+> **Background:**
 >
 > - I am no longer using this module on my own mirror. After several years, I found that I use the snapshots much more frequently than I streamed the actual cameras, which can be performed by much simpler modules and methods. To enable streaming, WebRTC (like [MMM-HomeAssistant-WebRTC](https://github.com/Anonym-tsk/MMM-HomeAssistant-WebRTC)) is a newer and better standard with much lower server overhead and latency for delivering RTSP Streams to the frontend than any of the options used here, in the future, this will be the method I focus on and I will not try to shoehorn another technology into this module.
+
+## Maintainer
+
+- [shbatm](https://github.com/shbatm) - does not actively maintain this module anymore
+- [KristjanESPERANTO](https://github.com/KristjanESPERANTO) - neither actively maintains this module, but accepts community contributions
 
 ## Features
 
@@ -22,18 +27,38 @@ This module will show a live RTSP video stream and/or periodic snapshots on the 
   - _Note:_ 3 simultaneous streams on a RaspberryPi 3 is about the limit for usability.
 - Support for [MMM-KeyBindings](https://github.com/shbatm/MMM-KeyBindings) module for Play/Pause Remote Control and navigation of multiple streams
 - Hardware-Accelerated Playback on the main screen, with option to use software playback on a remote browser window.
-- When using `omxplayer` or `vlc`, double-clicking the play button (or longpressing PlayPause key if using MMM-KeyBindings) will play the video fullscreen. Click anywhere once (or Pause with MMM-KeyBindings) to exit.
+- When using `vlc`, double-clicking the play button (or longpressing PlayPause key if using MMM-KeyBindings) will play the video fullscreen. Click anywhere once (or Pause with MMM-KeyBindings) to exit.
 
 ## Dependencies
 
-- The following packages are required for the module to function fully and the installer will attempt to install them with `apt`:
-  - `ffmpeg`, `omxplayer`, `vlc`, `devilspie2`, `wmctrl`
-- For hardware-accelerated streaming, `vlc` or `omxplayer` is required.
-- For manipulating VLC's windows, `devilspie2` and `wmctrl` are used.
-- For software-decoded streaming and/or remote browser viewing:
-  - Requires `jsmpeg` for front-end display of stream.
-  - Requires `node-rtsp-stream-es6` Node.js module and `ffmpeg` for backend.
-  - Video flow using `'ffmpeg'`: Camera RTSP Stream → `ffmpeg` pre-processor → MM module's `node_helper.js` (via `node-rtsp-stream-es6`) → Web Socket (`ws`) → MagicMirror² (via `jsmpeg`)
+### System Packages
+
+The following packages are required for the module to function fully and the installer will attempt to install them with `apt`:
+
+- `ffmpeg` - Video processing and transcoding
+- `vlc` - Hardware-accelerated video playback
+- `devilspie2` - Window positioning, sizing, and decoration removal for VLC
+- `wmctrl` - Window visibility and focus management for VLC
+
+### Node.js Dependencies
+
+- `jsmpeg` - Front-end video display library (included in module)
+- `node-ffmpeg-stream` - Node.js module for FFmpeg streaming backend
+- `ws` - WebSocket library for video streaming
+
+### Video Streaming Architecture
+
+#### Hardware-Accelerated Streaming (VLC)
+- **Requirements**: `vlc`, `devilspie2`, `wmctrl`
+- **Video flow**: Camera RTSP Stream → VLC Player (external application) → Direct hardware rendering overlaid on MagicMirror² (positioned via `devilspie2`/`wmctrl`)
+- **Benefits**: Hardware acceleration, low latency, better performance
+- **Limitations**: Local display only
+
+#### Software-Decoded Streaming (FFmpeg)
+- **Requirements**: `ffmpeg`, `node-ffmpeg-stream`, `jsmpeg`
+- **Video flow**: Camera RTSP Stream → `ffmpeg` pre-processor → MM module's `node_helper.js` (via `node-ffmpeg-stream`) → Web Socket (`ws`) → MagicMirror² (via `jsmpeg`)
+- **Benefits**: Remote browser viewing, cross-platform compatibility
+- **Limitations**: Higher CPU usage, potential latency
 
 ## Screenshot
 
@@ -91,13 +116,13 @@ It is highly recommended you use the tool included. Several sample configuration
 | `autoStart`           | Start the stream(s) automatically<br>_Default:_ `true`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | `rotateStreams`       | `true`: Rotate through all streams in a single window<br>`false`: Display an individual window for each stream<br>_Default:_ `true`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
 | `rotateStreamTimeout` | Time (in sec) to show each stream when `rotateStreams` is `true`.<br>_Default:_ `10`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| `localPlayer`         | _Optional:_ Which player to use for local playback: `vlc`, `ffmpeg` or `omxplayer`.<br>_Default:_ `vlc` for hardware acceleration.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| `localPlayer`         | _Optional:_ Which player to use for local playback: `vlc` or `ffmpeg`.<br>_Default:_ `vlc` for hardware acceleration.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
 | `remotePlayer`        | _Optional:_ Which player to use for remote browser playback: `ffmpeg` or `none`.<br>_Default:_ `ffmpeg`. Set to `none` to disable remote playback.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
 | `remoteSnaps`         | _Optional:_ If `true`, module will continue to show snapshots for any remote browser windows while playing the stream locally. Using `false` will stop updating snapshots when playing locally. Use this option if you only use the local screen to save resources.<br>_Default:_ `true`.                                                                                                                                                                                                                                                                                                                                                                                  |
 | `showSnapWhenPaused`  | Whether or not to show snapshots when the stream(s) is paused.<br>_Default:_ `true`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
 | `moduleWidth`         | Width in `px` of the module.<br>_Note:_ When `rotateStreams` is `false` and multiple streams are used, adjust this value to adjust the number of streams shown side by side. E.G. to show 2 streams side by side, this value should be `= 2*(Stream Width + 2*1px (border) + 2*15px (margin))`<br>_Default:_ `354px`                                                                                                                                                                                                                                                                                                                                                       |
 | `moduleHeight`        | Similar (but less critical) to `moduleWidth`. Adjust to the number of streams high to ensure other modules clear.<br>_Default:_ `240px`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
-| `moduleOffset`        | _Only applies when using OMXPlayer._ On some displays, the video does not properly line up with the box on the screen because of differences between JavaScript's reporting and the native display. Entering a pixel value will shift the video over by that amount.<br>_Default:_ `0` _Values:_ Any number (no units) by itself will adjust both top/left the same amount, or you can specify left & top adjustments separately (e.g. `moduleOffset: { left: 10, top: -10 }`                                                                                                                                                                                              |
+| `moduleOffset`        | _Only applies when using VLC._ On some displays, the video does not properly line up with the box on the screen because of differences between JavaScript's reporting and the native display. Entering a pixel value will shift the video over by that amount.<br>_Default:_ `0` _Values:_ Any number (no units) by itself will adjust both top/left the same amount, or you can specify left & top adjustments separately (e.g. `moduleOffset: { left: 10, top: -10 }`                                                                                                                                                                                              |
 | `shutdownDelay`       | The time delay (in sec) between when the last client disconnects and the `ffmpeg` or `vlc` stream actually stops. Once created, the websocket continues to run in the background; however, the `ffmpeg` process will only process the camera's stream while there are active connections on the socket (e.g. someone is watching the video on the frontend). When rotating through multiple streams this prevents closing the connection to a stream only to re-open a few seconds later when it comes back through the loop (which reduces the time delay when restarting a stream). To conserve resources on a slow device, you can set this to 0<br>_Default:_ 11 (sec) |
 | `debug`               | Set to `true` to show additional logging information.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 | `streamX`             | The individual stream configuration options. See table below for more details.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
@@ -125,7 +150,7 @@ config: {
 | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `name`            | _Required_ The name of the individual stream. Will be displayed when paused if snapshots are turned off.                                                                                                                                                                                                                                                                                                                                         |
 | `url`             | The url of the RTSP stream. See [this list](https://github.com/shbatm/MMM-RTSPStream/wiki/Stream-URLs-for-Various-Cameras) for paths for some common security cameras. Also see below for how to test for a valid url<br>Username and password should be passed in the url if required: `rtsp://<username>:<password>@<hostname>:<port>/<path>`<br>_Default:_ A test stream at `'rtsp://184.72.239.149/vod/mp4:BigBuckBunny_115k.mov'`,          |
-| `hdUrl`           | _Optional:_ The url for the "High-Def" stream to use when playing a full screen stream with OMXPlayer. If blank, regular url will be used.                                                                                                                                                                                                                                                                                                       |
+| `hdUrl`           | _Optional:_ The url for the "High-Def" stream to use when playing a full screen stream with VLC. If blank, regular url will be used.                                                                                                                                                                                                                                                                                                       |
 | `protocol`        | Protocol to use for receiving RTSP stream<br>_Default:_ `"tcp"`, valid options: `"tcp"` or `"udp"`.                                                                                                                                                                                                                                                                                                                                              |
 | `snapshotUrl`     | A string with the path to the camera snapshot. This can either be a url to camera itself (if supported) or a file path to where the snapshot is stored every X seconds by the camera. Leave blank to show just the stream title when paused.<br>Username and password should be passed in the url if required: `http://<username>:<password>@<hostname>:<port>/<path>`                                                                           |
 | `snapshotType`    | The type of snapshot path given<br>_Values:_ `url` or `file`<br>_Default:_ `url`                                                                                                                                                                                                                                                                                                                                                                 |
@@ -133,13 +158,10 @@ config: {
 | `frameRate`       | Framerate to use for the RTSP stream. Must be a string.<br>_Default:_ `"30"`                                                                                                                                                                                                                                                                                                                                                                     |
 | `width`           | The width in px of the stream.                                                                                                                                                                                                                                                                                                                                                                                                                   |
 | `height`          | The height in px of the stream.                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| `absPosition`     | _Only required for OMXPlayer_ Provide an absolute potiion to show the stream. This overrides the automatic window and moduleOffset settings.<br>_Format:_ `{ top: XX, right: XX, bottom: XX, left: XX }` where `XX` is the pixel position on the screen.                                                                                                                                                                                         |
+| `absPosition`     | _Only required for VLC_ Provide an absolute potiion to show the stream. This overrides the automatic window and moduleOffset settings.<br>_Format:_ `{ top: XX, right: XX, bottom: XX, left: XX }` where `XX` is the pixel position on the screen.                                                                                                                                                                                         |
 | `ffmpegPort`      | _Only required for `ffmpeg`_ Any available port to use for the ffmpeg websocket.<br>**_Notes:_** **THIS IS NOT THE PORT FOR YOUR CAMERA** Camera stream's port must be included in the URL above. This port must be unqiue for each stream added and cannot be used by another service on the server. This is a separate WebSocket from the the Socket.IO connection between the module's script and it's `node_helper.js`.<br>_Default:_ `9999` |
 | `hwAccel`         | _Only required for `ffmpeg`_ Attempt to use Hardware Accelerated Decoding with `ffmpeg`.<br>_Default:_ `false`                                                                                                                                                                                                                                                                                                                                   |
-| `muted`           | Disable sound (_OMXPlayer and VLC only_)<br>_Default:_ `false`                                                                                                                                                                                                                                                                                                                                                                                   |
-| `timeout`         | Timeout for stalled file/network operations (_OMXPlayer only_)<br>_Default:_ `10` (seconds)                                                                                                                                                                                                                                                                                                                                                      |
-| `rotateDegree`    | Set orientation of video (_OMXPlayer only_)<br>Available values: `0`, `90`, `180` or `270`<br>_Default:_ `0`                                                                                                                                                                                                                                                                                                                                     |
-| `omxRestart`      | Automatically restart the OMX Stream every X hours.<br>_Default:_ `24` (hours).                                                                                                                                                                                                                                                                                                                                                                  |
+| `muted`           | Disable sound (_VLC only_)<br>_Default:_ `false`                                                                                                                                                                                                                                                                                                                                                                                   |
 
 #### Testing a camera feed
 
@@ -147,10 +169,11 @@ To test to make sure you have a working url for a camera feed: create a text fil
 
 #### Advanced Stream Configurations
 
-This module has been tested exclusively with streams for Hikvision (Swann) cameras. You may find that you need to adjust the `ffmpeg` settings that are used beyond just frame rate and size. The command line arguements for `ffmpeg` can be changed by editing Line 14 of the following file after install. The `ffmpeg` arguement list is passed as an array.
+This module has been tested exclusively with streams for Hikvision (Swann) cameras. You may find that you need to adjust the `ffmpeg` settings that are used beyond just frame rate and size. The command line arguements for `ffmpeg` can be changed by editing the stream configuration options in the `node-ffmpeg-stream` module. The `ffmpeg` arguement list is passed as an options object.
 
 ```shell
-~/MagicMirror/modules/MMM-RTSPStream/node_modules/node-rtsp-stream-es6/src/mpeg1muxer.js
+# Configuration is now done via the stream configuration options
+# See: https://www.npmjs.com/package/node-ffmpeg-stream
 ```
 
 ### Controlling from other modules
@@ -160,11 +183,11 @@ The streams can be controlled on the main screen by sending a module notificatio
 ```js
 this.sendNotification("RTSP-PLAY", "all"); // Play all streams (or current stream if rotating)
 this.sendNotification("RTSP-PLAY", "streamX"); // Play a particular stream (when not rotating)
-this.sendNotification("RTSP-PLAY-FULLSCREEN", "streamX"); // Play a particular stream fullscreen (when using OMXPLAYER)
+this.sendNotification("RTSP-PLAY-FULLSCREEN", "streamX"); // Play a particular stream fullscreen (when using VLC)
 this.sendNotification("RTSP-PLAY-WINDOW", {
   name: "streamX",
   box: { top: XX, right: XX, bottom: XX, left: XX }
-}); // Play a particular stream in a custom window (when using OMXPLAYER)
+}); // Play a particular stream in a custom window (when using VLC)
 this.sendNotification("RTSP-STOP", "all"); // Stop the streams
 this.sendNotification("RTSP-STOP", "streamX"); // Stop a particular stream
 ```
@@ -192,9 +215,15 @@ keyBindings: {
 
 ## To-do
 
+Feel free to contribute to the module by adding any of the following features or fixing any of the known issues:
+
 - Add better touchscreen support (use an OnTouch method to play/pause instead of OnClick).
-- KNOWN ISSUE: snapshots can be stopped by another "instance" of the mirror running in a different window. Expected behavior: should only affect the local window.
-- KNOWN ISSUE: `omxplayer` will only play a certain maximum number of streams at a time. On a RPi3, this appears to be a max of 3. It won't error, it just won't play another stream. To fix: adjust the memory split of the GPU/CPU using the `raspi-config` command.
+
+### Known Issues
+
+- snapshots can be stopped by another "instance" of the mirror running in a different window. Expected behavior: should only affect the local window.
+- `ffmpeg` streams can sometimes start and stop erratically when using a WiFi connection. For best results, use a hard-wired Ethernet connection.
+- Positioning of the VLC window seems not to work on Wayland-based systems. If you are using a Wayland compositor, you may need to use the `ffmpeg` option instead of `vlc` for local playback.
 
 ## Experimentation
 
@@ -210,6 +239,20 @@ ffmpeg -i {RTSP_SOURCE} -f image2 -vf fps=fps=1/{x} -update 1 thumb.png
 ffmpeg -i {RTSP_SOURCE} -ss 00:00:01.500 -f image2 -vframes 1 thumb.png
 ```
 
+## Getting Help
+
+**Important:** This module is maintained on a best-effort basis without dedicated support. When seeking help:
+
+1. **Search existing issues** first - your problem may already be documented
+2. **Check the [MagicMirror² Forum](https://forum.magicmirror.builders)** for community discussions
+3. **When opening an issue**, include:
+   - Your complete module configuration
+   - Relevant error logs from both console and browser DevTools (`Ctrl+Shift+I`)
+   - Your system information (OS, MagicMirror version, etc.)
+4. **Be prepared to troubleshoot independently** - responses are not guaranteed
+
+For the best experience, consider using modern alternatives like WebRTC-based solutions for new installations.
+
 ## Contributing
 
 If you find any problems, bugs or have questions, please [open a GitHub issue](https://github.com/shbatm/MMM-RTSPStream/issues) in this repository.
@@ -220,6 +263,14 @@ Pull requests are of course also very welcome 🙂
 
 Please note that this project is released with a [Contributor Code of Conduct](CODE_OF_CONDUCT.md). By participating in this project you agree to abide by its terms.
 
+### Developer commands
+
+- `npm install` - Install development dependencies.
+- `node --run lint` - Run linting and formatter checks.
+- `node --run lint:fix` - Fix linting and formatter issues.
+- `node --run test` - Run linting and formatter checks.
+- `sh scripts/start_local_rtsp_server.sh` - Start a local RTSP server with a test stream for development purposes.
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE.md) file for details.
@@ -228,4 +279,3 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE.md) f
 
 All notable changes to this project will be documented in the [CHANGELOG.md](CHANGELOG.md) file.
 
-([source](https://superuser.com/questions/663928/ffmpeg-to-capture-stills-from-h-264-stream))

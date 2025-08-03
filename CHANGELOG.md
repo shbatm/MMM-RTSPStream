@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.0.0](https://github.com/shbatm/MMM-RTSPStream/compare/v2.1.0...v3.0.0) - 2025-08-03 - Remove OMXPlayer Support
+
+OMXPlayer is no longer actively developed and has been deprecated. This release removes all OMXPlayer support to simplify the codebase.
+
+### Breaking Changes
+
+**Removed OMXPlayer support**: Use `localPlayer: "vlc"` (hardware acceleration) or `localPlayer: "ffmpeg"` (software) instead.
+
+### Added
+
+- feat(config): add copy-to-clipboard button for configuration output
+- feat(config): add clipboard copy and auto-sizing textarea
+- feat(script): add RTSP test stream setup script with MediaMTX and FFmpeg automation
+
+### Changed
+
+- chore: remove `vlc.lua` file from repository
+- feat!: removed all OMXPlayer-related code and configuration options
+  - docs: updated documentation to reflect VLC-only hardware acceleration
+  - refactor: simplified installation (no more PM2 setup required)
+- refactor: remove `jQuery` dependency from configuration page
+- refactor: replace `Bootstrap` with modern CSS Grid/Flexbox layout in configuration page
+- refactor: replace `node-rtsp-stream-es6` with `node-ffmpeg-stream`
+
 ## [2.1.0](https://github.com/shbatm/MMM-RTSPStream/compare/v2.0.5...v2.1.0) - Refactor Codebase
 
 This release focuses on code modernization and maintainability improvements. The codebase has been significantly refactored with modern JavaScript standards, updated tooling, and comprehensive linting.

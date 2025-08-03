@@ -7,8 +7,6 @@
 # Usage         : ./postinstall.sh
 #==============================================================================
 
-if ! npm list -g | grep -q pm2; then
-	sudo npm i -g install pm2
-fi
+# PM2 is no longer required since OMXPlayer support was removed
 
 exit 0;

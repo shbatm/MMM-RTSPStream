@@ -1,3 +1,5 @@
+mediamtx/
 node_modules/
+*.tar.gz
 private_test.js
-
+vlc.lua

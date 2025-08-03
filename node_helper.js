@@ -15,18 +15,14 @@ const path = require("path");
 const DataURI = require("datauri");
 const Log = require("logger");
 const NodeHelper = require("node_helper");
-const Stream = require("node-rtsp-stream-es6");
+const {Stream} = require("node-ffmpeg-stream");
 
 const environ = Object.assign(process.env, {DISPLAY: ":0"});
-const pm2 = require("pm2");
 
 module.exports = NodeHelper.create({
   config: {},
 
   ffmpegStreams: {},
-
-  omxStream: {},
-  omxStreamTimeouts: {},
 
   vlcStream: {},
   vlcStreamTimeouts: {},
@@ -36,26 +32,17 @@ module.exports = NodeHelper.create({
 
   start () {
     this.started = false;
-    this.stopAllOmxplayers();
   },
 
   stop () {
     Log.log(`Shutting down MMM-RTSPStream streams that were using ${this.config.localPlayer}`);
-
-    // Kill any running OMX Streams
-    if (this.config.localPlayer === "omxplayer") {
-      child_process.spawn(path.resolve(`${__dirname}/scripts/onexit.js`), {
-        stdio: "ignore",
-        detached: true
-      });
-    }
 
     // Kill any FFMPEG strems that are running
     if (
       this.config.localPlayer === "ffmpeg" ||
       this.config.remotePlayer === "ffmpeg"
     ) {
-      Object.keys(this.ffmpegStreams).forEach((s) => this.ffmpegStreams[s].stopStream(0));
+      Object.keys(this.ffmpegStreams).forEach((s) => this.ffmpegStreams[s].stop());
     }
 
     // Kill any VLC Streams that are open
@@ -82,7 +69,19 @@ module.exports = NodeHelper.create({
       if (this.config.debug) {
         this.config[name].hideFfmpegOutput = false;
       }
-      this.ffmpegStreams[name] = new Stream(this.config[name]);
+      
+      // Configure for node-ffmpeg-stream
+      const streamConfig = {
+        name,
+        url: this.config[name].url,
+        wsPort: this.config[name].ffmpegPort,
+        options: {
+          "-r": this.config[name].frameRate || "30",
+          "-rtsp_transport": this.config[name].protocol || "tcp"
+        }
+      };
+      
+      this.ffmpegStreams[name] = new Stream(streamConfig);
     }
   },
 
@@ -254,8 +253,14 @@ end
       });
     };
 
+    const vlcLuaPath = path.resolve(`${__dirname}/scripts/vlc.lua`);
+    // Check if the vlc.lua file exists, if not, create it.
+    if (!fs.existsSync(vlcLuaPath)) {
+      Log.log("DP2: Creating vlc.lua file...");
+      fs.writeFileSync(vlcLuaPath, "");
+    }
     fs.readFile(
-      path.resolve(`${__dirname}/scripts/vlc.lua`),
+      vlcLuaPath,
       "utf8",
       (err, data) => {
         if (err) {
@@ -265,7 +270,7 @@ end
         // Only write the new DevilsPie2 config if we need to.
         if (data !== dp2Config) {
           fs.writeFile(
-            path.resolve(`${__dirname}/scripts/vlc.lua`),
+            vlcLuaPath,
             dp2Config,
             (innerErr) => {
               // throws an error, you could also catch it here
@@ -358,272 +363,6 @@ end
     }
   },
 
-  getOmxplayer (payload) {
-    if (this.pm2Connected) {
-      // Busy doing something, wait a half sec.
-      setTimeout(() => {
-        this.getOmxplayer(payload);
-      }, 500);
-      return;
-    }
-
-    const omxCmd = "omxplayer";
-
-    const namesM = [];
-
-    const argsM = [];
-
-    payload.forEach((s) => {
-      const args = [
-        "--live",
-        "--video_queue",
-        "4",
-        "--fps",
-        "30",
-        "--no-osd",
-        this.config[s.name].url
-      ];
-      if (!("fullscreen" in s)) {
-        args.unshift(
-          "--win",
-          `${s.box.left},${s.box.top},${s.box.right},${s.box.bottom}`
-        );
-      } else if ("hdUrl" in this.config[s.name]) {
-        args.pop();
-        args.push(this.config[s.name].hdUrl);
-      }
-      if (this.config[s.name].protocol !== "udp") {
-        args.unshift("--avdict", "rtsp_transport:tcp");
-      }
-      if (this.config[s.name].muted) {
-        args.unshift("-n", "-1");
-      }
-      if ("timeout" in this.config[s.name] && this.config[s.name].timeout) {
-        args.unshift("--timeout", this.config[s.name].timeout);
-      }
-      if (
-        "rotateDegree" in this.config[s.name] &&
-        this.config[s.name].rotateDegree
-      ) {
-        args.unshift("--orientation", this.config[s.name].rotateDegree);
-        args.unshift("--aspect-mode", "stretch");
-      }
-      if (this.config.debug) {
-        args.unshift("-I");
-      }
-      Log.log(`Starting stream ${s.name} using: ${omxCmd} ${args.join(" ")}`);
-
-      argsM.push(args);
-      namesM.push(`omx_${s.name}`);
-    });
-
-    // this.omxStream[payload.name] = child_process.spawn(omxCmd, args, opts);
-
-    // PM2 Test
-
-    pm2.connect((err) => {
-      if (err) {
-        Log.error(err);
-        return;
-      }
-      this.pm2Connected = true;
-
-      // Stops the Daemon if it's already started
-      pm2.list((listErr, list) => {
-        const errCB = (innerErr) => {
-          if (innerErr) {
-            Log.log(innerErr);
-            pm2.disconnect();
-            this.pm2Connected = false;
-          }
-        };
-
-        const startProcs = () => {
-          if (namesM.length > 0) {
-            Log.log(`Starting PM2 for ${namesM[namesM.length - 1]}`);
-            pm2.start(
-              {
-                script: "omxplayer",
-                name: namesM[namesM.length - 1],
-                interpreter: "bash",
-                out_file: "/dev/null",
-                // interpreterArgs: '-u',
-                args: argsM[namesM.length - 1]
-                // max_memory_restart : '100M'   // Optional: Restarts your app if it reaches 100Mo
-              },
-              (innerErr) => {
-                Log.log(`PM2 started for ${namesM[namesM.length - 1]}`);
-                this.omxStream[namesM[namesM.length - 1]] =
-                  namesM[namesM.length - 1];
-
-                // Automatically Restart OMX PM2 Instance every X Hours
-                const restartHrs = this.config.omxRestart;
-                if (typeof restartHrs === "number") {
-                  const worker = () => {
-                    pm2.restart(namesM[namesM.length - 1], (restartErr) => {
-                      if (restartErr) {
-                        Log.error(`Error restarting process: ${restartErr.message}`);
-                      } else {
-                        Log.log(`Process ${namesM[namesM.length - 1]} restarted successfully.`);
-                      }
-                    });
-                    this.omxStreamTimeouts[namesM[namesM.length - 1]] =
-                      setTimeout(worker, restartHrs * 60 * 60 * 1000);
-                  };
-                  this.omxStreamTimeouts[namesM[namesM.length - 1]] =
-                    setTimeout(worker, restartHrs * 60 * 60 * 1000);
-                }
-
-                namesM.pop();
-                argsM.pop();
-                startProcs();
-                if (innerErr) {
-                  throw innerErr;
-                }
-              }
-            );
-          } else {
-            pm2.disconnect(); // Disconnects from PM2
-            this.pm2Connected = false;
-          }
-        };
-
-        for (const proc in list) {
-          if ("name" in list[proc] && namesM.indexOf(list[proc].name) > -1) {
-            if (
-              "status" in list[proc].pm2_env &&
-              list[proc].pm2_env.status === "online"
-            ) {
-              Log.log(`PM2: ${list[proc].name} already running. Stopping old instance...`);
-              pm2.stop(list[proc].name, errCB);
-            }
-          }
-        }
-
-        startProcs();
-      });
-    });
-  },
-
-  stopOmxplayer (name, callback) {
-    if (this.pm2Connected) {
-      // Busy doing something, wait a half sec.
-      Log.info("PM2: waiting my turn...");
-      setTimeout(() => {
-        this.stopOmxplayer(name, callback);
-      }, 500);
-      return;
-    }
-
-    Log.log(`Stopping stream ${name}`);
-
-    pm2.connect((err) => {
-      if (err) {
-        Log.error(err);
-        return;
-      }
-      this.pm2Connected = true;
-
-      Log.log(`Stopping PM2 process: omx_${name}`);
-      pm2.stop(`omx_${name}`, (err2) => {
-        if (!err2) {
-          clearTimeout(this.omxStreamTimeouts[name]);
-          delete this.omxStream[name];
-        } else {
-          Log.log(err2);
-        }
-        pm2.disconnect();
-        this.pm2Connected = false;
-
-        if (typeof callback === "function") {
-          callback();
-        }
-      });
-    });
-  },
-
-  stopAllOmxplayers (callback) {
-    if (this.pm2Connected) {
-      // Busy doing something, wait a half sec.
-      setTimeout(() => {
-        this.stopAllOmxplayers(callback);
-      }, 500);
-      return;
-    }
-
-    Log.log("PM2: Stopping all OMXPlayer Streams...");
-    pm2.connect((err) => {
-      if (err) {
-        Log.error(err);
-        return;
-      }
-      this.pm2Connected = true;
-
-      // Stops the Daemon if it's already started
-      pm2.list((err2, list) => {
-        if (err2) {
-          Log.log(err2);
-          pm2.disconnect();
-          this.pm2Connected = false;
-          return;
-        }
-
-        const toStop = [];
-
-        const stopProcs = () => {
-          if (toStop.length > 0) {
-            pm2.stop(toStop[toStop.length - 1], (e) => {
-              if (e) {
-                Log.log(e);
-                throw e;
-              }
-              toStop.pop();
-              stopProcs();
-            });
-          } else {
-            pm2.disconnect();
-            this.omxStream = {};
-            this.pm2Connected = false;
-            Object.keys(this.omxStreamTimeouts).forEach((s) => {
-              clearTimeout(s);
-            });
-            if (typeof callback === "function") {
-              callback();
-            }
-          }
-        };
-
-        for (const proc in list) {
-          if ("name" in list[proc] && list[proc].name.startsWith("omx_")) {
-            Log.log(`PM2: Checking if ${list[proc].name} is running...`);
-            if (
-              "status" in list[proc].pm2_env &&
-              list[proc].pm2_env.status === "online"
-            ) {
-              Log.log(`PM2: Stopping ${list[proc].name}...`);
-              toStop.push(list[proc].name);
-            }
-          }
-        }
-        /*
-         * New Way:
-         * let omxProcs = list.filter(o => o.name.startsWith("omx_"));
-         * if (omxProcs) {
-         *     Log.log(Object.keys(omxProcs));
-         *     omxProcs.forEach(o => {
-         *         Log.log(`PM2: Checking if ${o.name} is running...`);
-         *         if ("status" in o.pm2_env && o.pm2_env.status === "online") {
-         *             Log.log(`PM2: Stopping ${o.name}...`);
-         *             toStop.push(o.name);
-         *         }
-         *     });
-         * }
-         */
-        stopProcs();
-      });
-    });
-  },
-
   // Override socketNotificationReceived method.
 
   /*
@@ -661,17 +400,6 @@ end
       if (payload in this.snapshots) {
         clearTimeout(this.snapshots[payload]);
         delete this.snapshots[payload];
-      }
-    }
-    if (notification === "PLAY_OMXSTREAM") {
-      this.getOmxplayer(payload);
-    }
-    if (notification === "STOP_OMXSTREAM") {
-      this.stopOmxplayer(payload);
-    }
-    if (notification === "STOP_ALL_OMXSTREAMS") {
-      if (Object.keys(this.omxStream).length > 0) {
-        this.stopAllOmxplayers();
       }
     }
     if (notification === "PLAY_VLCSTREAM") {
