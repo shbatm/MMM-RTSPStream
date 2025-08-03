@@ -282,7 +282,11 @@ Module.register("MMM-RTSPStream", {
     const wrapper = document.createElement("div");
 
     if (this.config.initialSetup) {
-      wrapper.innerHTML = `Use config wizard at http://${global.location.hostname}:${global.location.port}/${this.name}/config.html<br>to generate a configuration for this moudle.`;
+      const configUrl = `http://${global.location.hostname}:${global.location.port}/${this.name}/config.html`;
+      const outputString = `Use config wizard at <a href="${configUrl}" target="_blank">${configUrl}</a><br>to generate a configuration for this module.`;
+      wrapper.innerHTML = outputString;
+      Log.log(outputString);
+
       return wrapper;
     }
     if (!this.loaded) {
