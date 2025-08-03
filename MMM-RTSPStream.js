@@ -690,7 +690,7 @@ Module.register("MMM-RTSPStream", {
       }
     }
     if (notification === "RTSP-PLAY" && this.instance === "SERVER") {
-      if (!payload || payload === {} || payload === "all") {
+      if (!payload || JSON.stringify(payload) === "{}" || payload === "all") {
         if (this.config.rotateStreams) {
           this.playing = true;
           this.manualTransition(undefined, 1);
@@ -713,7 +713,7 @@ Module.register("MMM-RTSPStream", {
       ps = this.playStream(payload.name, false, payload.box);
     }
     if (notification === "RTSP-STOP" && this.instance === "SERVER") {
-      if (!payload || payload === {} || payload === "all") {
+      if (!payload || JSON.stringify(payload) === "{}" || payload === "all") {
         this.stopAllStreams();
       } else {
         this.stopStream(payload);
