@@ -17,6 +17,7 @@ OMXPlayer is no longer actively developed and has been deprecated. This release 
 
 - feat(config): add copy-to-clipboard button for configuration output
 - feat(config): add clipboard copy and auto-sizing textarea
+- feat(script): add RTSP test stream setup script with MediaMTX and FFmpeg automation
 
 ### Changed
 

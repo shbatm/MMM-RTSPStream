@@ -217,6 +217,14 @@ Pull requests are of course also very welcome 🙂
 
 Please note that this project is released with a [Contributor Code of Conduct](CODE_OF_CONDUCT.md). By participating in this project you agree to abide by its terms.
 
+### Developer commands
+
+- `npm install` - Install development dependencies.
+- `node --run lint` - Run linting and formatter checks.
+- `node --run lint:fix` - Fix linting and formatter issues.
+- `node --run test` - Run linting and formatter checks.
+- `sh scripts/start_local_rtsp_server.sh` - Start a local RTSP server with a test stream for development purposes.
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE.md) file for details.
