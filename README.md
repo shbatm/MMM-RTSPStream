@@ -26,14 +26,34 @@ This module will show a live RTSP video stream and/or periodic snapshots on the 
 
 ## Dependencies
 
-- The following packages are required for the module to function fully and the installer will attempt to install them with `apt`:
-  - `ffmpeg`, `vlc`, `devilspie2`, `wmctrl`
-- For hardware-accelerated streaming, `vlc` is required.
-- For manipulating VLC's windows, `devilspie2` and `wmctrl` are used.
-- For software-decoded streaming and/or remote browser viewing:
-  - Requires `jsmpeg` for front-end display of stream.
-  - Requires `node-ffmpeg-stream` Node.js module and `ffmpeg` for backend.
-  - Video flow using `'ffmpeg'`: Camera RTSP Stream → `ffmpeg` pre-processor → MM module's `node_helper.js` (via `node-ffmpeg-stream`) → Web Socket (`ws`) → MagicMirror² (via `jsmpeg`)
+### System Packages
+
+The following packages are required for the module to function fully and the installer will attempt to install them with `apt`:
+
+- `ffmpeg` - Video processing and transcoding
+- `vlc` - Hardware-accelerated video playback
+- `devilspie2` - Window positioning, sizing, and decoration removal for VLC
+- `wmctrl` - Window visibility and focus management for VLC
+
+### Node.js Dependencies
+
+- `jsmpeg` - Front-end video display library (included in module)
+- `node-ffmpeg-stream` - Node.js module for FFmpeg streaming backend
+- `ws` - WebSocket library for video streaming
+
+### Video Streaming Architecture
+
+#### Hardware-Accelerated Streaming (VLC)
+- **Requirements**: `vlc`, `devilspie2`, `wmctrl`
+- **Video flow**: Camera RTSP Stream → VLC Player (external application) → Direct hardware rendering overlaid on MagicMirror² (positioned via `devilspie2`/`wmctrl`)
+- **Benefits**: Hardware acceleration, low latency, better performance
+- **Limitations**: Local display only
+
+#### Software-Decoded Streaming (FFmpeg)
+- **Requirements**: `ffmpeg`, `node-ffmpeg-stream`, `jsmpeg`
+- **Video flow**: Camera RTSP Stream → `ffmpeg` pre-processor → MM module's `node_helper.js` (via `node-ffmpeg-stream`) → Web Socket (`ws`) → MagicMirror² (via `jsmpeg`)
+- **Benefits**: Remote browser viewing, cross-platform compatibility
+- **Limitations**: Higher CPU usage, potential latency
 
 ## Screenshot
 
