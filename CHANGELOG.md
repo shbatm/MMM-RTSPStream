@@ -13,6 +13,10 @@ OMXPlayer is no longer actively developed and has been deprecated. This release 
 
 **Removed OMXPlayer support**: Use `localPlayer: "vlc"` (hardware acceleration) or `localPlayer: "ffmpeg"` (software) instead.
 
+### Added
+
+- feat: add copy-to-clipboard button for configuration output
+
 ### Changed
 
 - feat!: removed all OMXPlayer-related code and configuration options

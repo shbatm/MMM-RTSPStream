@@ -100,6 +100,10 @@ const generateConfig = () => {
   document.querySelector("#configResult").value = s;
 };
 
+const copyToClipboard = () => {
+  navigator.clipboard.writeText(document.querySelector("#configResult").value);
+};
+
 // Initialize the application
 const initializeApp = () => {
   // Hide elements initially
@@ -226,6 +230,12 @@ const initializeApp = () => {
   const generateButton = document.querySelector("#generate");
   if (generateButton) {
     generateButton.addEventListener("click", generateConfig);
+  }
+
+  // Add event listener for copy button
+  const copyButton = document.querySelector("#copyButton");
+  if (copyButton) {
+    copyButton.addEventListener("click", copyToClipboard);
   }
 };
 

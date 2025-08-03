@@ -368,7 +368,10 @@
               <label class="label" for="configResult">Configuration</label>
               <div>
                 <textarea class="config-result" id="configResult" name="configResult">Click Generate button above</textarea>
-                <div class="help">Copy the above section to your configuration file.</div>
+                <div style="display: flex; gap: 1rem; align-items: center; margin-top: 0.5rem;">
+                  <div class="help">Copy the above section to your configuration file.</div>
+                  <button type="button" id="copyButton" class="btn" style="padding: 0.5rem 1rem; font-size: 0.85rem;">📋 Copy to Clipboard</button>
+                </div>
               </div>
             </div>
 
