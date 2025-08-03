@@ -1,22 +1,36 @@
 {
   "name": "mmm-rtspstream",
-  "version": "2.0.5",
-  "description": "Magic Mirror 2 module to stream video from an RTSP stream",
+  "version": "2.1.0",
+  "description": "MagicMirror² module to stream video from an RTSP stream",
+  "keywords": [
+    "magic mirror",
+    "rtsp",
+    "camera"
+  ],
   "main": "MMM-RTSPStream.js",
   "author": "shbatm",
   "license": "MIT",
   "scripts": {
+    "lint": "eslint && prettier . --check",
+    "lint:fix": "eslint --fix && prettier . --write",
     "preinstall": "./scripts/preinstall.sh",
     "postinstall": "./scripts/postinstall.sh",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node --run lint"
+  },
+  "devDependencies": {
+    "@eslint/css": "^0.10.0",
+    "@eslint/js": "^9.32.0",
+    "@eslint/markdown": "^7.1.0",
+    "eslint": "^9.32.0",
+    "globals": "^16.3.0",
+    "prettier": "^3.6.2"
   },
   "dependencies": {
-    "datauri": "^1.0.5",
-    "node-fetch": "^2.6.7",
+    "datauri": "^4.1.0",
     "node-rtsp-stream-es6": "github:shbatm/node-rtsp-stream-es6",
-    "pm2": "^5.1.2",
-    "ps-tree": "^1.1.0",
-    "ws": "^5.2.3"
+    "pm2": "^6.0.8",
+    "ps-tree": "^1.2.0",
+    "ws": "^8.18.3"
   },
   "repository": {
     "type": "git",
