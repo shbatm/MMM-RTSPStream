@@ -15,7 +15,8 @@ OMXPlayer is no longer actively developed and has been deprecated. This release 
 
 ### Added
 
-- feat: add copy-to-clipboard button for configuration output
+- feat(config): add copy-to-clipboard button for configuration output
+- feat(config): add clipboard copy and auto-sizing textarea
 
 ### Changed
 

@@ -193,7 +193,7 @@ input[type="radio"] {
 /* Config Result */
 .config-result {
   width: 100%;
-  min-height: 300px;
+  min-height: 100px;
   font-family: Monaco, monospace;
   font-size: 0.85rem;
   background: #f8f9fa;
@@ -201,6 +201,8 @@ input[type="radio"] {
   border-radius: 6px;
   padding: 1rem;
   resize: vertical;
+  field-sizing: content;
+  overflow: hidden;
 }
 
 .config-result:focus {
