@@ -171,7 +171,6 @@
           <div class="col-md-4">
             <select id="localPlayer" name="localPlayer" class="form-control">
               <option value="vlc">VLC Player (HW-accelerated)</option>
-              <option value="omxplayer">OMXPlayer (HW-accelerated)</option>
               <option value="ffmpeg">FFPMEG (SW decoder)</option>
             </select>
           </div>
@@ -212,7 +211,7 @@
               No
             </label>
             <p class="help-block">
-              When using OMXPlayer for local player and None for remote player,
+              When using VLC for local player and None for remote player,
               no video will be visible if you open the Mirror on a remote web
               browser or view through VNC. Selecting yes for this option will
               show snapshots to the remote viewers (saves resources over using
@@ -266,9 +265,9 @@
             </p>
           </div>
         </div>
-        <div class="form-group omxplayer vlc">
+        <div class="form-group vlc">
           <label class="col-md-4 control-label" for="moduleOffset"
-            >Module Offset - Only applies when using OMXPlayer/VLC.
+            >Module Offset - Only applies when using VLC.
           </label>
           <div class="col-md-4">
             <textarea
@@ -436,7 +435,7 @@
               class="form-control input-md"
             />
             <span class="help-block"
-              >The url of the HD RTSP stream for full screen OMXPlayer/VLC
+              >The url of the HD RTSP stream for full screen VLC
               use.</span
             >
           </div>
@@ -539,7 +538,7 @@
             <p class="help-block">The height in px of the stream</p>
           </div>
         </div>
-        <div class="form-group count-1 omxplayer vlc">
+        <div class="form-group count-1 vlc">
           <label class="col-md-4 control-label" for="s1absPosition"
             >Absolute Position</label
           >
@@ -552,13 +551,13 @@
               class="form-control input-md"
             />
             <span class="help-block"
-              >Required only for OMXPlayer or VLC. Use this to set an exact
+              >Required only for VLC. Use this to set an exact
               position for the video instead of getting it automatically.
               Format: "{ top: XX, right: XX, bottom: XX, left: XX }"</span
             >
           </div>
         </div>
-        <div class="form-group count-1 omxplayer vlc">
+        <div class="form-group count-1 vlc">
           <label class="col-md-4 control-label" for="s1muted"
             >Mute Audio from Stream?</label
           >
@@ -578,7 +577,7 @@
               No
             </label>
             <span class="help-block"
-              >Required only for OMXPlayer or VLC. Use this to mute the
+              >Required only for VLC. Use this to mute the
               stream.</span
             >
           </div>
@@ -770,7 +769,7 @@
             </div>
           </div>
         </div>
-        <div class="form-group count-2 omxplayer vlc">
+        <div class="form-group count-2 vlc">
           <label class="col-md-4 control-label" for="s2absPosition"
             >Absolute Position</label
           >
@@ -784,7 +783,7 @@
             />
           </div>
         </div>
-        <div class="form-group count-2 omxplayer vlc">
+        <div class="form-group count-2 vlc">
           <label class="col-md-4 control-label" for="s2muted"
             >Mute Audio from Stream?</label
           >
@@ -804,7 +803,7 @@
               No
             </label>
             <span class="help-block"
-              >Required only for OMXPlayer or VLC. Use this to mute the
+              >Required only for VLC. Use this to mute the
               stream.</span
             >
           </div>
@@ -985,7 +984,7 @@
             </div>
           </div>
         </div>
-        <div class="form-group count-3 omxplayer vlc">
+        <div class="form-group count-3 vlc">
           <label class="col-md-4 control-label" for="s3absPosition"
             >Absolute Position</label
           >
@@ -999,7 +998,7 @@
             />
           </div>
         </div>
-        <div class="form-group count-3 omxplayer vlc">
+        <div class="form-group count-3 vlc">
           <label class="col-md-4 control-label" for="s3muted"
             >Mute Audio from Stream?</label
           >
@@ -1019,7 +1018,7 @@
               No
             </label>
             <span class="help-block"
-              >Required only for OMXPlayer or VLC. Use this to mute the
+              >Required only for VLC. Use this to mute the
               stream.</span
             >
           </div>
@@ -1200,7 +1199,7 @@
             </div>
           </div>
         </div>
-        <div class="form-group count-4 omxplayer vlc">
+        <div class="form-group count-4 vlc">
           <label class="col-md-4 control-label" for="s4absPosition"
             >Absolute Position</label
           >
@@ -1214,7 +1213,7 @@
             />
           </div>
         </div>
-        <div class="form-group count-4 omxplayer vlc">
+        <div class="form-group count-4 vlc">
           <label class="col-md-4 control-label" for="s4muted"
             >Mute Audio from Stream?</label
           >
@@ -1234,7 +1233,7 @@
               No
             </label>
             <span class="help-block"
-              >Required only for OMXPlayer or VLC. Use this to mute the
+              >Required only for VLC. Use this to mute the
               stream.</span
             >
           </div>
@@ -1414,7 +1413,7 @@ Click Generate button Above</textarea
             `;
         }
         if (
-          ["omxplayer", "vlc"].indexOf($("select[name=localPlayer]").val()) &&
+          ["vlc"].indexOf($("select[name=localPlayer]").val()) &&
           $("#s1absPosition").val() !== ""
         ) {
           s =
@@ -1422,7 +1421,7 @@ Click Generate button Above</textarea
             `absPosition: ${$("#s1absPosition").val()},
             `;
         }
-        if (["omxplayer", "vlc"].indexOf($("select[name=localPlayer]").val())) {
+        if (["vlc"].indexOf($("select[name=localPlayer]").val())) {
           s =
             s +
             `muted: ${$("input[name=s1muted]:checked").val()},
@@ -1516,7 +1515,7 @@ Click Generate button Above</textarea
             `;
           }
           if (
-            ["omxplayer", "vlc"].indexOf($("select[name=localPlayer]").val()) &&
+            ["vlc"].indexOf($("select[name=localPlayer]").val()) &&
             $("#s2absPosition").val() !== ""
           ) {
             s =
@@ -1525,7 +1524,7 @@ Click Generate button Above</textarea
             `;
           }
           if (
-            ["omxplayer", "vlc"].indexOf($("select[name=localPlayer]").val())
+            ["vlc"].indexOf($("select[name=localPlayer]").val())
           ) {
             s =
               s +
@@ -1625,7 +1624,7 @@ Click Generate button Above</textarea
             `;
           }
           if (
-            ["omxplayer", "vlc"].indexOf($("select[name=localPlayer]").val()) &&
+            ["vlc"].indexOf($("select[name=localPlayer]").val()) &&
             $("#s3absPosition").val() !== ""
           ) {
             s =
@@ -1634,7 +1633,7 @@ Click Generate button Above</textarea
             `;
           }
           if (
-            ["omxplayer", "vlc"].indexOf($("select[name=localPlayer]").val())
+            ["vlc"].indexOf($("select[name=localPlayer]").val())
           ) {
             s =
               s +
@@ -1734,7 +1733,7 @@ Click Generate button Above</textarea
             `;
           }
           if (
-            ["omxplayer", "vlc"].indexOf($("select[name=localPlayer]").val()) &&
+            ["vlc"].indexOf($("select[name=localPlayer]").val()) &&
             $("#s4absPosition").val() !== ""
           ) {
             s =
@@ -1743,7 +1742,7 @@ Click Generate button Above</textarea
             `;
           }
           if (
-            ["omxplayer", "vlc"].indexOf($("select[name=localPlayer]").val())
+            ["vlc"].indexOf($("select[name=localPlayer]").val())
           ) {
             s =
               s +
@@ -1817,10 +1816,10 @@ Click Generate button Above</textarea
           } else {
             $(".ffmpeg").hide();
           }
-          if ($(this).val() === "omxplayer" || $(this).val() === "vlc") {
-            $(".omxplayer").show();
+          if ($(this).val() === "vlc") {
+            $(".vlc").show();
           } else {
-            $(".omxplayer").hide();
+            $(".vlc").hide();
           }
         });
         $("input[type=radio][name=streamCount]").change(function () {

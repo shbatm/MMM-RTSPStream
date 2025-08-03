@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased] - Remove OMXPlayer Support
+
+OMXPlayer is no longer actively developed and has been deprecated. This release removes all OMXPlayer support to simplify the codebase.
+
+### Breaking Changes
+
+**Removed OMXPlayer support**: Use `localPlayer: "vlc"` (hardware acceleration) or `localPlayer: "ffmpeg"` (software) instead.
+
+### Changed
+
+- feat!: removed all OMXPlayer-related code and configuration options
+  - docs: updated documentation to reflect VLC-only hardware acceleration
+  - refactor: simplified installation (no more PM2 setup required)
+
 ## [2.1.0](https://github.com/shbatm/MMM-RTSPStream/compare/v2.0.5...v2.1.0) - Refactor Codebase
 
 This release focuses on code modernization and maintainability improvements. The codebase has been significantly refactored with modern JavaScript standards, updated tooling, and comprehensive linting.

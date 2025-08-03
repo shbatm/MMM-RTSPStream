@@ -14,7 +14,6 @@
     "lint": "eslint && prettier . --check",
     "lint:fix": "eslint --fix && prettier . --write",
     "preinstall": "./scripts/preinstall.sh",
-    "postinstall": "./scripts/postinstall.sh",
     "test": "node --run lint"
   },
   "devDependencies": {
@@ -28,7 +27,6 @@
   "dependencies": {
     "datauri": "^4.1.0",
     "node-rtsp-stream-es6": "github:shbatm/node-rtsp-stream-es6",
-    "pm2": "^6.0.8",
     "ps-tree": "^1.2.0",
     "ws": "^8.18.3"
   },
