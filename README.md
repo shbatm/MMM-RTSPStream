@@ -32,8 +32,8 @@ This module will show a live RTSP video stream and/or periodic snapshots on the 
 - For manipulating VLC's windows, `devilspie2` and `wmctrl` are used.
 - For software-decoded streaming and/or remote browser viewing:
   - Requires `jsmpeg` for front-end display of stream.
-  - Requires `node-rtsp-stream-es6` Node.js module and `ffmpeg` for backend.
-  - Video flow using `'ffmpeg'`: Camera RTSP Stream → `ffmpeg` pre-processor → MM module's `node_helper.js` (via `node-rtsp-stream-es6`) → Web Socket (`ws`) → MagicMirror² (via `jsmpeg`)
+  - Requires `node-ffmpeg-stream` Node.js module and `ffmpeg` for backend.
+  - Video flow using `'ffmpeg'`: Camera RTSP Stream → `ffmpeg` pre-processor → MM module's `node_helper.js` (via `node-ffmpeg-stream`) → Web Socket (`ws`) → MagicMirror² (via `jsmpeg`)
 
 ## Screenshot
 
@@ -144,10 +144,11 @@ To test to make sure you have a working url for a camera feed: create a text fil
 
 #### Advanced Stream Configurations
 
-This module has been tested exclusively with streams for Hikvision (Swann) cameras. You may find that you need to adjust the `ffmpeg` settings that are used beyond just frame rate and size. The command line arguements for `ffmpeg` can be changed by editing Line 14 of the following file after install. The `ffmpeg` arguement list is passed as an array.
+This module has been tested exclusively with streams for Hikvision (Swann) cameras. You may find that you need to adjust the `ffmpeg` settings that are used beyond just frame rate and size. The command line arguements for `ffmpeg` can be changed by editing the stream configuration options in the `node-ffmpeg-stream` module. The `ffmpeg` arguement list is passed as an options object.
 
 ```shell
-~/MagicMirror/modules/MMM-RTSPStream/node_modules/node-rtsp-stream-es6/src/mpeg1muxer.js
+# Configuration is now done via the stream configuration options
+# See: https://www.npmjs.com/package/node-ffmpeg-stream
 ```
 
 ### Controlling from other modules

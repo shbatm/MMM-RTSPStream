@@ -27,6 +27,7 @@ OMXPlayer is no longer actively developed and has been deprecated. This release 
   - refactor: simplified installation (no more PM2 setup required)
 - refactor: remove `jQuery` dependency from configuration page
 - refactor: replace `Bootstrap` with modern CSS Grid/Flexbox layout in configuration page
+- refactor: replace `node-rtsp-stream-es6` with `node-ffmpeg-stream`
 
 ## [2.1.0](https://github.com/shbatm/MMM-RTSPStream/compare/v2.0.5...v2.1.0) - Refactor Codebase
 

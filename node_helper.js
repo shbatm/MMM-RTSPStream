@@ -15,7 +15,7 @@ const path = require("path");
 const DataURI = require("datauri");
 const Log = require("logger");
 const NodeHelper = require("node_helper");
-const Stream = require("node-rtsp-stream-es6");
+const {Stream} = require("node-ffmpeg-stream");
 
 const environ = Object.assign(process.env, {DISPLAY: ":0"});
 
@@ -42,7 +42,7 @@ module.exports = NodeHelper.create({
       this.config.localPlayer === "ffmpeg" ||
       this.config.remotePlayer === "ffmpeg"
     ) {
-      Object.keys(this.ffmpegStreams).forEach((s) => this.ffmpegStreams[s].stopStream(0));
+      Object.keys(this.ffmpegStreams).forEach((s) => this.ffmpegStreams[s].stop());
     }
 
     // Kill any VLC Streams that are open
@@ -69,7 +69,19 @@ module.exports = NodeHelper.create({
       if (this.config.debug) {
         this.config[name].hideFfmpegOutput = false;
       }
-      this.ffmpegStreams[name] = new Stream(this.config[name]);
+      
+      // Configure for node-ffmpeg-stream
+      const streamConfig = {
+        name,
+        url: this.config[name].url,
+        wsPort: this.config[name].ffmpegPort,
+        options: {
+          "-r": this.config[name].frameRate || "30",
+          "-rtsp_transport": this.config[name].protocol || "tcp"
+        }
+      };
+      
+      this.ffmpegStreams[name] = new Stream(streamConfig);
     }
   },
 
