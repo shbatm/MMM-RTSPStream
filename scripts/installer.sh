@@ -15,21 +15,15 @@ echo "Notice: This script and the installed software is provided “as is”, wi
 echo ""
 
 check_yes() {
-    read -p ">>> $1 [y/N]? " -n 1 REPLY
+    read -p ">>> $1 [y/N]? " -n 1 -r
     echo ""
-    if [[ ! "$REPLY" =~ ^[Yy]$ ]]; then
-        return 1
-    fi
-    return 0
+    [[ $REPLY =~ ^[Yy]$ ]]
 }
 
 check_no() {
-    read -p ">>> $1 [Y/n]? " -n 1 REPLY
+    read -r -p ">>> $1 [Y/n]? " REPLY
     echo ""
-    if [[ $REPLY =~ ^[Nn]$ ]]; then
-        return 1
-    fi
-    return 0
+    [[ "$REPLY" =~ ^[Nn]$ ]] && return 1 || return 0
 }
 
 if check_yes "Continue?"; then
@@ -39,7 +33,7 @@ else
 fi
 
 # check if we are correct by searching for https://github.com/MagicMirrorOrg/MagicMirror in package.json
-TEST_STRING="\"url\": \"git+https://github.com/MagicMirrorOrg/MagicMirror.git\""
+TEST_STRING="\"url\": \"https://github.com/MagicMirrorOrg/MagicMirror\""
 if grep -sq "$TEST_STRING" "$MM_HOME/package.json"; then
     # we found it
     echo -n ""
@@ -69,7 +63,7 @@ if [ -d "$MM_HOME/modules/$MODULE_NAME" ] ; then
 
     echo "You are currently on the $BRANCH branch."
     echo ""
-    if [ "$BRANCH" == "master" ]; then
+    if [ "$BRANCH" = "master" ]; then
         if check_yes "Do you want to switch to the develop branch?"; then
             git checkout develop
         fi
