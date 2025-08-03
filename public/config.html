@@ -4,7 +4,6 @@
     <meta charset="UTF-8" />
     <title>MMM-RTSPStream Configuration Builder</title>
     <link rel="stylesheet" href="bootstrap.min.css" type="text/css" />
-    <script src="jquery-3.2.1.min.js" type="text/javascript"></script>
     <style type="text/css">
       body {
         margin: 30px;
@@ -1292,554 +1291,436 @@ Click Generate button Above</textarea
       </fieldset>
     </form>
     <script type="text/javascript">
-      function generateConfig() {
-        var s = `{
-    module: "MMM-RTSPStream",
-    position: "${$("#position").val()}",
-    `;
-        if ($("#headerText").val() !== "") {
-          s =
-            s +
-            `header: "${$("#headerText").val()}",
-        `;
-        }
-        s =
-          s +
-          `config: {
-        autoStart: ${$("input[name=autoStart]:checked").val()},
-        rotateStreams: ${$("input[name=rotateStreams]:checked").val()},
-        `;
-        if ($("input[name=rotateStreams]:checked").val()) {
-          s =
-            s +
-            `rotateStreamTimeout: ${$("#rotateStreamTimeout").val()},
-        `;
-        }
-        s =
-          s +
-          `moduleWidth: ${$("#moduleWidth").val()},
-        moduleHeight: ${$("#moduleHeight").val()},
-        localPlayer: '${$("#localPlayer").val()}',
-        remotePlayer: '${$("#remotePlayer").val()}',
-        showSnapWhenPaused: ${$(
-          "input[name=showSnapWhenPaused]:checked"
-        ).val()},
-        remoteSnaps: ${$("input[name=remoteSnaps]:checked").val()},
-        `;
-        if ($("#moduleOffset").val() !== "") {
-          s =
-            s +
-            `moduleOffset: ${$("#moduleOffset").val()},
-        `;
-        }
-        if (
-          ["ffmpeg", "vlc"].indexOf($("select[name=localPlayer]").val()) !==
-            -1 ||
-          $("select[name=remotePlayer]").val() === "ffmpeg"
-        ) {
-          s =
-            s +
-            `shutdownDelay: ${$("#s1shutdownDelay").val()},
-        `;
-        }
-        s =
-          s +
-          `stream1: {
-            name: '${$("#s1Name").val()}',
-            url: '${$("#s1url").val()}',
-            `;
-        if ($("#s1protocol").val() === "udp") {
-          s =
-            s +
-            `protocol: 'udp',
-            `;
-        }
-        if ($("#s1frameRate") !== "") {
-          s =
-            s +
-            `frameRate: '${$("#s1frameRate").val()}',
-            `;
-        }
-        if ($("#s1hdUrl").val() !== "") {
-          s =
-            s +
-            `hdUrl: '${$("#s1hdUrl").val()}',
-            `;
-        }
-        if (
-          $("input[name=showSnapWhenPaused]:checked").val() === "true" &&
-          $("#s1snapshotUrl").val() !== ""
-        ) {
-          s =
-            s +
-            `snapshotUrl: '${$("#s1snapshotUrl").val()}',
-            `;
-        }
-        if ($("input[name=showSnapWhenPaused]:checked").val() === "true") {
-          s =
-            s +
-            `snapshotType: '${$("input[name=s1snapshotType]:checked").val()}',
-            `;
-        }
-        if (
-          $("input[name=showSnapWhenPaused]:checked").val() === "true" &&
-          $("#s1snapshotRefresh").val() !== ""
-        ) {
-          s =
-            s +
-            `snapshotRefresh: ${$("#s1snapshotRefresh").val()},
-            `;
-        }
-        if ($("#s1width").val() !== "") {
-          s =
-            s +
-            `width: ${$("#s1width").val()},
-            `;
-        } else {
-          s =
-            s +
-            `width: undefined,
-            `;
-        }
-        if ($("#s1height").val() !== "") {
-          s =
-            s +
-            `height: ${$("#s1height").val()},
-            `;
-        } else {
-          s =
-            s +
-            `height: undefined,
-            `;
-        }
-        if (
-          ["vlc"].indexOf($("select[name=localPlayer]").val()) &&
-          $("#s1absPosition").val() !== ""
-        ) {
-          s =
-            s +
-            `absPosition: ${$("#s1absPosition").val()},
-            `;
-        }
-        if (["vlc"].indexOf($("select[name=localPlayer]").val())) {
-          s =
-            s +
-            `muted: ${$("input[name=s1muted]:checked").val()},
-            `;
-        }
-        if (
-          $("select[name=localPlayer]").val() === "ffmpeg" ||
-          $("select[name=remotePlayer]").val() === "ffmpeg"
-        ) {
-          s =
-            s +
-            `ffmpegPort: ${$("#s1ffmpegPort").val()},
-            `;
-        }
-        s =
-          s +
-          `},
-        `;
-
-        if (
-          parseInt($("input[type=radio][name=streamCount]:checked").val()) >= 2
-        ) {
-          s =
-            s +
-            `stream2: {
-            name: '${$("#s2Name").val()}',
-            url: '${$("#s2url").val()}',
-            `;
-          if ($("#s2protocol").val() === "udp") {
-            s =
-              s +
-              `protocol: 'udp',
-            `;
-          }
-          if ($("#s2frameRate") !== "") {
-            s =
-              s +
-              `frameRate: '${$("#s2frameRate").val()}',
-            `;
-          }
-          if ($("#s2hdUrl").val() !== "") {
-            s =
-              s +
-              `hdUrl: '${$("#s2hdUrl").val()}',
-            `;
-          }
-          if (
-            $("input[name=showSnapWhenPaused]:checked").val() === "true" &&
-            $("#s2snapshotUrl").val() !== ""
-          ) {
-            s =
-              s +
-              `snapshotUrl: '${$("#s2snapshotUrl").val()}',
-            `;
-          }
-          if ($("input[name=showSnapWhenPaused]:checked").val() === "true") {
-            s =
-              s +
-              `snapshotType: '${$("input[name=s2snapshotType]:checked").val()}',
-            `;
-          }
-          if (
-            $("input[name=showSnapWhenPaused]:checked").val() === "true" &&
-            $("#s2snapshotRefresh").val() !== ""
-          ) {
-            s =
-              s +
-              `snapshotRefresh: ${$("#s2snapshotRefresh").val()},
-            `;
-          }
-          if ($("#s2width").val() !== "") {
-            s =
-              s +
-              `width: ${$("#s2width").val()},
-            `;
-          } else {
-            s =
-              s +
-              `width: undefined,
-            `;
-          }
-          if ($("#s2height").val() !== "") {
-            s =
-              s +
-              `height: ${$("#s2height").val()},
-            `;
-          } else {
-            s =
-              s +
-              `height: undefined,
-            `;
-          }
-          if (
-            ["vlc"].indexOf($("select[name=localPlayer]").val()) &&
-            $("#s2absPosition").val() !== ""
-          ) {
-            s =
-              s +
-              `absPosition: ${$("#s2absPosition").val()},
-            `;
-          }
-          if (
-            ["vlc"].indexOf($("select[name=localPlayer]").val())
-          ) {
-            s =
-              s +
-              `muted: ${$("input[name=s2muted]:checked").val()},
-            `;
-          }
-          if (
-            $("select[name=localPlayer]").val() === "ffmpeg" ||
-            $("select[name=localPlayer]").val() === "ffmpeg"
-          ) {
-            s =
-              s +
-              `ffmpegPort: ${$("#s2ffmpegPort").val()},
-            shutdownDelay: ${$("#s2shutdownDelay").val()},
-            hideFfmpegOutput: ${$(
-              "input[name=s2hideFfmpegOutput]:checked"
-            ).val()},
-            `;
-          }
-          s =
-            s +
-            `},
-        `;
-        }
-
-        if (
-          parseInt($("input[type=radio][name=streamCount]:checked").val()) >= 3
-        ) {
-          s =
-            s +
-            `stream3: {
-            name: '${$("#s3Name").val()}',
-            url: '${$("#s3url").val()}',
-            `;
-          if ($("#s3protocol").val() === "udp") {
-            s =
-              s +
-              `protocol: 'udp',
-            `;
-          }
-          if ($("#s3frameRate") !== "") {
-            s =
-              s +
-              `frameRate: '${$("#s3frameRate").val()}',
-            `;
-          }
-          if ($("#s3hdUrl").val() !== "") {
-            s =
-              s +
-              `hdUrl: '${$("#s3hdUrl").val()}',
-            `;
-          }
-          if (
-            $("input[name=showSnapWhenPaused]:checked").val() === "true" &&
-            $("#s3snapshotUrl").val() !== ""
-          ) {
-            s =
-              s +
-              `snapshotUrl: '${$("#s3snapshotUrl").val()}',
-            `;
-          }
-          if ($("input[name=showSnapWhenPaused]:checked").val() === "true") {
-            s =
-              s +
-              `snapshotType: '${$("input[name=s3snapshotType]:checked").val()}',
-            `;
-          }
-          if (
-            $("input[name=showSnapWhenPaused]:checked").val() === "true" &&
-            $("#s3snapshotRefresh").val() !== ""
-          ) {
-            s =
-              s +
-              `snapshotRefresh: ${$("#s3snapshotRefresh").val()},
-            `;
-          }
-          if ($("#s3width").val() !== "") {
-            s =
-              s +
-              `width: ${$("#s3width").val()},
-            `;
-          } else {
-            s =
-              s +
-              `width: undefined,
-            `;
-          }
-          if ($("#s3height").val() !== "") {
-            s =
-              s +
-              `height: ${$("#s3height").val()},
-            `;
-          } else {
-            s =
-              s +
-              `height: undefined,
-            `;
-          }
-          if (
-            ["vlc"].indexOf($("select[name=localPlayer]").val()) &&
-            $("#s3absPosition").val() !== ""
-          ) {
-            s =
-              s +
-              `absPosition: ${$("#s3absPosition").val()},
-            `;
-          }
-          if (
-            ["vlc"].indexOf($("select[name=localPlayer]").val())
-          ) {
-            s =
-              s +
-              `muted: ${$("input[name=s3muted]:checked").val()},
-            `;
-          }
-          if (
-            $("select[name=localPlayer]").val() === "ffmpeg" ||
-            $("select[name=localPlayer]").val() === "ffmpeg"
-          ) {
-            s =
-              s +
-              `ffmpegPort: ${$("#s3ffmpegPort").val()},
-            shutdownDelay: ${$("#s3shutdownDelay").val()},
-            hideFfmpegOutput: ${$(
-              "input[name=s3hideFfmpegOutput]:checked"
-            ).val()},
-            `;
-          }
-          s =
-            s +
-            `},
-        `;
-        }
-
-        if (
-          parseInt($("input[type=radio][name=streamCount]:checked").val()) >= 4
-        ) {
-          s =
-            s +
-            `stream4: {
-            name: '${$("#s4Name").val()}',
-            url: '${$("#s4url").val()}',
-            `;
-          if ($("#s4protocol").val() === "udp") {
-            s =
-              s +
-              `protocol: 'udp',
-            `;
-          }
-          if ($("#s4frameRate") !== "") {
-            s =
-              s +
-              `frameRate: '${$("#s4frameRate").val()}',
-            `;
-          }
-          if ($("#s4hdUrl").val() !== "") {
-            s =
-              s +
-              `hdUrl: '${$("#s4hdUrl").val()}',
-            `;
-          }
-          if (
-            $("input[name=showSnapWhenPaused]:checked").val() === "true" &&
-            $("#s4snapshotUrl").val() !== ""
-          ) {
-            s =
-              s +
-              `snapshotUrl: '${$("#s4snapshotUrl").val()}',
-            `;
-          }
-          if ($("input[name=showSnapWhenPaused]:checked").val() === "true") {
-            s =
-              s +
-              `snapshotType: '${$("input[name=s4snapshotType]:checked").val()}',
-            `;
-          }
-          if (
-            $("input[name=showSnapWhenPaused]:checked").val() === "true" &&
-            $("#s4snapshotRefresh").val() !== ""
-          ) {
-            s =
-              s +
-              `snapshotRefresh: ${$("#s4snapshotRefresh").val()},
-            `;
-          }
-          if ($("#s4width").val() !== "") {
-            s =
-              s +
-              `width: ${$("#s4width").val()},
-            `;
-          } else {
-            s =
-              s +
-              `width: undefined,
-            `;
-          }
-          if ($("#s4height").val() !== "") {
-            s =
-              s +
-              `height: ${$("#s4height").val()},
-            `;
-          } else {
-            s =
-              s +
-              `height: undefined,
-            `;
-          }
-          if (
-            ["vlc"].indexOf($("select[name=localPlayer]").val()) &&
-            $("#s4absPosition").val() !== ""
-          ) {
-            s =
-              s +
-              `absPosition: ${$("#s4absPosition").val()},
-            `;
-          }
-          if (
-            ["vlc"].indexOf($("select[name=localPlayer]").val())
-          ) {
-            s =
-              s +
-              `muted: ${$("input[name=s4muted]:checked").val()},
-            `;
-          }
-          if (
-            $("select[name=localPlayer]").val() === "ffmpeg" ||
-            $("select[name=localPlayer]").val() === "ffmpeg"
-          ) {
-            s =
-              s +
-              `ffmpegPort: ${$("#s4ffmpegPort").val()},
-            shutdownDelay: ${$("#s4shutdownDelay").val()},
-            hideFfmpegOutput: ${$(
-              "input[name=s4hideFfmpegOutput]:checked"
-            ).val()},
-            `;
-          }
-          s =
-            s +
-            `},
-        `;
-        }
-
-        s =
-          s +
-          `}
-},`;
-
-        $("#configResult").val(s);
+      // Helper functions to replace jQuery functionality
+      function getValue(selector) {
+        const element = document.querySelector(selector);
+        return element ? element.value : "";
       }
 
-      $(document).ready(function () {
-        $(".ffmpeg").hide();
-        $(".count-2").hide();
-        $(".count-3").hide();
-        $(".count-4").hide();
+      function getCheckedValue(selector) {
+        const element = document.querySelector(selector);
+        return element ? element.value : "";
+      }
 
-        $("input[name=rotateStreams]").on("change", function () {
-          if ($(this).val() === "true") {
-            $(".rotateStreamTimeout").show();
-          } else {
-            $(".rotateStreamTimeout").hide();
+      function hideElements(className) {
+        const elements = document.querySelectorAll(className);
+        elements.forEach(el => el.style.display = "none");
+      }
+
+      function showElements(className) {
+        const elements = document.querySelectorAll(className);
+        elements.forEach(el => el.style.display = "block");
+      }
+
+      function generateConfig() {
+        let s = `{
+    module: "MMM-RTSPStream",
+    position: "${getValue("#position")}",
+    `;
+        if (getValue("#headerText") !== "") {
+          s += `header: "${getValue("#headerText")}",
+        `;
+        }
+        s += `config: {
+        autoStart: ${getCheckedValue("input[name=autoStart]:checked")},
+        rotateStreams: ${getCheckedValue("input[name=rotateStreams]:checked")},
+        `;
+        if (getCheckedValue("input[name=rotateStreams]:checked") === "true") {
+          s += `rotateStreamTimeout: ${getValue("#rotateStreamTimeout")},
+        `;
+        }
+        s += `moduleWidth: ${getValue("#moduleWidth")},
+        moduleHeight: ${getValue("#moduleHeight")},
+        localPlayer: '${getValue("#localPlayer")}',
+        remotePlayer: '${getValue("#remotePlayer")}',
+        showSnapWhenPaused: ${getCheckedValue("input[name=showSnapWhenPaused]:checked")},
+        remoteSnaps: ${getCheckedValue("input[name=remoteSnaps]:checked")},
+        `;
+        if (getValue("#moduleOffset") !== "") {
+          s += `moduleOffset: ${getValue("#moduleOffset")},
+        `;
+        }
+        if (
+          ["ffmpeg", "vlc"].indexOf(getValue("#localPlayer")) !== -1 ||
+          getValue("#remotePlayer") === "ffmpeg"
+        ) {
+          s += `shutdownDelay: ${getValue("#s1shutdownDelay")},
+        `;
+        }
+        s += `stream1: {
+            name: '${getValue("#s1Name")}',
+            url: '${getValue("#s1url")}',
+            `;
+        if (getCheckedValue("input[name=s1protocol]:checked") === "udp") {
+          s += `protocol: 'udp',
+            `;
+        }
+        if (getValue("#s1frameRate") !== "") {
+          s += `frameRate: '${getValue("#s1frameRate")}',
+            `;
+        }
+        if (getValue("#s1hdUrl") !== "") {
+          s += `hdUrl: '${getValue("#s1hdUrl")}',
+            `;
+        }
+        if (
+          getCheckedValue("input[name=showSnapWhenPaused]:checked") === "true" &&
+          getValue("#s1snapshotUrl") !== ""
+        ) {
+          s += `snapshotUrl: '${getValue("#s1snapshotUrl")}',
+            `;
+        }
+        if (getCheckedValue("input[name=showSnapWhenPaused]:checked") === "true") {
+          s += `snapshotType: '${getCheckedValue("input[name=s1snapshotType]:checked")}',
+            `;
+        }
+        if (
+          getCheckedValue("input[name=showSnapWhenPaused]:checked") === "true" &&
+          getValue("#s1snapshotRefresh") !== ""
+        ) {
+          s += `snapshotRefresh: ${getValue("#s1snapshotRefresh")},
+            `;
+        }
+        if (getValue("#s1width") !== "") {
+          s += `width: ${getValue("#s1width")},
+            `;
+        } else {
+          s += `width: undefined,
+            `;
+        }
+        if (getValue("#s1height") !== "") {
+          s += `height: ${getValue("#s1height")},
+            `;
+        } else {
+          s += `height: undefined,
+            `;
+        }
+        if (
+          getValue("#localPlayer") === "vlc" &&
+          getValue("#s1absPosition") !== ""
+        ) {
+          s += `absPosition: ${getValue("#s1absPosition")},
+            `;
+        }
+        if (getValue("#localPlayer") === "vlc") {
+          s += `muted: ${getCheckedValue("input[name=s1muted]:checked")},
+            `;
+        }
+        if (
+          getValue("#localPlayer") === "ffmpeg" ||
+          getValue("#remotePlayer") === "ffmpeg"
+        ) {
+          s += `ffmpegPort: ${getValue("#s1ffmpegPort")},
+            `;
+        }
+        s += `},
+        `;
+
+        if (parseInt(getCheckedValue("input[name=streamCount]:checked")) >= 2) {
+          s += `stream2: {
+            name: '${getValue("#s2Name")}',
+            url: '${getValue("#s2url")}',
+            `;
+          if (getCheckedValue("input[name=s2protocol]:checked") === "udp") {
+            s += `protocol: 'udp',
+            `;
           }
-        });
-        $("input[name=showSnapWhenPaused]").on("change", function () {
-          if ($(this).val() === "true") {
-            $(".snapshotDetails").show();
-          } else {
-            $(".snapshotDetails").hide();
+          if (getValue("#s2frameRate") !== "") {
+            s += `frameRate: '${getValue("#s2frameRate")}',
+            `;
           }
-        });
-        $("select[name=remotePlayer]").on("change", function () {
-          console.log($(this).val(), $("select[name=localPlayer]").val());
+          if (getValue("#s2hdUrl") !== "") {
+            s += `hdUrl: '${getValue("#s2hdUrl")}',
+            `;
+          }
           if (
-            $(this).val() === "ffmpeg" ||
-            $("select[name=localPlayer]").val() === "ffmpeg"
+            getCheckedValue("input[name=showSnapWhenPaused]:checked") === "true" &&
+            getValue("#s2snapshotUrl") !== ""
           ) {
-            $(".ffmpeg").show();
-          } else {
-            $(".ffmpeg").hide();
+            s += `snapshotUrl: '${getValue("#s2snapshotUrl")}',
+            `;
           }
-        });
-        $("select[name=localPlayer]").on("change", function () {
+          if (getCheckedValue("input[name=showSnapWhenPaused]:checked") === "true") {
+            s += `snapshotType: '${getCheckedValue("input[name=s2snapshotType]:checked")}',
+            `;
+          }
           if (
-            $(this).val() === "ffmpeg" ||
-            $("select[name=remotePlayer]").val() === "ffmpeg"
+            getCheckedValue("input[name=showSnapWhenPaused]:checked") === "true" &&
+            getValue("#s2snapshotRefresh") !== ""
           ) {
-            $(".ffmpeg").show();
-          } else {
-            $(".ffmpeg").hide();
+            s += `snapshotRefresh: ${getValue("#s2snapshotRefresh")},
+            `;
           }
-          if ($(this).val() === "vlc") {
-            $(".vlc").show();
+          if (getValue("#s2width") !== "") {
+            s += `width: ${getValue("#s2width")},
+            `;
           } else {
-            $(".vlc").hide();
+            s += `width: undefined,
+            `;
           }
+          if (getValue("#s2height") !== "") {
+            s += `height: ${getValue("#s2height")},
+            `;
+          } else {
+            s += `height: undefined,
+            `;
+          }
+          if (
+            getValue("#localPlayer") === "vlc" &&
+            getValue("#s2absPosition") !== ""
+          ) {
+            s += `absPosition: ${getValue("#s2absPosition")},
+            `;
+          }
+          if (getValue("#localPlayer") === "vlc") {
+            s += `muted: ${getCheckedValue("input[name=s2muted]:checked")},
+            `;
+          }
+          if (
+            getValue("#localPlayer") === "ffmpeg" ||
+            getValue("#remotePlayer") === "ffmpeg"
+          ) {
+            s += `ffmpegPort: ${getValue("#s2ffmpegPort")},
+            `;
+          }
+          s += `},
+        `;
+        }
+
+        if (parseInt(getCheckedValue("input[name=streamCount]:checked")) >= 3) {
+          s += `stream3: {
+            name: '${getValue("#s3Name")}',
+            url: '${getValue("#s3url")}',
+            `;
+          if (getCheckedValue("input[name=s3protocol]:checked") === "udp") {
+            s += `protocol: 'udp',
+            `;
+          }
+          if (getValue("#s3frameRate") !== "") {
+            s += `frameRate: '${getValue("#s3frameRate")}',
+            `;
+          }
+          if (getValue("#s3hdUrl") !== "") {
+            s += `hdUrl: '${getValue("#s3hdUrl")}',
+            `;
+          }
+          if (
+            getCheckedValue("input[name=showSnapWhenPaused]:checked") === "true" &&
+            getValue("#s3snapshotUrl") !== ""
+          ) {
+            s += `snapshotUrl: '${getValue("#s3snapshotUrl")}',
+            `;
+          }
+          if (getCheckedValue("input[name=showSnapWhenPaused]:checked") === "true") {
+            s += `snapshotType: '${getCheckedValue("input[name=s3snapshotType]:checked")}',
+            `;
+          }
+          if (
+            getCheckedValue("input[name=showSnapWhenPaused]:checked") === "true" &&
+            getValue("#s3snapshotRefresh") !== ""
+          ) {
+            s += `snapshotRefresh: ${getValue("#s3snapshotRefresh")},
+            `;
+          }
+          if (getValue("#s3width") !== "") {
+            s += `width: ${getValue("#s3width")},
+            `;
+          } else {
+            s += `width: undefined,
+            `;
+          }
+          if (getValue("#s3height") !== "") {
+            s += `height: ${getValue("#s3height")},
+            `;
+          } else {
+            s += `height: undefined,
+            `;
+          }
+          if (
+            getValue("#localPlayer") === "vlc" &&
+            getValue("#s3absPosition") !== ""
+          ) {
+            s += `absPosition: ${getValue("#s3absPosition")},
+            `;
+          }
+          if (getValue("#localPlayer") === "vlc") {
+            s += `muted: ${getCheckedValue("input[name=s3muted]:checked")},
+            `;
+          }
+          if (
+            getValue("#localPlayer") === "ffmpeg" ||
+            getValue("#remotePlayer") === "ffmpeg"
+          ) {
+            s += `ffmpegPort: ${getValue("#s3ffmpegPort")},
+            `;
+          }
+          s += `},
+        `;
+        }
+
+        if (parseInt(getCheckedValue("input[name=streamCount]:checked")) >= 4) {
+          s += `stream4: {
+            name: '${getValue("#s4Name")}',
+            url: '${getValue("#s4url")}',
+            `;
+          if (getCheckedValue("input[name=s4protocol]:checked") === "udp") {
+            s += `protocol: 'udp',
+            `;
+          }
+          if (getValue("#s4frameRate") !== "") {
+            s += `frameRate: '${getValue("#s4frameRate")}',
+            `;
+          }
+          if (getValue("#s4hdUrl") !== "") {
+            s += `hdUrl: '${getValue("#s4hdUrl")}',
+            `;
+          }
+          if (
+            getCheckedValue("input[name=showSnapWhenPaused]:checked") === "true" &&
+            getValue("#s4snapshotUrl") !== ""
+          ) {
+            s += `snapshotUrl: '${getValue("#s4snapshotUrl")}',
+            `;
+          }
+          if (getCheckedValue("input[name=showSnapWhenPaused]:checked") === "true") {
+            s += `snapshotType: '${getCheckedValue("input[name=s4snapshotType]:checked")}',
+            `;
+          }
+          if (
+            getCheckedValue("input[name=showSnapWhenPaused]:checked") === "true" &&
+            getValue("#s4snapshotRefresh") !== ""
+          ) {
+            s += `snapshotRefresh: ${getValue("#s4snapshotRefresh")},
+            `;
+          }
+          if (getValue("#s4width") !== "") {
+            s += `width: ${getValue("#s4width")},
+            `;
+          } else {
+            s += `width: undefined,
+            `;
+          }
+          if (getValue("#s4height") !== "") {
+            s += `height: ${getValue("#s4height")},
+            `;
+          } else {
+            s += `height: undefined,
+            `;
+          }
+          if (
+            getValue("#localPlayer") === "vlc" &&
+            getValue("#s4absPosition") !== ""
+          ) {
+            s += `absPosition: ${getValue("#s4absPosition")},
+            `;
+          }
+          if (getValue("#localPlayer") === "vlc") {
+            s += `muted: ${getCheckedValue("input[name=s4muted]:checked")},
+            `;
+          }
+          if (
+            getValue("#localPlayer") === "ffmpeg" ||
+            getValue("#remotePlayer") === "ffmpeg"
+          ) {
+            s += `ffmpegPort: ${getValue("#s4ffmpegPort")},
+            `;
+          }
+          s += `},
+        `;
+        }
+
+        s += `}
+},`;
+
+        document.querySelector("#configResult").value = s;
+      }
+
+      // Document ready replacement
+      document.addEventListener("DOMContentLoaded", function() {
+        // Hide elements initially
+        hideElements(".ffmpeg");
+        hideElements(".count-2");
+        hideElements(".count-3");
+        hideElements(".count-4");
+
+        // Event listeners for rotateStreams
+        const rotateStreamsInputs = document.querySelectorAll("input[name=rotateStreams]");
+        rotateStreamsInputs.forEach(input => {
+          input.addEventListener("change", function() {
+            if (this.value === "true") {
+              showElements(".rotateStreamTimeout");
+            } else {
+              hideElements(".rotateStreamTimeout");
+            }
+          });
         });
-        $("input[type=radio][name=streamCount]").change(function () {
-          if (this.value === "1") {
-            $(".count-2").hide();
-            $(".count-3").hide();
-            $(".count-4").hide();
-          } else if (this.value === "2") {
-            $(".count-2").show();
-            $(".count-3").hide();
-            $(".count-4").hide();
-          } else if (this.value === "3") {
-            $(".count-2").show();
-            $(".count-3").show();
-            $(".count-4").hide();
-          } else if (this.value === "4") {
-            $(".count-2").show();
-            $(".count-3").show();
-            $(".count-4").show();
-          }
+
+        // Event listeners for showSnapWhenPaused
+        const showSnapInputs = document.querySelectorAll("input[name=showSnapWhenPaused]");
+        showSnapInputs.forEach(input => {
+          input.addEventListener("change", function() {
+            if (this.value === "true") {
+              showElements(".snapshotDetails");
+            } else {
+              hideElements(".snapshotDetails");
+            }
+          });
+        });
+
+        // Event listeners for remotePlayer
+        const remotePlayerSelect = document.querySelector("select[name=remotePlayer]");
+        if (remotePlayerSelect) {
+          remotePlayerSelect.addEventListener("change", function() {
+            const localPlayerValue = getValue("#localPlayer");
+            console.log(this.value, localPlayerValue);
+            if (this.value === "ffmpeg" || localPlayerValue === "ffmpeg") {
+              showElements(".ffmpeg");
+            } else {
+              hideElements(".ffmpeg");
+            }
+          });
+        }
+
+        // Event listeners for localPlayer
+        const localPlayerSelect = document.querySelector("select[name=localPlayer]");
+        if (localPlayerSelect) {
+          localPlayerSelect.addEventListener("change", function() {
+            const remotePlayerValue = getValue("#remotePlayer");
+            if (this.value === "ffmpeg" || remotePlayerValue === "ffmpeg") {
+              showElements(".ffmpeg");
+            } else {
+              hideElements(".ffmpeg");
+            }
+            if (this.value === "vlc") {
+              showElements(".vlc");
+            } else {
+              hideElements(".vlc");
+            }
+          });
+        }
+
+        // Event listeners for streamCount
+        const streamCountInputs = document.querySelectorAll("input[name=streamCount]");
+        streamCountInputs.forEach(input => {
+          input.addEventListener("change", function() {
+            if (this.value === "1") {
+              hideElements(".count-2");
+              hideElements(".count-3");
+              hideElements(".count-4");
+            } else if (this.value === "2") {
+              showElements(".count-2");
+              hideElements(".count-3");
+              hideElements(".count-4");
+            } else if (this.value === "3") {
+              showElements(".count-2");
+              showElements(".count-3");
+              hideElements(".count-4");
+            } else if (this.value === "4") {
+              showElements(".count-2");
+              showElements(".count-3");
+              showElements(".count-4");
+            }
+          });
         });
       });
     </script>

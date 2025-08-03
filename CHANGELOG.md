@@ -18,6 +18,7 @@ OMXPlayer is no longer actively developed and has been deprecated. This release 
 - feat!: removed all OMXPlayer-related code and configuration options
   - docs: updated documentation to reflect VLC-only hardware acceleration
   - refactor: simplified installation (no more PM2 setup required)
+- refactor: remove `jQuery` dependency from configuration page
 
 ## [2.1.0](https://github.com/shbatm/MMM-RTSPStream/compare/v2.0.5...v2.1.0) - Refactor Codebase
 

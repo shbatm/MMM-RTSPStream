@@ -7,7 +7,7 @@ import markdown from "@eslint/markdown";
 import stylistic from "@stylistic/eslint-plugin";
 
 export default defineConfig([
-  globalIgnores(["public/bootstrap.min.css", "public/jquery-3.2.1.min.js", "scripts/jsmpeg.min.js"]),
+  globalIgnores(["public/bootstrap.min.css", "scripts/jsmpeg.min.js"]),
   {files: ["**/*.css"], plugins: {css}, language: "css/css", extends: ["css/recommended"], rules: {"css/no-important": "off"}},
   {
     files: ["**/*.{js,mjs}"],
