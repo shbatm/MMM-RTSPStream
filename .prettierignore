@@ -1,4 +1,3 @@
+*.js
+*.mjs
 public/bootstrap.min.css
-public/jquery-3.2.1.min.js
-scripts/jsmpeg.min.js
-scripts/onexit.js
