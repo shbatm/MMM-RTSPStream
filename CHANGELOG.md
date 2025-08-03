@@ -1,14 +1,60 @@
-# :warning: Refer to GitHub Releases page for Change Logs post `2.0.2-dev`
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [2.1.0](https://github.com/shbatm/MMM-RTSPStream/compare/v2.0.5...v2.1.0) - Refactor Codebase
+
+This release focuses on code modernization and maintainability improvements. The codebase has been significantly refactored with modern JavaScript standards, updated tooling, and comprehensive linting.
+
+**No breaking changes to functionality** - all existing configurations and features should remain compatible, but please report any issues you find.
+
+### Changed
+
+- Code refactoring and modernization for better maintainability
+- Updated to ESLint for modern JavaScript linting (replacing JSHint)
+- Prettier code formatting applied throughout the codebase
+- Replaced `node-fetch` dependency with native Node.js fetch API
+- Modernized JavaScript syntax (replaced `var` with `const`/`let`)
+- Updated dependencies to latest versions
+- Improved code organization and formatting consistency
+
+### Fixed
+
+- Fixed payload check for empty objects in RTSP-PLAY and RTSP-STOP notifications (now properly detects `{}` using `JSON.stringify`)
+- Removed unused variables and improved variable scoping
+- Fixed DataURI instantiation to avoid scope issues
+
+### Documentation
+
+- Updated Code of Conduct to current version
+- Enhanced README with better structure and documentation
+- Converted license file to markdown format
+- Improved markdown formatting across all documentation files
+
+## [2.0.5](https://github.com/shbatm/MMM-RTSPStream/compare/v2.0.4...v2.0.5) - Revert node-fetch to 2.x
+
+## [2.0.4](https://github.com/shbatm/MMM-RTSPStream/compare/v2.0.3...v2.0.4) - VLC Mute Option
+
+### Changed
+
+* Snyk: Security upgrade ws from 3.3.3 to 5.2.3 by @snyk-bot in https://github.com/shbatm/MMM-RTSPStream/pull/97
+* Snyk: Security upgrade node-fetch from 2.6.7 to 3.2.10 by @shbatm in https://github.com/shbatm/MMM-RTSPStream/pull/99
+* Add option to mute VLC streams by @shbatm in https://github.com/shbatm/MMM-RTSPStream/pull/100
+
+## [2.0.3](https://github.com/shbatm/MMM-RTSPStream/compare/v2.0.2-dev...v2.0.3) - Maintainance Release
 
 ## [2.0.2-dev](https://github.com/shbatm/MMM-RTSPStream/compare/v2.0.1-dev...v2.0.2-dev) - Attempted fix for OMXPlayer with OpenGL (Fake KMS) enabled
 
-Changed:
+### Changed
 
 - Added "--no-osd" command line switch to omxplayer command. Per [this thread](https://www.raspberrypi.org/forums/viewtopic.php?t=159853), "omxplayer uses OpenVG for subtitles and status messsages which is not compatible with the OpenGL (Fake KMS) driver."
 
 ## [2.0.1-dev](https://github.com/shbatm/MMM-RTSPStream/compare/v2.0.0...v2.0.1-dev) - Major OMX Bugfixes
 
-Changed:
+### Changed
 
 - App closing now spawns a new process to actually kill the OMX streams, it was getting cut off in the middle of closing everything due to it being an async process.
 - Wait for DOM to be shown before calling to start the streams--this was causing the Fullscreen on Resume problems.
@@ -20,12 +66,12 @@ Changed:
 
 ## [2.0.0](https://github.com/shbatm/MMM-RTSPStream/compare/v1.2.2...v2.0.0) - Add VLC Streaming Support
 
-Added:
+### Added
 
 - VLC Window Overlay support added. Use `localPlayer: 'vlc',` in your module configuration.
 - Module-wide debug option added for more verbose output: `debug: true,`
 
-Changed:
+### Changed
 
 - `shutdownDelay` parameter moved from the individual stream config sections to the main module config so it only has to be provided once. It has also changed from milliseconds to seconds. Warning has been added if the timeout is less time than it takes to make it through the loop of streams (causes unnecessary restarts).
 - `hideFfmpegOutput` configuration option removed from stream config in favor of global `debug` module option.
@@ -36,30 +82,30 @@ Changed:
 
 ## [1.2.2](https://github.com/shbatm/MMM-RTSPStream/compare/v1.2.1...v1.2.2) - Auto-restart OMX Stream every X hours (Partially addresses #29)
 
-Changes:
+### Changed
 
 - Added config option to schedule automatic restarts of the OMX streams.
 
 ## [1.2.1](https://github.com/shbatm/MMM-RTSPStream/compare/v1.2.0...v1.2.1) - Custom video window parameters
 
-Changes:
+### Changed
 
 - OMX streams can be started via notification in a custom-sized window.
 
-Fixes:
+### Fixed
 
 - Bug fixes for ffmpegPort and absPosition settings.
 
 ## [1.2.0](https://github.com/shbatm/MMM-RTSPStream/compare/v1.1.1...v1.2.0) - Use PM2 to control OMX Streams
 
-Changes:
+### Changed
 
 - OMXPlayer streams are started using PM2 to allow auto-restart if the stream closes
 - Better shutdown handling if the "Graceful Shutdown" patch is installed.
 - Added Absolute Position option to override automatic detection of where to show the video.
 - Configuration Builder now included. See instructions in README.md
 
-Fixes:
+### Fixed
 
 - Various minor bug fixes and code cleanup
 - `port` setting changed to `ffmpegPort` for clarity
@@ -70,7 +116,7 @@ Fixes:
 
 ## [1.1.0](https://github.com/shbatm/MMM-RTSPStream/compare/v1.0.2...v1.1.0) - Hardware Acceleration w/ OMXPlayer
 
-Changes:
+### Changed
 
 - Option to use OMXPlayer on main server's screen to use hardware accelerated video playback. OMXPlayer will draw over top of browser window.
 - Option for fullscreen playback with OMXPlayer (double-click or MMM-KeyBindings longpress play)
@@ -78,7 +124,7 @@ Changes:
 - Updated MMM-KeyBindings calls to match refactored functions from that module
 - Implemented independent control for server and remote browser screens
 
-Fixes:
+### Fixed
 
 - JSMpeg throws error "Failed to get WebGL context." - Using option in JSMpeg call to disable WebGL.
 - Audio is ignored from the streams to prevent interference with other modules.
