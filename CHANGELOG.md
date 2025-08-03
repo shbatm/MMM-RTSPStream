@@ -1,12 +1,12 @@
-# :warning: Refer to GitHub Releases page for Change Logs post [2.0.2-dev]
+# :warning: Refer to GitHub Releases page for Change Logs post `2.0.2-dev`
 
-## [2.0.2-dev] - Attempted fix for OMXPlayer with OpenGL (Fake KMS) enabled
+## [2.0.2-dev](https://github.com/shbatm/MMM-RTSPStream/compare/v2.0.1-dev...v2.0.2-dev) - Attempted fix for OMXPlayer with OpenGL (Fake KMS) enabled
 
 Changed:
 
-- Added "--no-osd" command line switch to omxplayer command. Per [this thread](https://www.raspberrypi.org/forums/viewtopic.php?t=159853), "omxplayer uses OpenVG for subtitles and status messsages which is not compatible with [the OpenGL (Fake KMS)] driver."
+- Added "--no-osd" command line switch to omxplayer command. Per [this thread](https://www.raspberrypi.org/forums/viewtopic.php?t=159853), "omxplayer uses OpenVG for subtitles and status messsages which is not compatible with the OpenGL (Fake KMS) driver."
 
-## [2.0.1-dev] - Major OMX Bugfixes
+## [2.0.1-dev](https://github.com/shbatm/MMM-RTSPStream/compare/v2.0.0...v2.0.1-dev) - Major OMX Bugfixes
 
 Changed:
 
@@ -18,7 +18,7 @@ Changed:
 - Fixed broken key bindings after MMM-KeyBindings upgrade
 - Fixed issue where module was trying to connect to PM2 while it was already connected (e.g. stop stream 1 and start stream 2 back to back).
 
-## [2.0.0] - Add VLC Streaming Support
+## [2.0.0](https://github.com/shbatm/MMM-RTSPStream/compare/v1.2.2...v2.0.0) - Add VLC Streaming Support
 
 Added:
 
@@ -34,13 +34,13 @@ Changed:
   - You must update the node-rtsp-stream-es6 package too. This is most easily done by deleting your node_modules folder and re-running `npm install` on the module.
 - `RTSP-PLAY` notification now accepts an object `{ stream: "streamX", stopOthers: true }` which will stop other streams before starting the new stream.
 
-## [1.2.2] - Auto-restart OMX Stream every X hours (Partially addresses #29)
+## [1.2.2](https://github.com/shbatm/MMM-RTSPStream/compare/v1.2.1...v1.2.2) - Auto-restart OMX Stream every X hours (Partially addresses #29)
 
 Changes:
 
 - Added config option to schedule automatic restarts of the OMX streams.
 
-## [1.2.1] - Custom video window parameters
+## [1.2.1](https://github.com/shbatm/MMM-RTSPStream/compare/v1.2.0...v1.2.1) - Custom video window parameters
 
 Changes:
 
@@ -50,7 +50,7 @@ Fixes:
 
 - Bug fixes for ffmpegPort and absPosition settings.
 
-## [1.2.0] - Use PM2 to control OMX Streams
+## [1.2.0](https://github.com/shbatm/MMM-RTSPStream/compare/v1.1.1...v1.2.0) - Use PM2 to control OMX Streams
 
 Changes:
 
@@ -64,11 +64,11 @@ Fixes:
 - Various minor bug fixes and code cleanup
 - `port` setting changed to `ffmpegPort` for clarity
 
-## [1.1.1] - Added OMXPlayer Offset config option
+## [1.1.1](https://github.com/shbatm/MMM-RTSPStream/compare/v1.1.0...v1.1.1) - Added OMXPlayer Offset config option
 
 - Added `moduleOffset` config option. On some displays, the method used to find the location to draw the video does not properly line up with the screen. Entering a pixel value will shift the video location by that amount.
 
-## [1.1.0] - Hardware Acceleration w/ OMXPlayer
+## [1.1.0](https://github.com/shbatm/MMM-RTSPStream/compare/v1.0.2...v1.1.0) - Hardware Acceleration w/ OMXPlayer
 
 Changes:
 
@@ -83,14 +83,14 @@ Fixes:
 - JSMpeg throws error "Failed to get WebGL context." - Using option in JSMpeg call to disable WebGL.
 - Audio is ignored from the streams to prevent interference with other modules.
 
-## [1.0.2] - Fixes #10 - No playback on Monitor resume from suspend
+## [1.0.2](https://github.com/shbatm/MMM-RTSPStream/compare/v1.0.1...v1.0.2) - Fixes #10 - No playback on Monitor resume from suspend
 
 Added actions to suspend/resume the module when a `USER_PRESENCE` notification is received from the MMM-PIR-sensor module. This restarts the camera feeds when the monitor is resumed.
 
-## [1.0.1] - Fixes #2 - Add UDP Protocol
+## [1.0.1](https://github.com/shbatm/MMM-RTSPStream/compare/v1.0.0...v1.0.1) - Fixes #2 - Add UDP Protocol
 
 Added option for using UDP protocol in `ffmpeg`
 
-## [1.0.0] - Initial Release
+## [1.0.0](https://github.com/shbatm/MMM-RTSPStream/releases/tag/v1.0.0) - Initial Release
 
 First public release
