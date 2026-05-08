@@ -187,16 +187,20 @@ WebRTC playback (`localPlayer: "webrtc"` or `remotePlayer: "webrtc"`) requires a
 
 **Quick Setup:**
 
-1. Run the setup script (downloads and starts MediaMTX):
+1. Prepare MediaMTX (downloads binary, validates local RTSP/WHEP stack):
 
    ```bash
-   cd ~/MagicMirror/modules/MMM-RTSPStream/scripts
-   ./setup_mediamtx.sh
+   cd ~/MagicMirror/modules/MMM-RTSPStream
+   RTSPSTREAM_SKIP_MM=1 node --run demo
    ```
 
-   For Raspberry Pi, edit `setup_mediamtx.sh` and change `ARCH="linux_amd64"` to `ARCH="linux_arm64v8"`.
+   On Raspberry Pi (or other non-default architectures), set `MEDIAMTX_ARCH` explicitly, for example:
 
-2. Configure your stream in `mediamtx.yml`:
+   ```bash
+   MEDIAMTX_ARCH=linux_arm64v8 RTSPSTREAM_SKIP_MM=1 node --run demo
+   ```
+
+2. Configure your stream in `mediamtx/mediamtx.yml`:
 
    ```yaml
    paths:
@@ -380,25 +384,14 @@ Please note that this project is released with a [Contributor Code of Conduct](C
 - `node --run lint` - Run linting and formatter checks.
 - `node --run lint:fix` - Fix linting and formatter issues.
 - `node --run test` - Run linting and formatter checks.
-- `node --run demo` - Start MagicMirror with demo config for testing the module.
+- `node --run demo` - Start local WebRTC demo (auto-starts MediaMTX + FFmpeg test stream, then MagicMirror with `demo.config.js`).
 
-**Testing with a local stream:**
+**WebRTC demo flow (`node --run demo`):**
 
-1. Start MediaMTX and test stream:
-
-   ```bash
-   cd scripts
-   ./setup_mediamtx.sh        # Start MediaMTX server
-   ./start_test_stream.sh     # Start FFmpeg test pattern stream
-   ```
-
-   This creates a test stream at `http://localhost:8889/test/whep`.
-
-2. Start MagicMirror demo (already configured to use the test stream):
-
-   ```bash
-   node --run demo
-   ```
+1. Starts (or reuses) MediaMTX and checks API readiness on `http://127.0.0.1:9997`.
+2. Publishes a local FFmpeg test stream to `rtsp://127.0.0.1:8554/test`.
+3. Launches MagicMirror with the bundled demo config (`whepUrl: http://localhost:8889/test/whep`).
+4. Stops the helper processes it started when MagicMirror exits.
 
 The demo config uses WebRTC with the local test stream. You can switch between `localPlayer: "vlc"`, `"mplayer"`, or `"webrtc"` to test different playback methods.
 
