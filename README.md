@@ -390,7 +390,7 @@ Please note that this project is released with a [Contributor Code of Conduct](C
 2. Start MagicMirror demo (already configured to use the test stream):
 
    ```bash
-   npm run demo
+   node --run demo
    ```
 
 The demo config uses WebRTC with the local test stream. You can switch between `localPlayer: "vlc"`, `"mplayer"`, or `"webrtc"` to test different playback methods.
