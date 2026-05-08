@@ -1,6 +1,7 @@
 {
   "name": "mmm-rtspstream",
   "version": "4.0.0",
+  "type": "commonjs",
   "description": "MagicMirror² module for RTSP camera snapshots + VLC (local) or WebRTC (remote) playback",
   "keywords": [
     "magic mirror",
