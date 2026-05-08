@@ -110,16 +110,6 @@ Module.register("MMM-RTSPStream", {
         .forEach((key) => {
           self.streams[key] = {playing: false, status: {message: "", level: "info"}};
         });
-
-      // Fallback: if helper STARTED notification is missed, unblock UI and proceed.
-      setTimeout(() => {
-        if (!this.loaded && !this.suspended) {
-          Log.warn(`${this.name}: STARTED notification timeout, continuing with fallback.`);
-          this.loaded = true;
-          this.updateDom(this.config.animationSpeed);
-          setTimeout(() => this.resumed(), this.config.animationSpeed + 500);
-        }
-      }, 5000);
     }
   },
 
@@ -529,7 +519,9 @@ Module.register("MMM-RTSPStream", {
       if (whepUrl && typeof WHEPClient !== "undefined") {
         surface.muted = this.config[stream].muted !== false; // Default muted for autoplay
         // Start WHEP playback and monitoring via helper method
-        this.startWhepSession(stream, surface);
+        this.startWhepSession(stream, surface).catch((err) => {
+          Log.warn(`[${this.name}] Initial WHEP start failed for ${stream}:`, err);
+        });
       } else {
         Log.warn(`[${this.name}] No WHEP URL configured for stream ${stream}`);
       }
@@ -627,6 +619,7 @@ Module.register("MMM-RTSPStream", {
         this.clearWhepRestartTimer(stream);
         const restartState = this.streams[stream].whepRestartState;
         if (restartState) {
+          restartState.attempts = 0;
           restartState.restarting = false;
           restartState.lastReason = "";
         }
