@@ -19,8 +19,7 @@ export default defineConfig([
         Module: "readonly"
       }
     },
-    plugins: {js, stylistic},
-    extends: [importX.recommended, "js/all", "stylistic/all"],
+    extends: [importX.recommended, js.configs.all, stylistic.configs.all],
     rules: {
       "@stylistic/array-element-newline": ["error", "consistent"],
       "@stylistic/dot-location": ["error", "property"],
@@ -45,6 +44,5 @@ export default defineConfig([
       "sort-keys": "off"
     }
   },
-  {files: ["demo.config.js"], rules: {"prefer-const": "off"}},
   {files: ["**/*.md"], plugins: {markdown}, language: "markdown/gfm", extends: ["markdown/recommended"]}
 ]);
