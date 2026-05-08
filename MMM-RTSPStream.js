@@ -35,7 +35,7 @@ Module.register("MMM-RTSPStream", {
     whepAutoRefresh: false, // Enable automatic refresh when a WHEP feed appears hung
     whepCheckInterval: 10000, // How often (ms) to check WHEP feed health
     whepHangTimeout: 60000, // Consider the feed hung if no progress for this many ms
-    whepRestartMaxAttempts: 0, // Maximum reconnect attempts (0 = unlimited)
+    whepRestartMaxAttempts: 5, // Maximum reconnect attempts (0 = unlimited)
     whepRestartBaseDelay: 2000, // Base delay for reconnect backoff (ms)
     whepRestartMaxDelay: 30000, // Maximum reconnect backoff delay (ms)
     showWhepStatusOverlay: true, // Show a connection status overlay for WebRTC streams
@@ -519,9 +519,7 @@ Module.register("MMM-RTSPStream", {
       if (whepUrl && typeof WHEPClient !== "undefined") {
         surface.muted = this.config[stream].muted !== false; // Default muted for autoplay
         // Start WHEP playback and monitoring via helper method
-        this.startWhepSession(stream, surface).catch((err) => {
-          Log.warn(`[${this.name}] Initial WHEP start failed for ${stream}:`, err);
-        });
+        this.startWhepSession(stream, surface).catch(() => {});
       } else {
         Log.warn(`[${this.name}] No WHEP URL configured for stream ${stream}`);
       }
@@ -729,7 +727,12 @@ Module.register("MMM-RTSPStream", {
         return session;
       })
       .catch((err) => {
-        Log.error(`[${this.name}] WHEP start failed for ${stream}:`, err);
+        const isRetryAttempt = state.attempts > 0 || state.restarting;
+        if (isRetryAttempt) {
+          Log.warn(`[${this.name}] WHEP restart attempt failed for ${stream}:`, err);
+        } else {
+          Log.error(`[${this.name}] WHEP start failed for ${stream}:`, err);
+        }
         this.setWhepStatus(stream, `Feed connection failed: ${this.getReadableWhepReason("start-failed")}`, "error");
         this.scheduleWhepRestart(stream, "start-failed");
         throw err;
@@ -818,8 +821,7 @@ Module.register("MMM-RTSPStream", {
       delete streamState.webrtc;
     }
 
-    this.startWhepSession(stream, document.getElementById(canvasId)).catch((err) => {
-      Log.error(`[${this.name}] WHEP restart failed for ${stream}:`, err);
+    this.startWhepSession(stream, document.getElementById(canvasId)).catch(() => {
       this.setWhepStatus(stream, `Feed reconnect failed: ${this.getReadableWhepReason("restart-failed")}`, "error");
       state.restarting = false;
       this.scheduleWhepRestart(stream, "restart-failed");
