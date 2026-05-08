@@ -17,7 +17,8 @@
     "lint:fix": "eslint --fix && prettier . --write",
     "preinstall": "./scripts/preinstall.sh",
     "release": "commit-and-tag-version --config ./changelog.config.js",
-    "test": "node --run lint"
+    "test": "node --run test:unit && node --run lint",
+    "test:unit": "node --test tests/**/*.test.mjs"
   },
   "devDependencies": {
     "@eslint/css": "^1.2.0",
