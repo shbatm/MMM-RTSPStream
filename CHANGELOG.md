@@ -2,6 +2,37 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.1.0](https://github.com/shbatm/MMM-RTSPStream/compare/v4.0.0...v4.1.0) (2026-05-08)
+
+
+### Added
+
+* **demo:** auto-bootstrap WebRTC demo stack and simplify setup ([f3bc1e4](https://github.com/shbatm/MMM-RTSPStream/commit/f3bc1e4497916d05060f4ae569e05d0ee4baa14d))
+
+
+### Fixed
+
+* **whep:** harden restart lifecycle and startup flow ([8474ddf](https://github.com/shbatm/MMM-RTSPStream/commit/8474ddf59882d0296438c56c1a1346cc0dd99e38))
+* **whep:** limit retries and reduce failure log noise ([3816247](https://github.com/shbatm/MMM-RTSPStream/commit/381624733b4caaf08f952d99aeafc61327433ba3))
+
+
+### Documentation
+
+* update demo script command ([c56f400](https://github.com/shbatm/MMM-RTSPStream/commit/c56f400cc84d6accff6806125d17153789d203ae))
+
+
+### Chores
+
+* add "type" field to package.json ([b1163ad](https://github.com/shbatm/MMM-RTSPStream/commit/b1163ad44e286f75187602c7821b083cdceae357))
+* add automated tests workflow ([bd704ef](https://github.com/shbatm/MMM-RTSPStream/commit/bd704ef64fdb4c9e8a1bab4b1e808c269cf64a70))
+* update .prettierignore and refactor config in demo.config.js and eslint.config.mjs ([6c918b3](https://github.com/shbatm/MMM-RTSPStream/commit/6c918b3dbddf563d1ca4ef443cc3daf14d891d70))
+* update devDependencies ([1bbd92e](https://github.com/shbatm/MMM-RTSPStream/commit/1bbd92e7cc9856ae862f255922d747f38fa9e319))
+
+
+### Tests
+
+* add unit tests ([c816b09](https://github.com/shbatm/MMM-RTSPStream/commit/c816b09c45df0071dd5d429b42b534c95c9c125a))
+
 ## [4.0.0](https://github.com/shbatm/MMM-RTSPStream/compare/v3.0.1...v4.0.0) (2026-01-16)
 
 
