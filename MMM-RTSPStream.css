@@ -101,3 +101,21 @@
   color: #fff;
   opacity: 0;
 }
+
+.MMM-RTSPStream .statusOverlay {
+  font-size: 12px;
+  padding: 3px 0;
+  color: #ffd166;
+}
+
+.MMM-RTSPStream .statusOverlay.warn {
+  color: #ffd166;
+}
+
+.MMM-RTSPStream .statusOverlay.error {
+  color: #ff8f8f;
+}
+
+.MMM-RTSPStream .statusOverlay.hidden {
+  display: none;
+}

@@ -32,6 +32,13 @@ Module.register("MMM-RTSPStream", {
     moduleOffset: 0, // Offset to align player windows
     shutdownDelay: 11, // Seconds
     animationSpeed: 1500,
+    whepAutoRefresh: false, // Enable automatic refresh when a WHEP feed appears hung
+    whepCheckInterval: 10000, // How often (ms) to check WHEP feed health
+    whepHangTimeout: 60000, // Consider the feed hung if no progress for this many ms
+    whepRestartMaxAttempts: 0, // Maximum reconnect attempts (0 = unlimited)
+    whepRestartBaseDelay: 2000, // Base delay for reconnect backoff (ms)
+    whepRestartMaxDelay: 30000, // Maximum reconnect backoff delay (ms)
+    showWhepStatusOverlay: true, // Show a connection status overlay for WebRTC streams
     stream1: {
       name: "BigBuckBunny Test",
       url: "rtsp://184.72.239.149/vod/mp4:BigBuckBunny_115k.mov",
@@ -101,8 +108,18 @@ Module.register("MMM-RTSPStream", {
       Object.keys(this.config)
         .filter((key) => key.startsWith("stream"))
         .forEach((key) => {
-          self.streams[key] = {playing: false};
+          self.streams[key] = {playing: false, status: {message: "", level: "info"}};
         });
+
+      // Fallback: if helper STARTED notification is missed, unblock UI and proceed.
+      setTimeout(() => {
+        if (!this.loaded && !this.suspended) {
+          Log.warn(`${this.name}: STARTED notification timeout, continuing with fallback.`);
+          this.loaded = true;
+          this.updateDom(this.config.animationSpeed);
+          setTimeout(() => this.resumed(), this.config.animationSpeed + 500);
+        }
+      }, 5000);
     }
   },
 
@@ -299,12 +316,14 @@ Module.register("MMM-RTSPStream", {
         iw.appendChild(this.getCanvas(""));
         iw.appendChild(this.getPlayPauseBtn(""));
         wrapper.appendChild(iw);
+        wrapper.appendChild(this.getStatusOverlay(""));
       } else {
         Object.keys(this.streams).forEach((stream) => {
           const iw = this.getInnerWrapper(stream);
           iw.appendChild(this.getCanvas(stream));
           iw.appendChild(this.getPlayPauseBtn(stream));
           wrapper.appendChild(iw);
+          wrapper.appendChild(this.getStatusOverlay(stream));
         });
       }
       wrapper.appendChild(document.createElement("br"));
@@ -358,6 +377,50 @@ Module.register("MMM-RTSPStream", {
     innerWrapper.style.cssText = this.getCanvasSize(this.config[stream]);
     innerWrapper.id = `iw_${stream}`;
     return innerWrapper;
+  },
+
+  getStatusOverlay (stream) {
+    const overlay = document.createElement("div");
+    overlay.className = "MMM-RTSPStream statusOverlay hidden";
+    overlay.id = `status_${stream}`;
+    return overlay;
+  },
+
+  getOverlayStreamKey (stream) {
+    return this.config.rotateStreams
+      ? ""
+      : stream;
+  },
+
+  getReadableWhepReason (reason) {
+    const reasons = {
+      onError: "transport error",
+      stalled: "video stalled",
+      ended: "stream ended",
+      "video-error": "video element error",
+      "hang-timeout": "no media progress",
+      "start-failed": "session start failed",
+      "restart-failed": "restart attempt failed",
+      NoSurface: "missing video surface",
+      NoWhep: "missing WHEP URL/client"
+    };
+    return reasons[reason] || reason || "unknown error";
+  },
+
+  setWhepStatus (stream, message, level = "info") {
+    if (!this.config.showWhepStatusOverlay) {
+      return;
+    }
+    const targetStream = this.getOverlayStreamKey(stream);
+    const overlay = document.getElementById(`status_${targetStream}`);
+    if (!overlay) {
+      return;
+    }
+    overlay.textContent = message || "";
+    overlay.className = `MMM-RTSPStream statusOverlay ${level}`;
+    if (!message) {
+      overlay.className += " hidden";
+    }
   },
 
   getPlayPauseBtn (stream) {
@@ -465,14 +528,8 @@ Module.register("MMM-RTSPStream", {
       const {whepUrl} = this.config[stream];
       if (whepUrl && typeof WHEPClient !== "undefined") {
         surface.muted = this.config[stream].muted !== false; // Default muted for autoplay
-        WHEPClient.start(surface, whepUrl, {
-          audio: !this.config[stream].muted,
-          onError: (err) => Log.warn(`[${this.name}] WebRTC error for ${stream}:`, err)
-        })
-          .then((session) => {
-            this.streams[stream].webrtc = session; // {pc, stop}
-          })
-          .catch((err) => Log.error(`[${this.name}] WHEP start failed for ${stream}:`, err));
+        // Start WHEP playback and monitoring via helper method
+        this.startWhepSession(stream, surface);
       } else {
         Log.warn(`[${this.name}] No WHEP URL configured for stream ${stream}`);
       }
@@ -567,6 +624,19 @@ Module.register("MMM-RTSPStream", {
       } else if ("webrtc" in this.streams[stream]) {
         // Use session.stop() if available (new API), fallback to legacy
         const session = this.streams[stream].webrtc;
+        this.clearWhepRestartTimer(stream);
+        const restartState = this.streams[stream].whepRestartState;
+        if (restartState) {
+          restartState.restarting = false;
+          restartState.lastReason = "";
+        }
+        // Clear any monitor interval and event listeners attached to session
+        try {
+          this.cleanupWhepMonitor(session, stream);
+        } catch (e) {
+          Log.warn(`[${this.name}] Error cleaning WHEP monitor for ${stream}:`, e);
+        }
+
         if (typeof session.stop === "function") {
           session.stop();
         } else {
@@ -578,12 +648,210 @@ Module.register("MMM-RTSPStream", {
         delete this.streams[stream].webrtc;
       }
       this.streams[stream].playing = false;
+      this.setWhepStatus(stream, "", "info");
     }
 
     if (
       Object.keys(this.streams).filter((s) => s.playing).length === 0
     ) {
       this.playing = false;
+    }
+  },
+
+  // Start a WHEP session for a stream and attach a periodic health monitor
+  startWhepSession (stream, surface) {
+    const whepUrl = this.config[stream] && this.config[stream].whepUrl
+      ? this.config[stream].whepUrl
+      : "";
+    if (!whepUrl || typeof WHEPClient === "undefined") {
+      Log.warn(`[${this.name}] No WHEP URL or client for stream ${stream}`);
+      this.setWhepStatus(stream, "Feed connection failed: missing WHEP endpoint", "error");
+      return Promise.reject(new Error("NoWhep"));
+    }
+
+    if (!surface) {
+      Log.warn(`[${this.name}] No video surface found for stream ${stream}`);
+      this.setWhepStatus(stream, "Feed connection failed: video surface unavailable", "error");
+      return Promise.reject(new Error("NoSurface"));
+    }
+
+    const state = this.getWhepRestartState(stream);
+
+    return WHEPClient.start(surface, whepUrl, {
+      audio: !this.config[stream].muted,
+      onError: (err) => {
+        Log.warn(`[${this.name}] WebRTC error for ${stream}:`, err);
+        this.scheduleWhepRestart(stream, "onError");
+      }
+    })
+      .then((session) => {
+        this.setWhepStatus(stream, "", "info");
+        session.whepMonitor = {intervalId: null, lastProgress: Date.now(), listeners: []};
+
+        const updateProgress = () => {
+          session.whepMonitor.lastProgress = Date.now();
+        };
+        const onEnded = () => this.scheduleWhepRestart(stream, "ended");
+        const onVideoError = () => this.scheduleWhepRestart(stream, "video-error");
+        try {
+          surface.addEventListener("playing", updateProgress);
+          surface.addEventListener("timeupdate", updateProgress);
+          surface.addEventListener("loadeddata", updateProgress);
+          surface.addEventListener("canplay", updateProgress);
+          surface.addEventListener("ended", onEnded);
+          surface.addEventListener("error", onVideoError);
+          session.whepMonitor.listeners.push([surface, "playing", updateProgress]);
+          session.whepMonitor.listeners.push([surface, "timeupdate", updateProgress]);
+          session.whepMonitor.listeners.push([surface, "loadeddata", updateProgress]);
+          session.whepMonitor.listeners.push([surface, "canplay", updateProgress]);
+          session.whepMonitor.listeners.push([surface, "ended", onEnded]);
+          session.whepMonitor.listeners.push([surface, "error", onVideoError]);
+          // stalled only triggers restart when whepAutoRefresh is on
+          if (this.config.whepAutoRefresh) {
+            const onStalled = () => this.scheduleWhepRestart(stream, "stalled");
+            surface.addEventListener("stalled", onStalled);
+            session.whepMonitor.listeners.push([surface, "stalled", onStalled]);
+          }
+        } catch (err) {
+          Log.debug(`[${this.name}] Surface event registration failed for ${stream}:`, err);
+        }
+
+        const checkInterval = this.config.whepCheckInterval || 10000;
+        const hangTimeout = this.config.whepHangTimeout || 60000;
+
+        if (this.config.whepAutoRefresh) {
+          session.whepMonitor.intervalId = setInterval(() => {
+            const now = Date.now();
+            const last = session.whepMonitor.lastProgress || 0;
+            if (now - last > hangTimeout) {
+              this.scheduleWhepRestart(stream, "hang-timeout");
+            }
+          }, checkInterval);
+        }
+
+        this.streams[stream].webrtc = session;
+        state.attempts = 0;
+        state.restarting = false;
+        this.clearWhepRestartTimer(stream);
+        return session;
+      })
+      .catch((err) => {
+        Log.error(`[${this.name}] WHEP start failed for ${stream}:`, err);
+        this.setWhepStatus(stream, `Feed connection failed: ${this.getReadableWhepReason("start-failed")}`, "error");
+        this.scheduleWhepRestart(stream, "start-failed");
+        throw err;
+      });
+  },
+
+  getWhepRestartState (stream) {
+    if (!this.streams[stream].whepRestartState) {
+      this.streams[stream].whepRestartState = {
+        attempts: 0,
+        restarting: false,
+        timerId: null,
+        lastReason: ""
+      };
+    }
+    return this.streams[stream].whepRestartState;
+  },
+
+  clearWhepRestartTimer (stream) {
+    const state = this.streams[stream] && this.streams[stream].whepRestartState
+      ? this.streams[stream].whepRestartState
+      : null;
+    if (state && state.timerId) {
+      clearTimeout(state.timerId);
+      state.timerId = null;
+    }
+  },
+
+  scheduleWhepRestart (stream, reason) {
+    const streamState = this.streams[stream];
+    if (!streamState || !streamState.playing || this.suspended) {
+      return;
+    }
+
+    const state = this.getWhepRestartState(stream);
+    if (state.restarting || state.timerId) {
+      return;
+    }
+
+    const maxAttempts = Number(this.config.whepRestartMaxAttempts || 0);
+    if (maxAttempts > 0 && state.attempts >= maxAttempts) {
+      Log.error(`[${this.name}] WHEP restart attempts exhausted for ${stream} (last reason: ${reason})`);
+      this.setWhepStatus(stream, `Feed unavailable: retries exhausted (${this.getReadableWhepReason(reason)})`, "error");
+      return;
+    }
+
+    state.attempts += 1;
+    state.restarting = true;
+    state.lastReason = reason;
+
+    const baseDelay = Number(this.config.whepRestartBaseDelay || 2000);
+    const maxDelay = Number(this.config.whepRestartMaxDelay || 30000);
+    const delay = Math.min(maxDelay, baseDelay * 2 ** Math.max(0, state.attempts - 1));
+
+    Log.warn(`[${this.name}] Scheduling WHEP restart for ${stream} in ${delay}ms (reason: ${reason}, attempt: ${state.attempts})`);
+    this.setWhepStatus(stream, `Reconnecting feed: ${this.getReadableWhepReason(reason)} (attempt ${state.attempts})`, "warn");
+    state.timerId = setTimeout(() => {
+      state.timerId = null;
+      this.restartWhep(stream);
+    }, delay);
+  },
+
+  restartWhep (stream) {
+    const streamState = this.streams[stream];
+    if (!streamState || !streamState.playing) {
+      return;
+    }
+
+    const state = this.getWhepRestartState(stream);
+    const session = streamState.webrtc;
+    const canvasId = this.config.rotateStreams
+      ? "canvas_"
+      : `canvas_${stream}`;
+
+    if (session) {
+      try {
+        if (typeof session.stop === "function") {
+          session.stop();
+        } else if (session.pc) {
+          WHEPClient.stop(document.getElementById(canvasId), session.pc);
+        }
+      } catch (err) {
+        Log.debug(`[${this.name}] Error stopping WHEP session for ${stream}:`, err);
+      }
+      this.cleanupWhepMonitor(session, stream);
+      delete streamState.webrtc;
+    }
+
+    this.startWhepSession(stream, document.getElementById(canvasId)).catch((err) => {
+      Log.error(`[${this.name}] WHEP restart failed for ${stream}:`, err);
+      this.setWhepStatus(stream, `Feed reconnect failed: ${this.getReadableWhepReason("restart-failed")}`, "error");
+      state.restarting = false;
+      this.scheduleWhepRestart(stream, "restart-failed");
+    });
+  },
+
+  cleanupWhepMonitor (session, stream) {
+    if (!session || !session.whepMonitor) {
+      return;
+    }
+    if (session.whepMonitor.intervalId) {
+      try {
+        clearInterval(session.whepMonitor.intervalId);
+      } catch (err) {
+        Log.debug(`[${this.name}] Error clearing WHEP interval for ${stream}:`, err);
+      }
+    }
+    if (session.whepMonitor.listeners) {
+      session.whepMonitor.listeners.forEach((l) => {
+        try {
+          l[0].removeEventListener(l[1], l[2]);
+        } catch (err) {
+          Log.debug(`[${this.name}] Error removing WHEP listener for ${stream}:`, err);
+        }
+      });
     }
   },
 
