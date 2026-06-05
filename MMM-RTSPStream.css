@@ -10,11 +10,8 @@
  */
 .MMM-RTSPStream .wrapper {
   position: relative;
-  left: 50%;
   vertical-align: middle;
   text-align: center;
-  -webkit-transform: translateX(-50%); /* translateX(-30px); */
-  transform: translateX(-50%); /* translateX(-30px); */
 }
 
 .MMM-RTSPStream .wrapper br {
