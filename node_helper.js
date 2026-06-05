@@ -368,6 +368,7 @@ end
   socketNotificationReceived (notification, payload) {
     if (notification === "CONFIG") {
       this.config = payload;
+      const legacyWarnings = [];
       const streams = Object.keys(this.config).filter((key) => key.startsWith("stream"));
       if (
         this.config.rotateStreams &&
@@ -382,11 +383,21 @@ end
       // Warn & sanitize legacy config values
       if (this.config.localPlayer === "ffmpeg") {
         Log.warn("MMM-RTSPStream: localPlayer 'ffmpeg' removed in v4.0.0. For local playback only 'vlc' is supported.");
+        legacyWarnings.push("localPlayer: 'ffmpeg' is no longer supported; using 'vlc' instead.");
         this.config.localPlayer = "vlc";
       }
       if (this.config.remotePlayer === "ffmpeg") {
         Log.warn("MMM-RTSPStream: remotePlayer 'ffmpeg' removed in v4.0.0. Use 'webrtc' (with whepUrl per stream) or 'none'.");
+        legacyWarnings.push("remotePlayer: 'ffmpeg' is no longer supported; using 'none' instead.");
         this.config.remotePlayer = "none";
+      }
+      streams.forEach((name) => {
+        if (typeof this.config[name]?.ffmpegPort !== "undefined") {
+          legacyWarnings.push(`${name}.ffmpegPort is no longer used in v4 and should be removed.`);
+        }
+      });
+      if (legacyWarnings.length > 0) {
+        this.sendSocketNotification("CONFIG_WARNINGS", legacyWarnings);
       }
       streams.forEach((name) => this.sendSocketNotification("STARTED", name));
     }

@@ -116,3 +116,13 @@
 .MMM-RTSPStream .statusOverlay.hidden {
   display: none;
 }
+
+.MMM-RTSPStream .configWarning {
+  margin: 0 0 8px 0;
+  padding: 6px 8px;
+  border: 1px solid #ffd166;
+  color: #ffd166;
+  font-size: 12px;
+  line-height: 1.3;
+  text-align: left;
+}

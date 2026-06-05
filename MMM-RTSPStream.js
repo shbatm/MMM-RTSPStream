@@ -82,6 +82,8 @@ Module.register("MMM-RTSPStream", {
 
   streams: {},
 
+  configWarnings: [],
+
   // Allow for control on muliple instances
   instance:
     global.location &&
@@ -300,6 +302,13 @@ Module.register("MMM-RTSPStream", {
     if (this.loaded) {
       wrapper.style.cssText = `width: ${this.config.moduleWidth}px; height:${this.config.moduleHeight}px`;
       wrapper.className = "MMM-RTSPStream wrapper";
+
+      if (this.configWarnings.length > 0) {
+        const warning = document.createElement("div");
+        warning.className = "MMM-RTSPStream configWarning";
+        warning.innerHTML = `Legacy config detected:<br>${this.configWarnings.join("<br>")}`;
+        wrapper.appendChild(warning);
+      }
 
       if (this.config.rotateStreams) {
         const iw = this.getInnerWrapper("");
@@ -1090,6 +1099,11 @@ Module.register("MMM-RTSPStream", {
   },
   // socketNotificationReceived from helper
   socketNotificationReceived (notification, payload) {
+    if (notification === "CONFIG_WARNINGS") {
+      this.configWarnings = payload;
+      payload.forEach((msg) => Log.warn(`MMM-RTSPStream: ${msg}`));
+      this.updateDom(this.config.animationSpeed);
+    }
     if (notification === "STARTED") {
       if (!this.loaded) {
         this.loaded = true;
