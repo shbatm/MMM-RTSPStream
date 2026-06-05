@@ -18,7 +18,7 @@ paths:
     # Uncomment to use test pattern:
     # source: publisher
 
-  # Real camera stream
-  camera:
-    source: http://202.245.13.81/cgi-bin/camera?resolution=640&quality=1&Language=0&COUNTER
-    sourceProtocol: automatic
+  # Optional example camera path (disabled for clean demo logs)
+  # camera:
+  #   source: rtsp://username:password@192.168.1.100:554/stream1
+  #   sourceProtocol: automatic
