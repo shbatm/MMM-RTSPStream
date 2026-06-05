@@ -342,7 +342,7 @@ Module.register("MMM-RTSPStream", {
   },
 
   getCanvas (stream) {
-    const useWebRTC = this.instance === "LOCAL" && this.config.remotePlayer === "webrtc" || this.instance === "SERVER" && this.config.localPlayer === "webrtc";
+    const useWebRTC = this.isWebRTCActive();
     // In WebRTC mode, use a <video> element as the drawing surface.
     if (useWebRTC) {
       const video = document.createElement("video");
@@ -389,6 +389,11 @@ Module.register("MMM-RTSPStream", {
     return this.config.rotateStreams
       ? ""
       : stream;
+  },
+
+  isWebRTCActive () {
+    return this.instance === "LOCAL" && this.config.remotePlayer === "webrtc" ||
+      this.instance === "SERVER" && this.config.localPlayer === "webrtc";
   },
 
   getReadableWhepReason (reason) {
@@ -486,7 +491,7 @@ Module.register("MMM-RTSPStream", {
       this.stopStream(stream);
     }
 
-    const webrtcActive = this.instance === "LOCAL" && this.config.remotePlayer === "webrtc" || this.instance === "SERVER" && this.config.localPlayer === "webrtc";
+    const webrtcActive = this.isWebRTCActive();
 
     if (this.instance === "SERVER" && this.config.localPlayer === "vlc") {
       const rect = surface.getBoundingClientRect();
@@ -588,7 +593,7 @@ Module.register("MMM-RTSPStream", {
   playAll () {
     let ps = [];
     Object.keys(this.streams).forEach((s) => {
-      const webrtcActive = this.instance === "LOCAL" && this.config.remotePlayer === "webrtc" || this.instance === "SERVER" && this.config.localPlayer === "webrtc";
+      const webrtcActive = this.isWebRTCActive();
       if (this.instance === "SERVER" || webrtcActive) {
         const res = this.playStream(s);
         if (res.length > 0) {
@@ -891,7 +896,7 @@ Module.register("MMM-RTSPStream", {
         this.stopStream(this.currentStream);
         this.playSnapshots(this.currentStream);
       } else {
-        const webrtcActive = this.instance === "LOCAL" && this.config.remotePlayer === "webrtc" || this.instance === "SERVER" && this.config.localPlayer === "webrtc";
+        const webrtcActive = this.isWebRTCActive();
         if (this.instance === "SERVER" && !this.config.remoteSnaps || webrtcActive) {
           this.sendSocketNotification("SNAPSHOT_STOP", this.currentStream);
         }
@@ -909,7 +914,7 @@ Module.register("MMM-RTSPStream", {
       this.stopStream(this.selectedStream);
       this.playSnapshots(this.selectedStream);
     } else {
-      const webrtcActive = this.instance === "LOCAL" && this.config.remotePlayer === "webrtc" || this.instance === "SERVER" && this.config.localPlayer === "webrtc";
+      const webrtcActive = this.isWebRTCActive();
       if (this.instance === "SERVER" && !this.config.remoteSnaps || webrtcActive) {
         this.sendSocketNotification("SNAPSHOT_STOP", this.selectedStream);
       }
@@ -931,7 +936,7 @@ Module.register("MMM-RTSPStream", {
 
   getScripts () {
     const scripts = [];
-    if (this.instance === "LOCAL" && this.config.remotePlayer === "webrtc" || this.instance === "SERVER" && this.config.localPlayer === "webrtc") {
+    if (this.isWebRTCActive()) {
       scripts.push(this.file("scripts/webrtc-whep.js"));
     }
     return scripts;
