@@ -18,17 +18,17 @@
 #                rotateStreamTimeout: 10,
 #                moduleWidth: 354,
 #                moduleHeight: 240,
-#                localPlayer: 'ffmpeg',
+#                localPlayer: 'webrtc',
 #                remotePlayer: 'none',
 #                showSnapWhenPaused: true,
 #                remoteSnaps: true,
 #                shutdownDelay: 12,
 #                stream1: {
 #                    name: 'Test Stream',
-#                    url: 'rtsp://localhost:8554/mystream',
+#                    url: 'rtsp://localhost:8554/test',
+#                    whepUrl: 'http://localhost:8889/test/whep',
 #                    width: undefined,
 #                    height: undefined,
-#                    ffmpegPort: 9999,
 #                    }
 #            }
 #        },
