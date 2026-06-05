@@ -388,10 +388,10 @@ end
         this.config.rotateStreams &&
         this.config.shutdownDelay &&
         this.config.shutdownDelay <
-          (streams.length - 1) * this.config.rotateStreamsTimeout
+          (streams.length - 1) * this.config.rotateStreamTimeout
       ) {
         const suggestedDelay =
-          (streams.length - 1) * this.config.rotateStreamsTimeout + 2;
+          (streams.length - 1) * this.config.rotateStreamTimeout + 2;
         Log.warn(`WARNING: shutdownDelay is shorter than the time it takes to make it through the loop. Consider increasing to ${suggestedDelay}s.`);
       }
       // Warn & sanitize legacy config values
