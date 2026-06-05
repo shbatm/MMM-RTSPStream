@@ -59,12 +59,15 @@ const generateConfig = () => {
   }
 
   if (
-    ["ffmpeg", "vlc"].indexOf(getValue("#localPlayer")) !== -1 ||
-    getValue("#remotePlayer") === "ffmpeg"
+    ["vlc", "mplayer"].indexOf(getValue("#localPlayer")) !== -1
   ) {
     s += `shutdownDelay: ${getValue("#s1shutdownDelay")},
         `;
   }
+
+  const usesWebrtc =
+    getValue("#localPlayer") === "webrtc" ||
+    getValue("#remotePlayer") === "webrtc";
 
   // Generate stream configurations based on selected count
   const streamCount = parseInt(getCheckedValue("input[name=streamCount]:checked"), 10) || 1;
@@ -73,20 +76,19 @@ const generateConfig = () => {
     s += `stream${i}: {
             name: '${getValue(`#s${i}Name`)}',
             url: '${getValue(`#s${i}url`)}',
-            width: undefined,
-            height: undefined,
-            `;
+          `;
+
+    if (usesWebrtc) {
+      s += `whepUrl: '${getValue(`#s${i}whepUrl`)}',
+          `;
+    }
+
+    s += `width: undefined,
+          height: undefined,
+          `;
 
     if (getValue("#localPlayer") === "vlc") {
       s += `muted: true,
-            `;
-    }
-
-    if (
-      getValue("#localPlayer") === "ffmpeg" ||
-      getValue("#remotePlayer") === "ffmpeg"
-    ) {
-      s += `ffmpegPort: ${9999 + i - 1},
             `;
     }
 
@@ -107,7 +109,7 @@ const copyToClipboard = () => {
 // Initialize the application
 const initializeApp = () => {
   // Hide elements initially
-  hideElements(".ffmpeg");
+  hideElements(".webrtc");
   hideElements(".count-2");
   hideElements(".count-3");
   hideElements(".count-4");
@@ -141,10 +143,10 @@ const initializeApp = () => {
   if (remotePlayerSelect) {
     remotePlayerSelect.addEventListener("change", function () {
       const localPlayerValue = getValue("#localPlayer");
-      if (this.value === "ffmpeg" || localPlayerValue === "ffmpeg") {
-        showElements(".ffmpeg");
+      if (this.value === "webrtc" || localPlayerValue === "webrtc") {
+        showElements(".webrtc");
       } else {
-        hideElements(".ffmpeg");
+        hideElements(".webrtc");
       }
     });
   }
@@ -154,15 +156,15 @@ const initializeApp = () => {
   if (localPlayerSelect) {
     localPlayerSelect.addEventListener("change", function () {
       const remotePlayerValue = getValue("#remotePlayer");
-      if (this.value === "ffmpeg" || remotePlayerValue === "ffmpeg") {
-        showElements(".ffmpeg");
+      if (this.value === "webrtc" || remotePlayerValue === "webrtc") {
+        showElements(".webrtc");
       } else {
-        hideElements(".ffmpeg");
+        hideElements(".webrtc");
       }
-      if (this.value === "vlc") {
-        showElements(".vlc");
+      if (this.value === "vlc" || this.value === "mplayer") {
+        showElements(".shutdownDelay");
       } else {
-        hideElements(".vlc");
+        hideElements(".shutdownDelay");
       }
     });
   }
@@ -236,6 +238,14 @@ const initializeApp = () => {
   const copyButton = document.querySelector("#copyButton");
   if (copyButton) {
     copyButton.addEventListener("click", copyToClipboard);
+  }
+
+  // Apply initial visibility based on default selections.
+  if (localPlayerSelect) {
+    localPlayerSelect.dispatchEvent(new Event("change"));
+  }
+  if (remotePlayerSelect) {
+    remotePlayerSelect.dispatchEvent(new Event("change"));
   }
 };
 

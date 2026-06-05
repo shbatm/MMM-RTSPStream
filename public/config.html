@@ -178,7 +178,8 @@
               <div>
                 <select id="localPlayer" name="localPlayer" class="select">
                   <option value="vlc">VLC Player (HW-accelerated)</option>
-                  <option value="ffmpeg">FFMPEG (SW decoder)</option>
+                  <option value="mplayer">MPlayer</option>
+                  <option value="webrtc">WebRTC (WHEP)</option>
                 </select>
               </div>
             </div>
@@ -190,7 +191,7 @@
               <div>
                 <select id="remotePlayer" name="remotePlayer" class="select">
                   <option value="none">None / N/A</option>
-                  <option value="ffmpeg">FFMPEG</option>
+                  <option value="webrtc">WebRTC (WHEP)</option>
                 </select>
               </div>
             </div>
@@ -296,7 +297,7 @@
               </div>
             </div>
 
-            <div class="form-group ffmpeg">
+            <div class="form-group shutdownDelay">
               <label class="label" for="s1shutdownDelay">Shutdown Delay</label>
               <div>
                 <div class="input-group">
@@ -318,6 +319,16 @@
                   when it comes back through the loop (which reduces the time
                   delay when restarting a stream). To conserve resources on a
                   slow device, you can set this to 0
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group webrtc">
+              <label class="label">WebRTC (WHEP) Hint</label>
+              <div>
+                <div class="help">
+                  If local or remote player uses WebRTC, set whepUrl per stream
+                  (example: http://localhost:8889/mycamera/whep).
                 </div>
               </div>
             </div>
@@ -412,6 +423,20 @@
               </div>
             </div>
 
+            <div class="form-group count-1 webrtc hidden">
+              <label class="label" for="s1whepUrl">Stream #1 WHEP URL</label>
+              <div>
+                <input
+                  id="s1whepUrl"
+                  name="s1whepUrl"
+                  type="text"
+                  placeholder="http://localhost:8889/mycamera/whep"
+                  class="input"
+                />
+                <div class="help">Required when using WebRTC playback.</div>
+              </div>
+            </div>
+
             <!-- Stream 2 Configuration -->
             <div class="form-group count-2 hidden">
               <label class="label" for="s2Name">Stream #2 Name</label>
@@ -438,6 +463,19 @@
                   class="input"
                 />
                 <div class="help">The url of the RTSP stream for camera 2</div>
+              </div>
+            </div>
+
+            <div class="form-group count-2 webrtc hidden">
+              <label class="label" for="s2whepUrl">Stream #2 WHEP URL</label>
+              <div>
+                <input
+                  id="s2whepUrl"
+                  name="s2whepUrl"
+                  type="text"
+                  placeholder="http://localhost:8889/mycamera/whep"
+                  class="input"
+                />
               </div>
             </div>
 
@@ -470,6 +508,19 @@
               </div>
             </div>
 
+            <div class="form-group count-3 webrtc hidden">
+              <label class="label" for="s3whepUrl">Stream #3 WHEP URL</label>
+              <div>
+                <input
+                  id="s3whepUrl"
+                  name="s3whepUrl"
+                  type="text"
+                  placeholder="http://localhost:8889/mycamera/whep"
+                  class="input"
+                />
+              </div>
+            </div>
+
             <!-- Stream 4 Configuration -->
             <div class="form-group count-4 hidden">
               <label class="label" for="s4Name">Stream #4 Name</label>
@@ -496,6 +547,19 @@
                   class="input"
                 />
                 <div class="help">The url of the RTSP stream for camera 4</div>
+              </div>
+            </div>
+
+            <div class="form-group count-4 webrtc hidden">
+              <label class="label" for="s4whepUrl">Stream #4 WHEP URL</label>
+              <div>
+                <input
+                  id="s4whepUrl"
+                  name="s4whepUrl"
+                  type="text"
+                  placeholder="http://localhost:8889/mycamera/whep"
+                  class="input"
+                />
               </div>
             </div>
           </div>
