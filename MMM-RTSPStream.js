@@ -659,93 +659,92 @@ Module.register("MMM-RTSPStream", {
   },
 
   // Start a WHEP session for a stream and attach a periodic health monitor
-  startWhepSession (stream, surface) {
+  async startWhepSession (stream, surface) {
     const whepUrl = this.config[stream] && this.config[stream].whepUrl
       ? this.config[stream].whepUrl
       : "";
     if (!whepUrl || typeof WHEPClient === "undefined") {
       Log.warn(`[${this.name}] No WHEP URL or client for stream ${stream}`);
       this.setWhepStatus(stream, "Feed connection failed: missing WHEP endpoint", "error");
-      return Promise.reject(new Error("NoWhep"));
+      throw new Error("NoWhep");
     }
 
     if (!surface) {
       Log.warn(`[${this.name}] No video surface found for stream ${stream}`);
       this.setWhepStatus(stream, "Feed connection failed: video surface unavailable", "error");
-      return Promise.reject(new Error("NoSurface"));
+      throw new Error("NoSurface");
     }
 
     const state = this.getWhepRestartState(stream);
-
-    return WHEPClient.start(surface, whepUrl, {
-      audio: !this.config[stream].muted,
-      onError: (err) => {
-        Log.warn(`[${this.name}] WebRTC error for ${stream}:`, err);
-        this.scheduleWhepRestart(stream, "onError");
-      }
-    })
-      .then((session) => {
-        this.setWhepStatus(stream, "", "info");
-        session.whepMonitor = {intervalId: null, lastProgress: Date.now(), listeners: []};
-
-        const updateProgress = () => {
-          session.whepMonitor.lastProgress = Date.now();
-        };
-        const onEnded = () => this.scheduleWhepRestart(stream, "ended");
-        const onVideoError = () => this.scheduleWhepRestart(stream, "video-error");
-        try {
-          surface.addEventListener("playing", updateProgress);
-          surface.addEventListener("timeupdate", updateProgress);
-          surface.addEventListener("loadeddata", updateProgress);
-          surface.addEventListener("canplay", updateProgress);
-          surface.addEventListener("ended", onEnded);
-          surface.addEventListener("error", onVideoError);
-          session.whepMonitor.listeners.push([surface, "playing", updateProgress]);
-          session.whepMonitor.listeners.push([surface, "timeupdate", updateProgress]);
-          session.whepMonitor.listeners.push([surface, "loadeddata", updateProgress]);
-          session.whepMonitor.listeners.push([surface, "canplay", updateProgress]);
-          session.whepMonitor.listeners.push([surface, "ended", onEnded]);
-          session.whepMonitor.listeners.push([surface, "error", onVideoError]);
-          // stalled only triggers restart when whepAutoRefresh is on
-          if (this.config.whepAutoRefresh) {
-            const onStalled = () => this.scheduleWhepRestart(stream, "stalled");
-            surface.addEventListener("stalled", onStalled);
-            session.whepMonitor.listeners.push([surface, "stalled", onStalled]);
-          }
-        } catch (err) {
-          Log.debug(`[${this.name}] Surface event registration failed for ${stream}:`, err);
+    try {
+      const session = await WHEPClient.start(surface, whepUrl, {
+        audio: !this.config[stream].muted,
+        onError: (err) => {
+          Log.warn(`[${this.name}] WebRTC error for ${stream}:`, err);
+          this.scheduleWhepRestart(stream, "onError");
         }
-
-        const checkInterval = this.config.whepCheckInterval || 10000;
-        const hangTimeout = this.config.whepHangTimeout || 60000;
-
-        if (this.config.whepAutoRefresh) {
-          session.whepMonitor.intervalId = setInterval(() => {
-            const now = Date.now();
-            const last = session.whepMonitor.lastProgress || 0;
-            if (now - last > hangTimeout) {
-              this.scheduleWhepRestart(stream, "hang-timeout");
-            }
-          }, checkInterval);
-        }
-
-        this.streams[stream].webrtc = session;
-        state.attempts = 0;
-        state.restarting = false;
-        this.clearWhepRestartTimer(stream);
-        return session;
-      })
-      .catch((err) => {
-        const isRetryAttempt = state.attempts > 0 || state.restarting;
-        if (isRetryAttempt) {
-          Log.warn(`[${this.name}] WHEP restart attempt failed for ${stream}:`, err);
-        } else {
-          Log.error(`[${this.name}] WHEP start failed for ${stream}:`, err);
-        }
-        this.setWhepStatus(stream, `Feed connection failed: ${this.getReadableWhepReason("start-failed")}`, "error");
-        this.scheduleWhepRestart(stream, "start-failed");
-        throw err;
       });
+
+      this.setWhepStatus(stream, "", "info");
+      session.whepMonitor = {intervalId: null, lastProgress: Date.now(), listeners: []};
+
+      const updateProgress = () => {
+        session.whepMonitor.lastProgress = Date.now();
+      };
+      const onEnded = () => this.scheduleWhepRestart(stream, "ended");
+      const onVideoError = () => this.scheduleWhepRestart(stream, "video-error");
+      try {
+        surface.addEventListener("playing", updateProgress);
+        surface.addEventListener("timeupdate", updateProgress);
+        surface.addEventListener("loadeddata", updateProgress);
+        surface.addEventListener("canplay", updateProgress);
+        surface.addEventListener("ended", onEnded);
+        surface.addEventListener("error", onVideoError);
+        session.whepMonitor.listeners.push([surface, "playing", updateProgress]);
+        session.whepMonitor.listeners.push([surface, "timeupdate", updateProgress]);
+        session.whepMonitor.listeners.push([surface, "loadeddata", updateProgress]);
+        session.whepMonitor.listeners.push([surface, "canplay", updateProgress]);
+        session.whepMonitor.listeners.push([surface, "ended", onEnded]);
+        session.whepMonitor.listeners.push([surface, "error", onVideoError]);
+        // stalled only triggers restart when whepAutoRefresh is on
+        if (this.config.whepAutoRefresh) {
+          const onStalled = () => this.scheduleWhepRestart(stream, "stalled");
+          surface.addEventListener("stalled", onStalled);
+          session.whepMonitor.listeners.push([surface, "stalled", onStalled]);
+        }
+      } catch (err) {
+        Log.debug(`[${this.name}] Surface event registration failed for ${stream}:`, err);
+      }
+
+      const checkInterval = this.config.whepCheckInterval || 10000;
+      const hangTimeout = this.config.whepHangTimeout || 60000;
+
+      if (this.config.whepAutoRefresh) {
+        session.whepMonitor.intervalId = setInterval(() => {
+          const now = Date.now();
+          const last = session.whepMonitor.lastProgress || 0;
+          if (now - last > hangTimeout) {
+            this.scheduleWhepRestart(stream, "hang-timeout");
+          }
+        }, checkInterval);
+      }
+
+      this.streams[stream].webrtc = session;
+      state.attempts = 0;
+      state.restarting = false;
+      this.clearWhepRestartTimer(stream);
+      return session;
+    } catch (err) {
+      const isRetryAttempt = state.attempts > 0 || state.restarting;
+      if (isRetryAttempt) {
+        Log.warn(`[${this.name}] WHEP restart attempt failed for ${stream}:`, err);
+      } else {
+        Log.error(`[${this.name}] WHEP start failed for ${stream}:`, err);
+      }
+      this.setWhepStatus(stream, `Feed connection failed: ${this.getReadableWhepReason("start-failed")}`, "error");
+      this.scheduleWhepRestart(stream, "start-failed");
+      throw err;
+    }
   },
 
   getWhepRestartState (stream) {
