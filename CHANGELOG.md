@@ -2,6 +2,39 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.2.0](https://github.com/shbatm/MMM-RTSPStream/compare/v4.1.0...v4.2.0) (2026-06-05)
+
+
+### Added
+
+* **validation:** surface legacy config migration warnings ([2d842e8](https://github.com/shbatm/MMM-RTSPStream/commit/2d842e8ebae36817f623f8b0eee038629fd210c7))
+
+
+### Fixed
+
+* **builder:** correct stale wording and time unit ([9ce32fb](https://github.com/shbatm/MMM-RTSPStream/commit/9ce32fb4097d515bea3147eaa03458a832b3a94f))
+* **builder:** generate v4-compatible stream config ([ae95652](https://github.com/shbatm/MMM-RTSPStream/commit/ae956526fa66fd098179802788b891fa3d338eef))
+* **demo:** remove unstable camera source from mediamtx template ([06a7783](https://github.com/shbatm/MMM-RTSPStream/commit/06a7783c8e85fc09b24f6191280c6c623f360ab8))
+* **helper:** use rotateStreamTimeout for delay warning ([658be15](https://github.com/shbatm/MMM-RTSPStream/commit/658be15691c966b343ab98762a143ce9df876a9d))
+* **ui:** stop forcing wrapper to screen center ([909d1a2](https://github.com/shbatm/MMM-RTSPStream/commit/909d1a2600b7c7d314e9a00ae42357aac355cdc3))
+
+
+### Documentation
+
+* **script:** update legacy example config to v4 ([2db333e](https://github.com/shbatm/MMM-RTSPStream/commit/2db333e4064600d3472d9ed4467b4d1170495a66))
+
+
+### Chores
+
+* update devDependencies ([d72ac8e](https://github.com/shbatm/MMM-RTSPStream/commit/d72ac8e6fc0d7d6c1448fd8e310a5458afc33c80))
+
+
+### Code Refactoring
+
+* **snapshot:** remove datauri and use async built-ins ([87e1ab4](https://github.com/shbatm/MMM-RTSPStream/commit/87e1ab4da1b22033dfc2ac821ed0e7c008a4a9fc))
+* **webrtc:** centralize active-mode condition ([d9973b2](https://github.com/shbatm/MMM-RTSPStream/commit/d9973b223e7a0e89ed662e7ddfca1a97314fc36d))
+* **webrtc:** switch WHEP start flow to async/await ([e209cd3](https://github.com/shbatm/MMM-RTSPStream/commit/e209cd3434eec08c1c663dac5d70d4b5654f5b6f))
+
 ## [4.1.0](https://github.com/shbatm/MMM-RTSPStream/compare/v4.0.0...v4.1.0) (2026-05-08)
 
 
