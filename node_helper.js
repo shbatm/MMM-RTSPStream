@@ -12,11 +12,24 @@
 const child_process = require("child_process");
 const fs = require("fs");
 const path = require("path");
-const DataURI = require("datauri");
 const Log = require("logger");
 const NodeHelper = require("node_helper");
 
 const environ = Object.assign(process.env, {DISPLAY: ":0"});
+const SNAPSHOT_MIME_BY_EXT = {
+  ".jpg": "image/jpeg",
+  ".jpeg": "image/jpeg",
+  ".png": "image/png",
+  ".gif": "image/gif",
+  ".webp": "image/webp",
+  ".bmp": "image/bmp",
+  ".svg": "image/svg+xml"
+};
+
+const getSnapshotMimeType = function getSnapshotMimeType (filePath) {
+  const ext = path.extname(filePath).toLowerCase();
+  return SNAPSHOT_MIME_BY_EXT[ext] || "application/octet-stream";
+};
 
 module.exports = NodeHelper.create({
   config: {},
@@ -56,7 +69,7 @@ module.exports = NodeHelper.create({
     return undefined;
   },
 
-  getData (name) {
+  async getData (name) {
     // Log.log("Getting data for "+name);
     const self = this;
 
@@ -71,43 +84,44 @@ module.exports = NodeHelper.create({
       typeof this.config[name].snapshotType !== "undefined" &&
       this.config[name].snapshotType === "file"
     ) {
-      const datauri = new DataURI();
-      datauri.encode(snapUrl, (err, content) => {
-        if (err) {
-          throw err;
-        }
+      const mimeType = getSnapshotMimeType(snapUrl);
+      try {
+        const buffer = await fs.promises.readFile(snapUrl);
+        const content = `data:${mimeType};base64,${buffer.toString("base64")}`;
         self.sendSocketNotification("SNAPSHOT", {
           name,
           image: true,
           buffer: content
         });
-      });
+      } catch (error) {
+        Log.error(self.name, `ERROR: Could not load snapshot file for ${name}.`, error);
+      }
     } else {
-      fetch(snapUrl, {
-        method: "GET"
-      })
-        .then(async (response) => {
-          if (response.status === 200) {
-            const buffer = await response.buffer();
-            self.sendSocketNotification("SNAPSHOT", {
-              name,
-              image: true,
-              buffer: `data:image/jpeg;base64,${buffer.toString("base64")}`
-            });
-          } else if (response.status === 401) {
-            self.sendSocketNotification(`DATA_ERROR_${name}`, "401 Error");
-            Log.error(self.name, "401 Error");
-          } else {
-            Log.error(
-              self.name,
-              "Could not load data.",
-              response.statusText
-            );
-          }
-        })
-        .catch((error) => {
-          Log.error(self.name, "ERROR: Could not load data.", error);
+      try {
+        const response = await fetch(snapUrl, {
+          method: "GET"
         });
+
+        if (response.status === 200) {
+          const buffer = await response.buffer();
+          self.sendSocketNotification("SNAPSHOT", {
+            name,
+            image: true,
+            buffer: `data:image/jpeg;base64,${buffer.toString("base64")}`
+          });
+        } else if (response.status === 401) {
+          self.sendSocketNotification(`DATA_ERROR_${name}`, "401 Error");
+          Log.error(self.name, "401 Error");
+        } else {
+          Log.error(
+            self.name,
+            "Could not load data.",
+            response.statusText
+          );
+        }
+      } catch (error) {
+        Log.error(self.name, "ERROR: Could not load data.", error);
+      }
       return;
     }
     this.snapshots[name] = setTimeout(() => {

@@ -31,9 +31,6 @@
     "globals": "^17.6.0",
     "prettier": "^3.8.3"
   },
-  "dependencies": {
-    "datauri": "^4.1.0"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/shbatm/MMM-RTSPStream.git"
