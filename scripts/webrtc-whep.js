@@ -128,7 +128,7 @@
     const stop = () => {
       stopped = true;
       if (pc) {
-        pc.getReceivers().forEach((r) => r.track?.stop());
+        pc.getReceivers().forEach((receiver) => receiver.track?.stop());
         pc.close();
         pc = null;
       }

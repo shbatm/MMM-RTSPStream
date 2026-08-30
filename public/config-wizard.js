@@ -23,27 +23,27 @@ const showElements = (className) => {
 };
 
 const generateConfig = () => {
-  let s = `{
+  let configText = `{
     module: "MMM-RTSPStream",
     position: "${getValue("#position")}",
     `;
 
   if (getValue("#headerText") !== "") {
-    s += `header: "${getValue("#headerText")}",
+    configText += `header: "${getValue("#headerText")}",
         `;
   }
 
-  s += `config: {
+  configText += `config: {
         autoStart: ${getCheckedValue("input[name=autoStart]:checked")},
         rotateStreams: ${getCheckedValue("input[name=rotateStreams]:checked")},
         `;
 
   if (getCheckedValue("input[name=rotateStreams]:checked") === "true") {
-    s += `rotateStreamTimeout: ${getValue("#rotateStreamTimeout")},
+    configText += `rotateStreamTimeout: ${getValue("#rotateStreamTimeout")},
         `;
   }
 
-  s += `moduleWidth: ${getValue("#moduleWidth")},
+  configText += `moduleWidth: ${getValue("#moduleWidth")},
         moduleHeight: ${getValue("#moduleHeight")},
         localPlayer: '${getValue("#localPlayer")}',
         remotePlayer: '${getValue("#remotePlayer")}',
@@ -52,14 +52,14 @@ const generateConfig = () => {
         `;
 
   if (getValue("#moduleOffset") !== "") {
-    s += `moduleOffset: ${getValue("#moduleOffset")},
+    configText += `moduleOffset: ${getValue("#moduleOffset")},
         `;
   }
 
   if (
     ["vlc", "mplayer"].indexOf(getValue("#localPlayer")) !== -1
   ) {
-    s += `shutdownDelay: ${getValue("#s1shutdownDelay")},
+    configText += `shutdownDelay: ${getValue("#s1shutdownDelay")},
         `;
   }
 
@@ -70,34 +70,34 @@ const generateConfig = () => {
   // Generate stream configurations based on selected count
   const streamCount = parseInt(getCheckedValue("input[name=streamCount]:checked"), 10) || 1;
 
-  for (let i = 1; i <= streamCount; i += 1) {
-    s += `stream${i}: {
-            name: '${getValue(`#s${i}Name`)}',
-            url: '${getValue(`#s${i}url`)}',
+  for (let streamIndex = 1; streamIndex <= streamCount; streamIndex += 1) {
+    configText += `stream${streamIndex}: {
+            name: '${getValue(`#s${streamIndex}Name`)}',
+            url: '${getValue(`#s${streamIndex}url`)}',
           `;
 
     if (usesWebrtc) {
-      s += `whepUrl: '${getValue(`#s${i}whepUrl`)}',
+      configText += `whepUrl: '${getValue(`#s${streamIndex}whepUrl`)}',
           `;
     }
 
-    s += `width: undefined,
+    configText += `width: undefined,
           height: undefined,
           `;
 
     if (getValue("#localPlayer") === "vlc") {
-      s += `muted: true,
+      configText += `muted: true,
             `;
     }
 
-    s += `},
+    configText += `},
         `;
   }
 
-  s += `}
+  configText += `}
 },`;
 
-  document.querySelector("#configResult").value = s;
+  document.querySelector("#configResult").value = configText;
 };
 
 const copyToClipboard = () => {
@@ -218,10 +218,10 @@ const initializeApp = () => {
   });
 
   // Add keyboard shortcuts
-  document.addEventListener("keydown", (e) => {
+  document.addEventListener("keydown", (event) => {
     // Ctrl/Cmd + Enter to generate config
-    if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
-      e.preventDefault();
+    if ((event.ctrlKey || event.metaKey) && event.key === "Enter") {
+      event.preventDefault();
       generateConfig();
     }
   });

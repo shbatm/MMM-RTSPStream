@@ -137,9 +137,9 @@ window.MMMRTSPStreamWhepStatus = {
       }
     }
     if (session.whepMonitor.listeners) {
-      session.whepMonitor.listeners.forEach((l) => {
+      session.whepMonitor.listeners.forEach((listener) => {
         try {
-          l[0].removeEventListener(l[1], l[2]);
+          listener[0].removeEventListener(listener[1], listener[2]);
         } catch (err) {
           Log.debug(`[${this.name}] Error removing WHEP listener for ${stream}:`, err);
         }

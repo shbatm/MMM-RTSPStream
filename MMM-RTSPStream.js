@@ -119,9 +119,9 @@ Module.register("MMM-RTSPStream", {
   },
 
   rotateStream (goToStream = undefined, goDirection = 0) {
-    const k = Object.keys(this.streams);
-    let ps;
-    const resetCurrentIndex = k.length;
+    const streamNames = Object.keys(this.streams);
+    let vlcPayload;
+    const resetCurrentIndex = streamNames.length;
     const lastStream = this.currentStream;
 
     // Update the current index
@@ -139,17 +139,17 @@ Module.register("MMM-RTSPStream", {
       } else if (this.currentIndex < 0) {
         this.currentIndex = resetCurrentIndex - 1; // Went too far backwards, wrap-around to end
       }
-      this.currentStream = k[this.currentIndex];
+      this.currentStream = streamNames[this.currentIndex];
     }
 
     if (this.playing) {
       if (lastStream) {
         this.stopStream(lastStream);
       }
-      ps = this.playStream(this.currentStream);
-      if (ps.length > 0) {
+      vlcPayload = this.playStream(this.currentStream);
+      if (vlcPayload.length > 0) {
         if (this.config.localPlayer === "vlc") {
-          this.sendSocketNotification("PLAY_VLCSTREAM", ps);
+          this.sendSocketNotification("PLAY_VLCSTREAM", vlcPayload);
         }
       }
     } else {
@@ -200,7 +200,7 @@ Module.register("MMM-RTSPStream", {
         this.playAll();
       } else {
         Log.log("Playing all snapshots");
-        Object.keys(this.streams).forEach((s) => this.playSnapshots(s));
+        Object.keys(this.streams).forEach((streamName) => this.playSnapshots(streamName));
       }
     }
   },
@@ -224,7 +224,7 @@ Module.register("MMM-RTSPStream", {
     }
   },
 
-  playBtnCallback (s) {
+  playBtnCallback (streamName) {
     let ps;
     if (this.config.rotateStreams) {
       if (this.playing) {
@@ -239,12 +239,12 @@ Module.register("MMM-RTSPStream", {
           }
         }
       }
-    } else if (this.streams[s].playing) {
-      this.stopStream(s);
-      this.playSnapshots(s);
+    } else if (this.streams[streamName].playing) {
+      this.stopStream(streamName);
+      this.playSnapshots(streamName);
     } else {
-      this.sendSocketNotification("SNAPSHOT_STOP", s);
-      ps = this.playStream(s);
+      this.sendSocketNotification("SNAPSHOT_STOP", streamName);
+      ps = this.playStream(streamName);
       if (ps.length > 0) {
         if (this.config.localPlayer === "vlc") {
           this.sendSocketNotification("PLAY_VLCSTREAM", ps);
@@ -253,16 +253,16 @@ Module.register("MMM-RTSPStream", {
     }
   },
 
-  playBtnDblClickCB (s) {
-    if (this.instance === "SERVER" && !this.streams[s].playing) {
-      const ps = this.playStream(s, true);
+  playBtnDblClickCB (streamName) {
+    if (this.instance === "SERVER" && !this.streams[streamName].playing) {
+      const ps = this.playStream(streamName, true);
       if (ps.length > 0) {
         if (this.config.localPlayer === "vlc") {
           this.sendSocketNotification("PLAY_VLCSTREAM", ps);
         }
       }
     } else {
-      this.playBtnCallback(s);
+      this.playBtnCallback(streamName);
     }
   },
 
@@ -320,14 +320,14 @@ Module.register("MMM-RTSPStream", {
   },
 
   getCanvasSize (streamConfig) {
-    let s = "";
+    let canvasStyle = "";
     if (typeof streamConfig.width !== "undefined") {
-      s += `width: ${streamConfig.width}px; `;
+      canvasStyle += `width: ${streamConfig.width}px; `;
     }
     if (typeof streamConfig.height !== "undefined") {
-      s += `height: ${streamConfig.height}px; line-height: ${streamConfig.height};`;
+      canvasStyle += `height: ${streamConfig.height}px; line-height: ${streamConfig.height};`;
     }
-    return s;
+    return canvasStyle;
   },
 
   getCanvas (stream) {
@@ -537,15 +537,15 @@ Module.register("MMM-RTSPStream", {
 
   playAll () {
     let ps = [];
-    Object.keys(this.streams).forEach((s) => {
+    Object.keys(this.streams).forEach((streamName) => {
       const webrtcActive = this.isWebRTCActive();
       if (this.instance === "SERVER" || webrtcActive) {
-        const res = this.playStream(s);
-        if (res.length > 0) {
-          ps = ps.concat(res);
+        const vlcPayload = this.playStream(streamName);
+        if (vlcPayload.length > 0) {
+          ps = ps.concat(vlcPayload);
         }
         if (!(this.instance === "SERVER" && this.config.remoteSnaps) && !(webrtcActive && this.instance === "SERVER")) {
-          this.sendSocketNotification("SNAPSHOT_STOP", s);
+          this.sendSocketNotification("SNAPSHOT_STOP", streamName);
         }
       }
     });
@@ -583,8 +583,8 @@ Module.register("MMM-RTSPStream", {
         // Clear any monitor interval and event listeners attached to session
         try {
           this.cleanupWhepMonitor(session, stream);
-        } catch (e) {
-          Log.warn(`[${this.name}] Error cleaning WHEP monitor for ${stream}:`, e);
+        } catch (error) {
+          Log.warn(`[${this.name}] Error cleaning WHEP monitor for ${stream}:`, error);
         }
 
         if (typeof session.stop === "function") {
@@ -602,7 +602,7 @@ Module.register("MMM-RTSPStream", {
     }
 
     if (
-      Object.keys(this.streams).filter((s) => s.playing).length === 0
+      Object.keys(this.streams).filter((streamName) => this.streams[streamName].playing).length === 0
     ) {
       this.playing = false;
     }
@@ -706,16 +706,16 @@ Module.register("MMM-RTSPStream", {
       );
       vlcStopAll = true;
     }
-    Object.keys(this.streams).forEach((s) => {
-      this.stopStream(s, vlcStopAll);
+    Object.keys(this.streams).forEach((streamName) => {
+      this.stopStream(streamName, vlcStopAll);
       if (startSnapshots) {
         if (!this.config.rotateStreams) {
-          this.playSnapshots(s);
+          this.playSnapshots(streamName);
         }
       } else {
-        this.sendSocketNotification("SNAPSHOT_STOP", s);
+        this.sendSocketNotification("SNAPSHOT_STOP", streamName);
       }
-      this.updatePlayPauseBtn(s);
+      this.updatePlayPauseBtn(streamName);
     });
     if (startSnapshots && this.config.rotateStreams) {
       this.manualTransition();
@@ -791,8 +791,8 @@ Module.register("MMM-RTSPStream", {
         ...this.config.keyBindings
       };
       KeyHandler.register(this.name, {
-        sendNotification: (n, p) => {
-          this.sendNotification(n, p);
+        sendNotification: (notification, payload) => {
+          this.sendNotification(notification, payload);
         },
         validKeyPress: (kp) => {
           this.validKeyPress(kp);
@@ -927,27 +927,27 @@ Module.register("MMM-RTSPStream", {
   selectedStream: "",
 
   selectStream (direction = 1, clear = false) {
-    const k = Object.keys(this.streams);
+    const streamNames = Object.keys(this.streams);
     if (clear) {
       this.selectedStream = "";
     } else if (this.selectedStream) {
-      const i = k.indexOf(this.selectedStream);
-      let newI = i + direction;
-      if (newI >= k.length) {
+      const selectedIndex = streamNames.indexOf(this.selectedStream);
+      let newI = selectedIndex + direction;
+      if (newI >= streamNames.length) {
         newI = 0;
       } else if (newI < 0) {
-        newI = k.length - 1;
+        newI = streamNames.length - 1;
       }
-      this.selectedStream = k[newI];
+      this.selectedStream = streamNames[newI];
     } else {
-      [this.selectedStream] = k;
+      [this.selectedStream] = streamNames;
     }
-    k.forEach((s) => {
-      if (s === this.selectedStream) {
-        document.getElementById(`iw_${s}`).style.cssText +=
+    streamNames.forEach((streamName) => {
+      if (streamName === this.selectedStream) {
+        document.getElementById(`iw_${streamName}`).style.cssText +=
           "border-color: red;";
       } else {
-        const iw = document.getElementById(`iw_${s}`);
+        const iw = document.getElementById(`iw_${streamName}`);
         iw.style.cssText = iw.style.cssText.replace("border-color: red;", "");
       }
     });

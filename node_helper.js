@@ -150,28 +150,28 @@ module.exports = NodeHelper.create({
     const positions = {};
     let dp2Check = false;
 
-    payload.forEach((s) => {
+    payload.forEach((streamPayload) => {
       // Abort a single delayed shutdown, if there was one.
-      if (s.name in this.vlcDelayedExit && s.name in this.vlcStream) {
-        clearTimeout(this.vlcDelayedExit[s.name]);
-        delete this.vlcDelayedExit[s.name];
-        unhideWindow(s.name);
+      if (streamPayload.name in this.vlcDelayedExit && streamPayload.name in this.vlcStream) {
+        clearTimeout(this.vlcDelayedExit[streamPayload.name]);
+        delete this.vlcDelayedExit[streamPayload.name];
+        unhideWindow(streamPayload.name);
       } else {
         // Otherwise, Generate the player window
         let args;
         if (isMPlayer) {
           // MPlayer arguments
-          args = ["-noborder", "-ontop", "-title", s.name];
-          if ("fullscreen" in s && "hdUrl" in this.config[s.name]) {
-            args.push("-fs", this.config[s.name].hdUrl);
-          } else if (!("fullscreen" in s)) {
-            const width = s.box.right - s.box.left;
-            const height = s.box.bottom - s.box.top;
-            args.push("-geometry", `${width}x${height}+${s.box.left}+${s.box.top}`);
-            args.push(this.config[s.name].url);
-            positions[s.name] = `${s.box.left}, ${s.box.top}, ${width}, ${height}`;
+          args = ["-noborder", "-ontop", "-title", streamPayload.name];
+          if ("fullscreen" in streamPayload && "hdUrl" in this.config[streamPayload.name]) {
+            args.push("-fs", this.config[streamPayload.name].hdUrl);
+          } else if (!("fullscreen" in streamPayload)) {
+            const width = streamPayload.box.right - streamPayload.box.left;
+            const height = streamPayload.box.bottom - streamPayload.box.top;
+            args.push("-geometry", `${width}x${height}+${streamPayload.box.left}+${streamPayload.box.top}`);
+            args.push(this.config[streamPayload.name].url);
+            positions[streamPayload.name] = `${streamPayload.box.left}, ${streamPayload.box.top}, ${width}, ${height}`;
           }
-          if (this.config[s.name].muted) {
+          if (this.config[streamPayload.name].muted) {
             args.splice(1, 0, "-nosound");
           }
         } else {
@@ -182,33 +182,33 @@ module.exports = NodeHelper.create({
             "--video-on-top",
             "--no-video-deco",
             "--no-embedded-video",
-            `--video-title=${s.name}`,
-            this.config[s.name].url
+            `--video-title=${streamPayload.name}`,
+            this.config[streamPayload.name].url
           ];
-          if ("fullscreen" in s && "hdUrl" in this.config[s.name]) {
+          if ("fullscreen" in streamPayload && "hdUrl" in this.config[streamPayload.name]) {
             args.pop();
-            args.push(this.config[s.name].hdUrl);
-          } else if (!("fullscreen" in s)) {
+            args.push(this.config[streamPayload.name].hdUrl);
+          } else if (!("fullscreen" in streamPayload)) {
             args.unshift(
               "--width",
-              s.box.right - s.box.left,
+              streamPayload.box.right - streamPayload.box.left,
               "--height",
-              s.box.bottom - s.box.top
+              streamPayload.box.bottom - streamPayload.box.top
             );
-            positions[s.name] = `${s.box.left}, ${s.box.top}, ${
-              s.box.right - s.box.left
-            }, ${s.box.bottom - s.box.top}`;
+            positions[streamPayload.name] = `${streamPayload.box.left}, ${streamPayload.box.top}, ${
+              streamPayload.box.right - streamPayload.box.left
+            }, ${streamPayload.box.bottom - streamPayload.box.top}`;
           }
-          if (this.config[s.name].muted) {
+          if (this.config[streamPayload.name].muted) {
             args.unshift("--no-audio");
           }
         }
-        Log.log(`Starting stream ${s.name} using ${playerCmd.toUpperCase()} with args ${args.join(" ")}...`);
+        Log.log(`Starting stream ${streamPayload.name} using ${playerCmd.toUpperCase()} with args ${args.join(" ")}...`);
 
-        this.vlcStream[s.name] = childProcess.spawn(playerCmd, args, opts);
+        this.vlcStream[streamPayload.name] = childProcess.spawn(playerCmd, args, opts);
 
-        this.vlcStream[s.name].on("error", () => {
-          Log.error(`Failed to start subprocess: ${this.vlcStream[s.name]}.`);
+        this.vlcStream[streamPayload.name].on("error", () => {
+          Log.error(`Failed to start subprocess: ${this.vlcStream[streamPayload.name]}.`);
         });
 
         dp2Check = true;
@@ -235,10 +235,10 @@ if (starts_with(get_window_name(), "stream")) then
 end
 `;
     } else {
-      Object.keys(positions).forEach((p) => {
+      Object.keys(positions).forEach((windowName) => {
         dp2Config += `
-if (get_window_name()=="${p}") then
-    set_window_geometry(${positions[p]});
+if (get_window_name()=="${windowName}") then
+    set_window_geometry(${positions[windowName]});
     undecorate_window();
     set_on_top();
     make_always_on_top();
@@ -334,15 +334,15 @@ end
       Log.log(delay
         ? `Delayed exit of all VLC Streams in ${delay} sec...`
         : "Killing All VLC Streams...");
-      Object.keys(this.vlcStream).forEach((s) => {
+      Object.keys(this.vlcStream).forEach((streamName) => {
         if (delay) {
-          this.stopVlcPlayer(s, delay);
+          this.stopVlcPlayer(streamName, delay);
         } else {
           try {
-            this.vlcStream[s].stderr.removeAllListeners();
-            this.vlcStream[s].kill();
-            delete this.vlcStream[s];
-            delete this.vlcDelayedExit[s];
+            this.vlcStream[streamName].stderr.removeAllListeners();
+            this.vlcStream[streamName].kill();
+            delete this.vlcStream[streamName];
+            delete this.vlcDelayedExit[streamName];
           } catch (err) {
             Log.log(err);
           }
