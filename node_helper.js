@@ -14,7 +14,7 @@ const Log = require("logger");
 const NodeHelper = require("node_helper");
 const createWindowManager = require("./scripts/window-manager");
 
-const environ = Object.assign(process.env, {DISPLAY: ":0"});
+const environ = {...process.env};
 const SNAPSHOT_MIME_BY_EXT = {
   ".jpg": "image/jpeg",
   ".jpeg": "image/jpeg",
