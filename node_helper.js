@@ -261,18 +261,22 @@ end
     };
 
     const vlcLuaPath = path.resolve(`${__dirname}/scripts/vlc.lua`);
-    // Check if the vlc.lua file exists, if not, create it.
-    if (!fs.existsSync(vlcLuaPath)) {
-      Log.log("DP2: Creating vlc.lua file...");
-      fs.writeFileSync(vlcLuaPath, "");
-    }
-
     let currentConfig;
     try {
       currentConfig = await fs.promises.readFile(vlcLuaPath, "utf8");
     } catch (error) {
-      Log.error("DP2: Failed to read vlc.lua config.", error);
-      return;
+      if (error.code !== "ENOENT") {
+        Log.error("DP2: Failed to read vlc.lua config.", error);
+        return;
+      }
+      Log.log("DP2: Creating vlc.lua file...");
+      try {
+        await fs.promises.writeFile(vlcLuaPath, "");
+        currentConfig = "";
+      } catch (writeError) {
+        Log.error("DP2: Failed to create vlc.lua file.", writeError);
+        return;
+      }
     }
 
     // Only write the new DevilsPie2 config if we need to.
