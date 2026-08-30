@@ -1,4 +1,3 @@
-/* eslint-disable no-negated-condition */
 /* eslint-disable func-style */
 /* eslint-disable no-param-reassign */
 /* eslint-disable func-names */
@@ -954,29 +953,27 @@ Module.register("MMM-RTSPStream", {
 
   selectStream (direction = 1, clear = false) {
     const k = Object.keys(this.streams);
-    if (!clear) {
-      if (!this.selectedStream) {
-        [this.selectedStream] = k;
-      } else {
-        const i = k.indexOf(this.selectedStream);
-        let newI = i + direction;
-        if (newI >= k.length) {
-          newI = 0;
-        } else if (newI < 0) {
-          newI = k.length - 1;
-        }
-        this.selectedStream = k[newI];
-      }
-    } else {
+    if (clear) {
       this.selectedStream = "";
+    } else if (this.selectedStream) {
+      const i = k.indexOf(this.selectedStream);
+      let newI = i + direction;
+      if (newI >= k.length) {
+        newI = 0;
+      } else if (newI < 0) {
+        newI = k.length - 1;
+      }
+      this.selectedStream = k[newI];
+    } else {
+      [this.selectedStream] = k;
     }
     k.forEach((s) => {
-      if (s !== this.selectedStream) {
-        const iw = document.getElementById(`iw_${s}`);
-        iw.style.cssText = iw.style.cssText.replace("border-color: red;", "");
-      } else {
+      if (s === this.selectedStream) {
         document.getElementById(`iw_${s}`).style.cssText +=
           "border-color: red;";
+      } else {
+        const iw = document.getElementById(`iw_${s}`);
+        iw.style.cssText = iw.style.cssText.replace("border-color: red;", "");
       }
     });
   },
