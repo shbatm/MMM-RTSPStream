@@ -1,5 +1,3 @@
-/* eslint-disable no-param-reassign */
-/* eslint-disable func-names */
 /* eslint-disable no-empty-function */
 /* eslint-disable max-lines */
 /* global KeyHandler MM WHEPClient */
@@ -221,18 +219,19 @@ Module.register("MMM-RTSPStream", {
   },
 
   // Overwrite the module show method to force a callback.
-  show (speed, callback, options) {
-    if (typeof callback === "object") {
-      options = callback;
-      callback = function () {};
-    }
+  async show (speed, callback, options) {
+    const isOptionsArg = typeof callback === "object";
+    const resumeCallback = isOptionsArg
+      ? undefined
+      : callback;
+    const showOptions = (isOptionsArg
+      ? callback
+      : options) || {};
 
-    const newCallback = () => {
-      this.resumed(callback);
-    };
-    options ||= {};
-
-    MM.showModule(this, speed, newCallback, options);
+    await new Promise((resolve) => {
+      MM.showModule(this, speed, resolve, showOptions);
+    });
+    this.resumed(resumeCallback);
   },
 
   playBtnCallback (s) {
@@ -368,13 +367,11 @@ Module.register("MMM-RTSPStream", {
   },
 
   getInnerWrapper (stream) {
+    const streamKey = stream || "stream1";
     const innerWrapper = document.createElement("div");
     innerWrapper.className = "MMM-RTSPStream innerWrapper";
-    if (!stream) {
-      stream = "stream1";
-    }
-    innerWrapper.style.cssText = this.getCanvasSize(this.config[stream]);
-    innerWrapper.id = `iw_${stream}`;
+    innerWrapper.style.cssText = this.getCanvasSize(this.config[streamKey]);
+    innerWrapper.id = `iw_${streamKey}`;
     return innerWrapper;
   },
 
