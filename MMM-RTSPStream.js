@@ -1,4 +1,3 @@
-/* eslint-disable no-empty-function */
 /* eslint-disable max-lines */
 /* global KeyHandler MM WHEPClient */
 
@@ -193,12 +192,6 @@ Module.register("MMM-RTSPStream", {
       this.selectStream(undefined, true);
     }
   },
-
-  /*
-   * resume()
-   * This method is called when a module is shown.
-   */
-  resume () {},
 
   resumed () {
     Log.log(`${this.name} has resumed... rotateStreams: ${this.config.rotateStreams}, autoStart: ${this.config.autoStart}`);
@@ -484,8 +477,11 @@ Module.register("MMM-RTSPStream", {
       const {whepUrl} = this.config[stream];
       if (whepUrl && typeof WHEPClient !== "undefined") {
         surface.muted = this.config[stream].muted !== false; // Default muted for autoplay
-        // Start WHEP playback and monitoring via helper method
-        this.startWhepSession(stream, surface).catch(() => {});
+        /*
+         * Start WHEP playback and monitoring via helper method; rejection is already
+         * logged and turned into a restart attempt inside startWhepSession itself.
+         */
+        this.startWhepSession(stream, surface).catch(() => undefined);
       } else {
         Log.warn(`[${this.name}] No WHEP URL configured for stream ${stream}`);
       }
