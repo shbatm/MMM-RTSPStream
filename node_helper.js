@@ -1,5 +1,4 @@
 /* eslint-disable max-lines */
-/* eslint-disable camelcase */
 /*
  * MagicMirror²
  * Node Helper: MMM-RTSPStream
@@ -8,14 +7,14 @@
  * MIT Licensed.
  */
 
-const child_process = require("child_process");
+const childProcess = require("child_process");
 const {promisify} = require("util");
 const fs = require("fs");
 const path = require("path");
 const Log = require("logger");
 const NodeHelper = require("node_helper");
 
-const execFileAsync = promisify(child_process.execFile);
+const execFileAsync = promisify(childProcess.execFile);
 const environ = Object.assign(process.env, {DISPLAY: ":0"});
 const SNAPSHOT_MIME_BY_EXT = {
   ".jpg": "image/jpeg",
@@ -208,7 +207,7 @@ module.exports = NodeHelper.create({
         }
         Log.log(`Starting stream ${s.name} using ${playerCmd.toUpperCase()} with args ${args.join(" ")}...`);
 
-        this.vlcStream[s.name] = child_process.spawn(playerCmd, args, opts);
+        this.vlcStream[s.name] = childProcess.spawn(playerCmd, args, opts);
 
         this.vlcStream[s.name].on("error", () => {
           Log.error(`Failed to start subprocess: ${this.vlcStream[s.name]}.`);
@@ -257,7 +256,7 @@ end
         this.dp2 = undefined;
       }
       Log.info("DP2: Running window resizers...");
-      this.dp2 = child_process.spawn(dp2Cmd, dp2Args, opts);
+      this.dp2 = childProcess.spawn(dp2Cmd, dp2Args, opts);
       this.dp2.on("error", () => {
         Log.error("DP2: Failed to start.");
       });
