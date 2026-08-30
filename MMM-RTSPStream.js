@@ -361,8 +361,9 @@ Module.register("MMM-RTSPStream", {
   },
 
   isWebRTCActive () {
-    return this.instance === "LOCAL" && this.config.remotePlayer === "webrtc" ||
-      this.instance === "SERVER" && this.config.localPlayer === "webrtc";
+    const isLocalWebRTC = this.instance === "LOCAL" && this.config.remotePlayer === "webrtc";
+    const isServerWebRTC = this.instance === "SERVER" && this.config.localPlayer === "webrtc";
+    return isLocalWebRTC || isServerWebRTC;
   },
 
   getPlayPauseBtn (stream) {
