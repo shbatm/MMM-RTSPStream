@@ -33,7 +33,6 @@ export default defineConfig([
       "max-lines-per-function": ["warn", 500],
       "max-statements": ["warn", 200],
       "no-inline-comments": "off",
-      "no-invalid-this": "off",
       "no-magic-numbers": "off",
       "no-ternary": "off",
       "no-undefined": "off",

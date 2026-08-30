@@ -146,11 +146,7 @@ Module.register("MMM-RTSPStream", {
         this.stopStream(lastStream);
       }
       const vlcPayload = this.playStream(this.currentStream);
-      if (vlcPayload.length > 0) {
-        if (this.config.localPlayer === "vlc") {
-          this.sendSocketNotification("PLAY_VLCSTREAM", vlcPayload);
-        }
-      }
+      this.sendVlcPayload(vlcPayload);
     } else {
       if (lastStream) {
         this.sendSocketNotification("SNAPSHOT_STOP", lastStream);
@@ -231,11 +227,7 @@ Module.register("MMM-RTSPStream", {
       } else {
         this.sendSocketNotification("SNAPSHOT_STOP", this.currentStream);
         const vlcPayload = this.playStream(this.currentStream);
-        if (vlcPayload.length > 0) {
-          if (this.config.localPlayer === "vlc") {
-            this.sendSocketNotification("PLAY_VLCSTREAM", vlcPayload);
-          }
-        }
+        this.sendVlcPayload(vlcPayload);
       }
     } else if (this.streams[streamName].playing) {
       this.stopStream(streamName);
@@ -243,22 +235,14 @@ Module.register("MMM-RTSPStream", {
     } else {
       this.sendSocketNotification("SNAPSHOT_STOP", streamName);
       const vlcPayload = this.playStream(streamName);
-      if (vlcPayload.length > 0) {
-        if (this.config.localPlayer === "vlc") {
-          this.sendSocketNotification("PLAY_VLCSTREAM", vlcPayload);
-        }
-      }
+      this.sendVlcPayload(vlcPayload);
     }
   },
 
   playBtnDblClickCB (streamName) {
     if (this.instance === "SERVER" && !this.streams[streamName].playing) {
       const ps = this.playStream(streamName, true);
-      if (ps.length > 0) {
-        if (this.config.localPlayer === "vlc") {
-          this.sendSocketNotification("PLAY_VLCSTREAM", ps);
-        }
-      }
+      this.sendVlcPayload(ps);
     } else {
       this.playBtnCallback(streamName);
     }
@@ -547,11 +531,7 @@ Module.register("MMM-RTSPStream", {
         }
       }
     });
-    if (ps.length > 0) {
-      if (this.config.localPlayer === "vlc") {
-        this.sendSocketNotification("PLAY_VLCSTREAM", ps);
-      }
-    }
+    this.sendVlcPayload(ps);
   },
 
   stopStream (stream, vlcStopAll = false) {
@@ -759,11 +739,7 @@ Module.register("MMM-RTSPStream", {
         ps = this.playStream(this.selectedStream);
       }
     }
-    if (ps.length > 0) {
-      if (this.config.localPlayer === "vlc") {
-        this.sendSocketNotification("PLAY_VLCSTREAM", ps);
-      }
-    }
+    this.sendVlcPayload(ps);
   },
 
   getScripts () {
