@@ -3,7 +3,7 @@
  * Connects to a WHEP endpoint and attaches the remote MediaStream to a <video> element.
  * No external deps; uses browser WebRTC APIs.
  */
-(() => {
+{
   const DEFAULT_RECONNECT_DELAY_MS = 3000;
   const MAX_RECONNECT_ATTEMPTS = 5;
 
@@ -143,4 +143,4 @@
   };
 
   window.WHEPClient = {start};
-})();
+}
