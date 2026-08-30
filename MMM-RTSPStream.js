@@ -65,8 +65,6 @@ Module.register("MMM-RTSPStream", {
     takeFocus: "Menu"
   },
 
-  requiresVersion: "2.4.0", // Required version of MagicMirror
-
   playing: false,
 
   currentIndex: -1,
