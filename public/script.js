@@ -1,5 +1,3 @@
-/* eslint-disable func-names */
-// Helper functions to replace jQuery functionality
 const getValue = (selector) => {
   const element = document.querySelector(selector);
   return element
@@ -117,8 +115,8 @@ const initializeApp = () => {
   // Event listeners for rotateStreams
   const rotateStreamsInputs = document.querySelectorAll("input[name=rotateStreams]");
   rotateStreamsInputs.forEach((input) => {
-    input.addEventListener("change", function () {
-      if (this.value === "true") {
+    input.addEventListener("change", (event) => {
+      if (event.currentTarget.value === "true") {
         showElements(".rotateStreamTimeout");
       } else {
         hideElements(".rotateStreamTimeout");
@@ -129,8 +127,8 @@ const initializeApp = () => {
   // Event listeners for showSnapWhenPaused
   const showSnapInputs = document.querySelectorAll("input[name=showSnapWhenPaused]");
   showSnapInputs.forEach((input) => {
-    input.addEventListener("change", function () {
-      if (this.value === "true") {
+    input.addEventListener("change", (event) => {
+      if (event.currentTarget.value === "true") {
         showElements(".snapshotDetails");
       } else {
         hideElements(".snapshotDetails");
@@ -141,9 +139,9 @@ const initializeApp = () => {
   // Event listeners for remotePlayer
   const remotePlayerSelect = document.querySelector("select[name=remotePlayer]");
   if (remotePlayerSelect) {
-    remotePlayerSelect.addEventListener("change", function () {
+    remotePlayerSelect.addEventListener("change", (event) => {
       const localPlayerValue = getValue("#localPlayer");
-      if (this.value === "webrtc" || localPlayerValue === "webrtc") {
+      if (event.currentTarget.value === "webrtc" || localPlayerValue === "webrtc") {
         showElements(".webrtc");
       } else {
         hideElements(".webrtc");
@@ -154,14 +152,14 @@ const initializeApp = () => {
   // Event listeners for localPlayer
   const localPlayerSelect = document.querySelector("select[name=localPlayer]");
   if (localPlayerSelect) {
-    localPlayerSelect.addEventListener("change", function () {
+    localPlayerSelect.addEventListener("change", (event) => {
       const remotePlayerValue = getValue("#remotePlayer");
-      if (this.value === "webrtc" || remotePlayerValue === "webrtc") {
+      if (event.currentTarget.value === "webrtc" || remotePlayerValue === "webrtc") {
         showElements(".webrtc");
       } else {
         hideElements(".webrtc");
       }
-      if (this.value === "vlc" || this.value === "mplayer") {
+      if (event.currentTarget.value === "vlc" || event.currentTarget.value === "mplayer") {
         showElements(".shutdownDelay");
       } else {
         hideElements(".shutdownDelay");
@@ -172,20 +170,20 @@ const initializeApp = () => {
   // Event listeners for streamCount
   const streamCountInputs = document.querySelectorAll("input[name=streamCount]");
   streamCountInputs.forEach((input) => {
-    input.addEventListener("change", function () {
-      if (this.value === "1") {
+    input.addEventListener("change", (event) => {
+      if (event.currentTarget.value === "1") {
         hideElements(".count-2");
         hideElements(".count-3");
         hideElements(".count-4");
-      } else if (this.value === "2") {
+      } else if (event.currentTarget.value === "2") {
         showElements(".count-2");
         hideElements(".count-3");
         hideElements(".count-4");
-      } else if (this.value === "3") {
+      } else if (event.currentTarget.value === "3") {
         showElements(".count-2");
         showElements(".count-3");
         hideElements(".count-4");
-      } else if (this.value === "4") {
+      } else if (event.currentTarget.value === "4") {
         showElements(".count-2");
         showElements(".count-3");
         showElements(".count-4");
@@ -195,9 +193,9 @@ const initializeApp = () => {
 
   // Add smooth scroll behavior for form navigation
   document.querySelectorAll("a[href^=\"#\"]").forEach((anchor) => {
-    anchor.addEventListener("click", function (e) {
-      e.preventDefault();
-      const target = document.querySelector(this.getAttribute("href"));
+    anchor.addEventListener("click", (event) => {
+      event.preventDefault();
+      const target = document.querySelector(event.currentTarget.getAttribute("href"));
       if (target) {
         target.scrollIntoView({
           behavior: "smooth",
@@ -210,11 +208,11 @@ const initializeApp = () => {
   // Add form validation feedback
   const inputs = document.querySelectorAll(".input, .select, .textarea");
   inputs.forEach((input) => {
-    input.addEventListener("blur", function () {
-      if (this.hasAttribute("required") && !this.value.trim()) {
-        this.style.borderColor = "#dc3545";
+    input.addEventListener("blur", (event) => {
+      if (event.currentTarget.hasAttribute("required") && !event.currentTarget.value.trim()) {
+        event.currentTarget.style.borderColor = "#dc3545";
       } else {
-        this.style.borderColor = "#e9ecef";
+        event.currentTarget.style.borderColor = "#e9ecef";
       }
     });
   });
