@@ -1,4 +1,3 @@
-/* eslint-disable func-style */
 /* eslint-disable no-param-reassign */
 /* eslint-disable func-names */
 /* eslint-disable no-empty-function */
@@ -398,24 +397,10 @@ Module.register("MMM-RTSPStream", {
   },
 
   getPlayPauseBtn (stream) {
-    const self = this;
-
-    function makeOnClickHandler (s) {
-      return function () {
-        self.playBtnCallback(s);
-      };
-    }
-
-    function makeOnDblClickHandler (s) {
-      return function () {
-        self.playBtnDblClickCB(s);
-      };
-    }
-
     const playBtnWrapper = document.createElement("div");
     playBtnWrapper.className = "control";
-    playBtnWrapper.onclick = makeOnClickHandler(stream);
-    playBtnWrapper.oncontextmenu = makeOnDblClickHandler(stream);
+    playBtnWrapper.onclick = () => this.playBtnCallback(stream);
+    playBtnWrapper.oncontextmenu = () => this.playBtnDblClickCB(stream);
     playBtnWrapper.id = `playBtnWrapper_${stream}`;
 
     const playBtnLabel = document.createElement("label");
