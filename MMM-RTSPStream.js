@@ -241,8 +241,8 @@ Module.register("MMM-RTSPStream", {
 
   playBtnDblClickCB (streamName) {
     if (this.instance === "SERVER" && !this.streams[streamName].playing) {
-      const ps = this.playStream(streamName, true);
-      this.sendVlcPayload(ps);
+      const vlcPayload = this.playStream(streamName, true);
+      this.sendVlcPayload(vlcPayload);
     } else {
       this.playBtnCallback(streamName);
     }
@@ -518,20 +518,20 @@ Module.register("MMM-RTSPStream", {
   },
 
   playAll () {
-    let ps = [];
+    let vlcPayloads = [];
     Object.keys(this.streams).forEach((streamName) => {
       const webrtcActive = this.isWebRTCActive();
       if (this.instance === "SERVER" || webrtcActive) {
         const vlcPayload = this.playStream(streamName);
         if (vlcPayload.length > 0) {
-          ps = ps.concat(vlcPayload);
+          vlcPayloads = vlcPayloads.concat(vlcPayload);
         }
         if (!(this.instance === "SERVER" && this.config.remoteSnaps) && !(webrtcActive && this.instance === "SERVER")) {
           this.sendSocketNotification("SNAPSHOT_STOP", streamName);
         }
       }
     });
-    this.sendVlcPayload(ps);
+    this.sendVlcPayload(vlcPayloads);
   },
 
   stopStream (stream, vlcStopAll = false) {
@@ -702,7 +702,7 @@ Module.register("MMM-RTSPStream", {
   },
 
   toggleStreams (payload) {
-    let ps = [];
+    let vlcPayloads = [];
     if (this.config.rotateStreams) {
       if (this.playing) {
         this.stopStream(this.currentStream);
@@ -713,7 +713,7 @@ Module.register("MMM-RTSPStream", {
           this.sendSocketNotification("SNAPSHOT_STOP", this.currentStream);
         }
         if (this.instance === "SERVER" || webrtcActive) {
-          ps = this.playStream(this.currentStream);
+          vlcPayloads = this.playStream(this.currentStream);
         }
       }
     } else if (!this.selectedStream) {
@@ -734,12 +734,12 @@ Module.register("MMM-RTSPStream", {
         this.instance === "SERVER" &&
         payload.KeyState === "KEY_LONGPRESSED"
       ) {
-        ps = this.playStream(this.selectedStream, true);
+        vlcPayloads = this.playStream(this.selectedStream, true);
       } else if (this.instance === "SERVER" || webrtcActive) {
-        ps = this.playStream(this.selectedStream);
+        vlcPayloads = this.playStream(this.selectedStream);
       }
     }
-    this.sendVlcPayload(ps);
+    this.sendVlcPayload(vlcPayloads);
   },
 
   getScripts () {
@@ -842,9 +842,9 @@ Module.register("MMM-RTSPStream", {
     }
   },
 
-  sendVlcPayload (ps) {
-    if (ps.length > 0 && this.config.localPlayer === "vlc") {
-      this.sendSocketNotification("PLAY_VLCSTREAM", ps);
+  sendVlcPayload (vlcPayloads) {
+    if (vlcPayloads.length > 0 && this.config.localPlayer === "vlc") {
+      this.sendSocketNotification("PLAY_VLCSTREAM", vlcPayloads);
     }
   },
 
