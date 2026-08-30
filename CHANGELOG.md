@@ -2,6 +2,48 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.3.0](https://github.com/shbatm/MMM-RTSPStream/compare/v4.2.0...v4.3.0) (2026-08-30)
+
+### Fixed
+
+* cancel delayed Devilspie2 restarts on shutdown ([22f72eb](https://github.com/shbatm/MMM-RTSPStream/commit/22f72eb0f536f160dca7cd3916a052d972b3cb24))
+* **env:** respect existing display settings ([d13caae](https://github.com/shbatm/MMM-RTSPStream/commit/d13caaed455aeaf9beae5736f605306faca5d8fc))
+* **install:** correct X11 dependency setup ([d607584](https://github.com/shbatm/MMM-RTSPStream/commit/d607584a97cb860522209926d57617a600d4eff1))
+* **node_helper:** replace throwing fs callbacks with fs.promises in getVlcPlayer ([3c10365](https://github.com/shbatm/MMM-RTSPStream/commit/3c10365de16dec986f73fc2b1e9d667988472de1))
+* **node_helper:** use execFile instead of exec to prevent shell injection in wmctrl calls ([500850b](https://github.com/shbatm/MMM-RTSPStream/commit/500850bde67e785d3d7faab5cfac714a845740d2))
+
+### Chores
+
+* add allowScripts config ([0498ac0](https://github.com/shbatm/MMM-RTSPStream/commit/0498ac0d3db95bb0dd226c0e947165260a8ef2b6))
+* optimize indentation ([619c1e8](https://github.com/shbatm/MMM-RTSPStream/commit/619c1e8cbc3340d4745c89fc0ee98b715b30e542))
+* update devDependencies ([b821015](https://github.com/shbatm/MMM-RTSPStream/commit/b821015549d1f87bc982016bd720048b4707d711))
+* update GitHub Actions ([31c811e](https://github.com/shbatm/MMM-RTSPStream/commit/31c811e82cac456f0be2cf44be9b48239a8b25df))
+
+### Code Refactoring
+
+* centralize VLC payload dispatch ([bc14bf8](https://github.com/shbatm/MMM-RTSPStream/commit/bc14bf8e57965214514f8d4f6a8ea8e3481c0d6d))
+* clarify VLC payload names ([956c975](https://github.com/shbatm/MMM-RTSPStream/commit/956c975cd61e69a30d80a3daab962d8b6445bb89))
+* clarify WebRTC activation checks ([a9da97c](https://github.com/shbatm/MMM-RTSPStream/commit/a9da97c0c76965c8f10ef66a02c3052467ea702b))
+* **css:** nest module selectors ([9314ac3](https://github.com/shbatm/MMM-RTSPStream/commit/9314ac350f5a14bae9742dce93aa50e60ad120a0))
+* drop unnecessary callback param from resumed() ([324f47a](https://github.com/shbatm/MMM-RTSPStream/commit/324f47a319262ef412297a0577bd9f5b5bbb3423))
+* encapsulate X11 window control ([422ec11](https://github.com/shbatm/MMM-RTSPStream/commit/422ec116407bb43e9a0d18cab9df55e47c2563cb))
+* extract WHEP reconnect/status logic to scripts/whep-status.js ([bd3d851](https://github.com/shbatm/MMM-RTSPStream/commit/bd3d851dbf0451543a8f94e5f054c4ea6b5e2848))
+* invert negated conditions in selectStream ([c0569e2](https://github.com/shbatm/MMM-RTSPStream/commit/c0569e20295d986f73c3728c8fbcd3a70391ce3f))
+* **node_helper:** rename child_process to childProcess for camelcase compliance ([46e9afa](https://github.com/shbatm/MMM-RTSPStream/commit/46e9afa326dd17d64cf0c5a88ffc34122014be5b))
+* remove obsolete global and self aliases ([fe52cd7](https://github.com/shbatm/MMM-RTSPStream/commit/fe52cd709354a6478e732aa62c9d0819cad6f52c))
+* remove redundant handler-factory functions in getPlayPauseBtn ([59b0db6](https://github.com/shbatm/MMM-RTSPStream/commit/59b0db6448b3217b27f3190be15b8b8bfa02425d))
+* remove redundant resume() override, simplify swallowed catch ([f5e0c07](https://github.com/shbatm/MMM-RTSPStream/commit/f5e0c072dbce0053f7aab15c0f0cf5bb7ceb30da))
+* remove requiresVersion ([2998776](https://github.com/shbatm/MMM-RTSPStream/commit/29987768a308bf0695ff666fbce92b133747b0f5))
+* rename script.js to config-wizard.js ([4b36d14](https://github.com/shbatm/MMM-RTSPStream/commit/4b36d14abed1b2648afa9f118bfa32602d23a932))
+* replace ++ with += 1 for no-plusplus compliance ([8112ef5](https://github.com/shbatm/MMM-RTSPStream/commit/8112ef5b77367620c0b38bf44875ecb785b98d6c))
+* replace IIFE wrapper with plain block scope ([8b7a4dd](https://github.com/shbatm/MMM-RTSPStream/commit/8b7a4dd3682d2e8e58d6357d5790bc4f220d5c05))
+* resolve show() callback via async/await, remove param reassignment ([6c1a383](https://github.com/shbatm/MMM-RTSPStream/commit/6c1a383aa6405c14e138fe875443ccd2b28248b5))
+* scope VLC payload declarations ([94b806f](https://github.com/shbatm/MMM-RTSPStream/commit/94b806fff34a133557cc16ac49669a81029c10d4))
+* **script.js:** use arrow functions with event.currentTarget instead of this ([b09673e](https://github.com/shbatm/MMM-RTSPStream/commit/b09673ef7c34407084c93672b8c2875ca0ab31ef))
+* split notificationReceived into focused handler methods ([7c30d3e](https://github.com/shbatm/MMM-RTSPStream/commit/7c30d3e0ecec582fae9e18ed814a54a34e2ab503))
+* use async VLC config file handling ([d8846cb](https://github.com/shbatm/MMM-RTSPStream/commit/d8846cb519d7fe0a2a78ecceebd10ee614ebca23))
+* use descriptive local variable names ([8636218](https://github.com/shbatm/MMM-RTSPStream/commit/8636218120879ad1b0dbe174f957aa47edb820ea))
+* **window:** extract manager and add tests ([4ed9dc5](https://github.com/shbatm/MMM-RTSPStream/commit/4ed9dc5a9cbaae63e3286d07e96cebd5bdf71a6d))
 ## [4.2.0](https://github.com/shbatm/MMM-RTSPStream/compare/v4.1.0...v4.2.0) (2026-06-05)
 
 
