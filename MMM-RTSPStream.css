@@ -5,124 +5,124 @@
  * shbatm
  * MIT Licensed.
  *
- * Custom here your css module
- *
  */
-.MMM-RTSPStream .wrapper {
-  position: relative;
-  vertical-align: middle;
-  text-align: center;
-}
+.MMM-RTSPStream {
+  .wrapper {
+    position: relative;
+    vertical-align: middle;
+    text-align: center;
+  }
 
-.MMM-RTSPStream .wrapper br {
-  clear: both;
-}
+  .wrapper br {
+    clear: both;
+  }
 
-.MMM-RTSPStream .innerWrapper {
-  position: relative;
-  width: 352px; /* Video width + 2*border + 2*padding */
-  height: 242px;
-  border: 1px solid white;
-  /* float: left; */
-  display: inline-block;
-  text-align: center;
-  margin: 2px;
-}
+  .innerWrapper {
+    position: relative;
+    width: 352px; /* Video width + 2*border + 2*padding */
+    height: 242px;
+    border: 1px solid white;
+    /* float: left; */
+    display: inline-block;
+    text-align: center;
+    margin: 2px;
+  }
 
-.MMM-RTSPStream .canvas {
-  position: absolute;
-  z-index: 10;
-  left: 50%;
-  top: 50%;
-  /* width: 352px;
-  height: 240px; */
-  -webkit-transform: translate(-50%, -50%);
-  transform: translate(-50%, -50%);
-  width: 100%;
-  height: 100%;
-}
+  .canvas {
+    position: absolute;
+    z-index: 10;
+    left: 50%;
+    top: 50%;
+    /* width: 352px;
+    height: 240px; */
+    -webkit-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+  }
 
-.MMM-RTSPStream .snapshot {
-  position: absolute;
-  z-index: 1;
-  left: 50%;
-  top: 50%;
-  /* width: 352px;
-  height: 240px; */
-  -webkit-transform: translate(-50%, -50%);
-  transform: translate(-50%, -50%);
-  width: 100%;
-  height: 100%;
-}
+  .snapshot {
+    position: absolute;
+    z-index: 1;
+    left: 50%;
+    top: 50%;
+    /* width: 352px;
+    height: 240px; */
+    -webkit-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+  }
 
-/* Next and Previous arrow */
-.MMM-RTSPStream .control {
-  z-index: 55;
-  opacity: 0;
-  display: inline-block;
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  line-height: 50%;
-  width: 100%;
-  height: 100%;
-  vertical-align: middle;
-  -webkit-transform: translate(-50%, -50%);
-  transform: translate(-50%, -50%);
-}
+  /* Next and Previous arrow */
+  .control {
+    z-index: 55;
+    opacity: 0;
+    display: inline-block;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    line-height: 50%;
+    width: 100%;
+    height: 100%;
+    vertical-align: middle;
+    -webkit-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+  }
 
-/* Show button when you hover near */
-.MMM-RTSPStream .control:hover label {
-  opacity: 0.6;
-  cursor: pointer !important;
-}
+  /* Show button when you hover near */
+  .control:hover label {
+    opacity: 0.6;
+    cursor: pointer !important;
+  }
 
-.MMM-RTSPStream .control:hover {
-  opacity: 0.6;
-  cursor: pointer !important;
-}
+  .control:hover {
+    opacity: 0.6;
+    cursor: pointer !important;
+  }
 
-.MMM-RTSPStream .control label {
-  z-index: 100;
-  display: block;
-  text-align: center;
-  line-height: 50px;
-  width: 100px;
-  height: 100px;
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  -webkit-transform: translate(-50%, -50%);
-  transform: translate(-50%, -50%);
-  font-size: 100px;
-  color: #fff;
-  opacity: 0;
-}
+  .control label {
+    z-index: 100;
+    display: block;
+    text-align: center;
+    line-height: 50px;
+    width: 100px;
+    height: 100px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    -webkit-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    font-size: 100px;
+    color: #fff;
+    opacity: 0;
+  }
 
-.MMM-RTSPStream .statusOverlay {
-  font-size: 12px;
-  padding: 3px 0;
-  color: #ffd166;
-}
+  .statusOverlay {
+    font-size: 12px;
+    padding: 3px 0;
+    color: #ffd166;
+  }
 
-.MMM-RTSPStream .statusOverlay.warn {
-  color: #ffd166;
-}
+  .statusOverlay.warn {
+    color: #ffd166;
+  }
 
-.MMM-RTSPStream .statusOverlay.error {
-  color: #ff8f8f;
-}
+  .statusOverlay.error {
+    color: #ff8f8f;
+  }
 
-.MMM-RTSPStream .statusOverlay.hidden {
-  display: none;
-}
+  .statusOverlay.hidden {
+    display: none;
+  }
 
-.MMM-RTSPStream .configWarning {
-  margin: 0 0 8px 0;
-  padding: 6px 8px;
-  border: 1px solid #ffd166;
-  color: #ffd166;
-  font-size: 12px;
-  line-height: 1.3;
-  text-align: left;
+  .configWarning {
+    margin: 0 0 8px 0;
+    padding: 6px 8px;
+    border: 1px solid #ffd166;
+    color: #ffd166;
+    font-size: 12px;
+    line-height: 1.3;
+    text-align: left;
+  }
 }
