@@ -31,13 +31,62 @@ const getSnapshotMimeType = function getSnapshotMimeType (filePath) {
   return SNAPSHOT_MIME_BY_EXT[ext] || "application/octet-stream";
 };
 
-// Un-hides and raises a previously hidden stream window (used to abort a delayed shutdown).
-const unhideWindow = async function unhideWindow (name) {
-  try {
-    await execFileAsync("wmctrl", ["-r", name, "-b", "remove,hidden"], {env: environ});
-    await execFileAsync("wmctrl", ["-a", name], {env: environ});
-  } catch (error) {
-    Log.error(`exec error: ${error}`);
+const windowManager = {
+  devilspieProcess: null,
+  restartTimer: null,
+
+  start (command, args, options) {
+    this.stopProcess();
+    Log.info("DP2: Running window resizers...");
+    this.devilspieProcess = childProcess.spawn(command, args, options);
+    this.devilspieProcess.on("error", () => {
+      Log.error("DP2: Failed to start.");
+    });
+  },
+
+  stop () {
+    this.stopRestartTimer();
+    this.stopProcess();
+  },
+
+  stopProcess () {
+    if (this.devilspieProcess) {
+      this.devilspieProcess.stderr.removeAllListeners();
+      this.devilspieProcess.kill();
+      this.devilspieProcess = null;
+    }
+  },
+
+  stopRestartTimer () {
+    if (this.restartTimer) {
+      clearTimeout(this.restartTimer);
+      this.restartTimer = null;
+    }
+  },
+
+  scheduleRestart (callback, delay) {
+    this.stopRestartTimer();
+    this.restartTimer = setTimeout(() => {
+      this.restartTimer = null;
+      callback();
+    }, delay);
+  },
+
+  async hideWindow (name) {
+    try {
+      await execFileAsync("wmctrl", ["-r", name, "-b", "add,hidden"], {env: environ});
+    } catch (error) {
+      Log.error(`exec error: ${error}`);
+    }
+  },
+
+  async unhideWindow (name) {
+    try {
+      await execFileAsync("wmctrl", ["-r", name, "-b", "remove,hidden"], {env: environ});
+      await execFileAsync("wmctrl", ["-a", name], {env: environ});
+    } catch (error) {
+      Log.error(`exec error: ${error}`);
+    }
   }
 };
 
@@ -65,16 +114,10 @@ module.exports = NodeHelper.create({
 
     // Kill any VLC/MPlayer Streams that are open
     if (this.config.localPlayer === "vlc" || this.config.localPlayer === "mplayer") {
-      if (this.dp2RestartTimer) {
-        clearTimeout(this.dp2RestartTimer);
-        this.dp2RestartTimer = null;
-      }
-      if (this.dp2) {
+      if (windowManager.devilspieProcess) {
         Log.log("Killing DevilsPie2...");
-        this.dp2.stderr.removeAllListeners();
-        this.dp2.kill();
-        this.dp2 = undefined;
       }
+      windowManager.stop();
       this.stopAllVlcPlayers();
     }
   },
@@ -160,7 +203,7 @@ module.exports = NodeHelper.create({
       if (streamPayload.name in this.vlcDelayedExit && streamPayload.name in this.vlcStream) {
         clearTimeout(this.vlcDelayedExit[streamPayload.name]);
         delete this.vlcDelayedExit[streamPayload.name];
-        unhideWindow(streamPayload.name);
+        windowManager.unhideWindow(streamPayload.name);
       } else {
         // Otherwise, Generate the player window
         let args;
@@ -253,16 +296,7 @@ end
     }
 
     const startDp2 = () => {
-      if (this.dp2) {
-        this.dp2.stderr.removeAllListeners();
-        this.dp2.kill();
-        this.dp2 = undefined;
-      }
-      Log.info("DP2: Running window resizers...");
-      this.dp2 = childProcess.spawn(dp2Cmd, dp2Args, opts);
-      this.dp2.on("error", () => {
-        Log.error("DP2: Failed to start.");
-      });
+      windowManager.start(dp2Cmd, dp2Args, opts);
     };
 
     const vlcLuaPath = path.resolve(`${__dirname}/scripts/vlc.lua`);
@@ -299,11 +333,7 @@ end
     }
     startDp2();
     // Give the windows time to settle, then re-call to resize again.
-    if (this.dp2RestartTimer) {
-      clearTimeout(this.dp2RestartTimer);
-    }
-    this.dp2RestartTimer = setTimeout(() => {
-      this.dp2RestartTimer = null;
+    windowManager.scheduleRestart(() => {
       startDp2();
     }, 7000 * payload.length);
   },
@@ -329,9 +359,7 @@ end
             quitVlc();
           }, delay * 1000);
           // execFile avoids shell interpolation of name (untrusted config value)
-          execFileAsync("wmctrl", ["-r", name, "-b", "add,hidden"], {env: environ}).catch((error) => {
-            Log.error(`exec error: ${error}`);
-          });
+          windowManager.hideWindow(name);
         }
       } else {
         quitVlc();
