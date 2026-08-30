@@ -200,7 +200,7 @@ Module.register("MMM-RTSPStream", {
    */
   resume () {},
 
-  resumed (callback) {
+  resumed () {
     Log.log(`${this.name} has resumed... rotateStreams: ${this.config.rotateStreams}, autoStart: ${this.config.autoStart}`);
     this.suspended = false;
     if (this.loaded) {
@@ -212,9 +212,6 @@ Module.register("MMM-RTSPStream", {
         Log.log("Playing all snapshots");
         Object.keys(this.streams).forEach((s) => this.playSnapshots(s));
       }
-    }
-    if (typeof callback === "function") {
-      callback();
     }
   },
 
@@ -231,7 +228,10 @@ Module.register("MMM-RTSPStream", {
     await new Promise((resolve) => {
       MM.showModule(this, speed, resolve, showOptions);
     });
-    this.resumed(resumeCallback);
+    this.resumed();
+    if (typeof resumeCallback === "function") {
+      resumeCallback();
+    }
   },
 
   playBtnCallback (s) {
