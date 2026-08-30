@@ -1,5 +1,4 @@
 /* eslint-disable max-lines */
-/* eslint-disable no-negated-condition */
 /* eslint-disable camelcase */
 /*
  * MagicMirror²
@@ -141,7 +140,7 @@ module.exports = NodeHelper.create({
     }, this.config[name].snapshotRefresh * 1000);
   },
 
-  getVlcPlayer (payload) {
+  async getVlcPlayer (payload) {
     const opts = {
       detached: false,
       env: environ,
@@ -270,44 +269,33 @@ end
       Log.log("DP2: Creating vlc.lua file...");
       fs.writeFileSync(vlcLuaPath, "");
     }
-    fs.readFile(
-      vlcLuaPath,
-      "utf8",
-      (err, data) => {
-        if (err) {
-          throw err;
-        }
 
-        // Only write the new DevilsPie2 config if we need to.
-        if (data !== dp2Config) {
-          fs.writeFile(
-            vlcLuaPath,
-            dp2Config,
-            (innerErr) => {
-              // throws an error, you could also catch it here
-              if (innerErr) {
-                throw innerErr;
-              }
+    let currentConfig;
+    try {
+      currentConfig = await fs.promises.readFile(vlcLuaPath, "utf8");
+    } catch (error) {
+      Log.error("DP2: Failed to read vlc.lua config.", error);
+      return;
+    }
 
-              Log.log("DP2: Config File Saved!");
-              if (this.config.debug) {
-                Log.log(dp2Config);
-              }
-              startDp2();
-              // Give the windows time to settle, then re-call to resize again.
-              setTimeout(() => {
-                startDp2();
-              }, 7000 * payload.length);
-            }
-          );
-        } else {
-          startDp2();
-          setTimeout(() => {
-            startDp2();
-          }, 7000 * payload.length);
-        }
+    // Only write the new DevilsPie2 config if we need to.
+    if (currentConfig !== dp2Config) {
+      try {
+        await fs.promises.writeFile(vlcLuaPath, dp2Config);
+      } catch (error) {
+        Log.error("DP2: Failed to write vlc.lua config.", error);
+        return;
       }
-    );
+      Log.log("DP2: Config File Saved!");
+      if (this.config.debug) {
+        Log.log(dp2Config);
+      }
+    }
+    startDp2();
+    // Give the windows time to settle, then re-call to resize again.
+    setTimeout(() => {
+      startDp2();
+    }, 7000 * payload.length);
   },
 
   stopVlcPlayer (name, delay, callback) {
