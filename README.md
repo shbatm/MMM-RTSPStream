@@ -33,7 +33,7 @@ This module will show a live RTSP video stream and/or periodic snapshots on the 
 
 ### System Packages
 
-The following packages are required for the module to function fully and the installer will attempt to install them with `apt`:
+The following packages are required for local VLC playback. The preinstall script attempts to install the X11 helper packages on Debian-based systems when an X11 session is detected. Install the media player separately:
 
 - `vlc` - Hardware-accelerated video playback (local screen)
 - `devilspie2` - Window positioning, sizing, and decoration removal for VLC
