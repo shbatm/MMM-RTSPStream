@@ -56,6 +56,7 @@ const createSandbox = () => {
   };
 
   sandbox.global = sandbox;
+  sandbox.window = sandbox;
 
   return sandbox;
 };
@@ -63,11 +64,16 @@ const createSandbox = () => {
 const loadDefinition = () => {
   const testsDir = path.dirname(fileURLToPath(import.meta.url));
   const modulePath = path.resolve(testsDir, "../MMM-RTSPStream.js");
+  const whepStatusPath = path.resolve(testsDir, "../scripts/whep-status.js");
   const code = fs.readFileSync(modulePath, "utf8");
+  const whepStatusCode = fs.readFileSync(whepStatusPath, "utf8");
   const sandbox = createSandbox();
 
   vm.createContext(sandbox);
   vm.runInContext(code, sandbox, {filename: "MMM-RTSPStream.js"});
+  vm.runInContext(whepStatusCode, sandbox, {filename: "whep-status.js"});
+  // Mirrors the Object.assign(this, window.MMMRTSPStreamWhepStatus) done in start().
+  Object.assign(sandbox.definition, sandbox.MMMRTSPStreamWhepStatus);
 
   return {definition: sandbox.definition, sandbox};
 };
