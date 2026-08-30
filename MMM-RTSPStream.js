@@ -120,7 +120,6 @@ Module.register("MMM-RTSPStream", {
 
   rotateStream (goToStream = undefined, goDirection = 0) {
     const streamNames = Object.keys(this.streams);
-    let vlcPayload;
     const resetCurrentIndex = streamNames.length;
     const lastStream = this.currentStream;
 
@@ -146,7 +145,7 @@ Module.register("MMM-RTSPStream", {
       if (lastStream) {
         this.stopStream(lastStream);
       }
-      vlcPayload = this.playStream(this.currentStream);
+      const vlcPayload = this.playStream(this.currentStream);
       if (vlcPayload.length > 0) {
         if (this.config.localPlayer === "vlc") {
           this.sendSocketNotification("PLAY_VLCSTREAM", vlcPayload);
@@ -225,17 +224,16 @@ Module.register("MMM-RTSPStream", {
   },
 
   playBtnCallback (streamName) {
-    let ps;
     if (this.config.rotateStreams) {
       if (this.playing) {
         this.stopStream(this.currentStream);
         this.playSnapshots(this.currentStream);
       } else {
         this.sendSocketNotification("SNAPSHOT_STOP", this.currentStream);
-        ps = this.playStream(this.currentStream);
-        if (ps.length > 0) {
+        const vlcPayload = this.playStream(this.currentStream);
+        if (vlcPayload.length > 0) {
           if (this.config.localPlayer === "vlc") {
-            this.sendSocketNotification("PLAY_VLCSTREAM", ps);
+            this.sendSocketNotification("PLAY_VLCSTREAM", vlcPayload);
           }
         }
       }
@@ -244,10 +242,10 @@ Module.register("MMM-RTSPStream", {
       this.playSnapshots(streamName);
     } else {
       this.sendSocketNotification("SNAPSHOT_STOP", streamName);
-      ps = this.playStream(streamName);
-      if (ps.length > 0) {
+      const vlcPayload = this.playStream(streamName);
+      if (vlcPayload.length > 0) {
         if (this.config.localPlayer === "vlc") {
-          this.sendSocketNotification("PLAY_VLCSTREAM", ps);
+          this.sendSocketNotification("PLAY_VLCSTREAM", vlcPayload);
         }
       }
     }
