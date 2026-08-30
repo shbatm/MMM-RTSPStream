@@ -10,11 +10,13 @@
  */
 
 const child_process = require("child_process");
+const {promisify} = require("util");
 const fs = require("fs");
 const path = require("path");
 const Log = require("logger");
 const NodeHelper = require("node_helper");
 
+const execFileAsync = promisify(child_process.execFile);
 const environ = Object.assign(process.env, {DISPLAY: ":0"});
 const SNAPSHOT_MIME_BY_EXT = {
   ".jpg": "image/jpeg",
@@ -29,6 +31,16 @@ const SNAPSHOT_MIME_BY_EXT = {
 const getSnapshotMimeType = function getSnapshotMimeType (filePath) {
   const ext = path.extname(filePath).toLowerCase();
   return SNAPSHOT_MIME_BY_EXT[ext] || "application/octet-stream";
+};
+
+// Un-hides and raises a previously hidden stream window (used to abort a delayed shutdown).
+const unhideWindow = async function unhideWindow (name) {
+  try {
+    await execFileAsync("wmctrl", ["-r", name, "-b", "remove,hidden"], {env: environ});
+    await execFileAsync("wmctrl", ["-a", name], {env: environ});
+  } catch (error) {
+    Log.error(`exec error: ${error}`);
+  }
 };
 
 module.exports = NodeHelper.create({
@@ -147,15 +159,7 @@ module.exports = NodeHelper.create({
       if (s.name in this.vlcDelayedExit && s.name in this.vlcStream) {
         clearTimeout(this.vlcDelayedExit[s.name]);
         delete this.vlcDelayedExit[s.name];
-        child_process.exec(
-          `wmctrl -r ${s.name} -b remove,hidden && wmctrl -a ${s.name}`,
-          {env: environ},
-          (error) => {
-            if (error) {
-              Log.error(`exec error: ${error}`);
-            }
-          }
-        );
+        unhideWindow(s.name);
       } else {
         // Otherwise, Generate the player window
         let args;
@@ -326,15 +330,10 @@ end
           this.vlcDelayedExit[name] = setTimeout(() => {
             quitVlc();
           }, delay * 1000);
-          child_process.exec(
-            `wmctrl -r ${name} -b add,hidden`,
-            {env: environ},
-            (error) => {
-              if (error) {
-                Log.error(`exec error: ${error}`);
-              }
-            }
-          );
+          // execFile avoids shell interpolation of name (untrusted config value)
+          execFileAsync("wmctrl", ["-r", name, "-b", "add,hidden"], {env: environ}).catch((error) => {
+            Log.error(`exec error: ${error}`);
+          });
         }
       } else {
         quitVlc();
