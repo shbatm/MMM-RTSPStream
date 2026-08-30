@@ -8,13 +8,12 @@
  */
 
 const childProcess = require("child_process");
-const {promisify} = require("util");
 const fs = require("fs");
 const path = require("path");
 const Log = require("logger");
 const NodeHelper = require("node_helper");
+const createWindowManager = require("./scripts/window-manager");
 
-const execFileAsync = promisify(childProcess.execFile);
 const environ = Object.assign(process.env, {DISPLAY: ":0"});
 const SNAPSHOT_MIME_BY_EXT = {
   ".jpg": "image/jpeg",
@@ -31,64 +30,7 @@ const getSnapshotMimeType = function getSnapshotMimeType (filePath) {
   return SNAPSHOT_MIME_BY_EXT[ext] || "application/octet-stream";
 };
 
-const windowManager = {
-  devilspieProcess: null,
-  restartTimer: null,
-
-  start (command, args, options) {
-    this.stopProcess();
-    Log.info("DP2: Running window resizers...");
-    this.devilspieProcess = childProcess.spawn(command, args, options);
-    this.devilspieProcess.on("error", () => {
-      Log.error("DP2: Failed to start.");
-    });
-  },
-
-  stop () {
-    this.stopRestartTimer();
-    this.stopProcess();
-  },
-
-  stopProcess () {
-    if (this.devilspieProcess) {
-      this.devilspieProcess.stderr.removeAllListeners();
-      this.devilspieProcess.kill();
-      this.devilspieProcess = null;
-    }
-  },
-
-  stopRestartTimer () {
-    if (this.restartTimer) {
-      clearTimeout(this.restartTimer);
-      this.restartTimer = null;
-    }
-  },
-
-  scheduleRestart (callback, delay) {
-    this.stopRestartTimer();
-    this.restartTimer = setTimeout(() => {
-      this.restartTimer = null;
-      callback();
-    }, delay);
-  },
-
-  async hideWindow (name) {
-    try {
-      await execFileAsync("wmctrl", ["-r", name, "-b", "add,hidden"], {env: environ});
-    } catch (error) {
-      Log.error(`exec error: ${error}`);
-    }
-  },
-
-  async unhideWindow (name) {
-    try {
-      await execFileAsync("wmctrl", ["-r", name, "-b", "remove,hidden"], {env: environ});
-      await execFileAsync("wmctrl", ["-a", name], {env: environ});
-    } catch (error) {
-      Log.error(`exec error: ${error}`);
-    }
-  }
-};
+const windowManager = createWindowManager({environ});
 
 module.exports = NodeHelper.create({
   config: {},
@@ -114,7 +56,7 @@ module.exports = NodeHelper.create({
 
     // Kill any VLC/MPlayer Streams that are open
     if (this.config.localPlayer === "vlc" || this.config.localPlayer === "mplayer") {
-      if (windowManager.devilspieProcess) {
+      if (windowManager.isRunning()) {
         Log.log("Killing DevilsPie2...");
       }
       windowManager.stop();
