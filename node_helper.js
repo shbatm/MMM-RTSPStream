@@ -52,6 +52,7 @@ module.exports = NodeHelper.create({
   vlcStream: {},
   vlcStreamTimeouts: {},
   vlcDelayedExit: {},
+  dp2RestartTimer: null,
 
   snapshots: {},
 
@@ -64,6 +65,10 @@ module.exports = NodeHelper.create({
 
     // Kill any VLC/MPlayer Streams that are open
     if (this.config.localPlayer === "vlc" || this.config.localPlayer === "mplayer") {
+      if (this.dp2RestartTimer) {
+        clearTimeout(this.dp2RestartTimer);
+        this.dp2RestartTimer = null;
+      }
       if (this.dp2) {
         Log.log("Killing DevilsPie2...");
         this.dp2.stderr.removeAllListeners();
@@ -294,7 +299,11 @@ end
     }
     startDp2();
     // Give the windows time to settle, then re-call to resize again.
-    setTimeout(() => {
+    if (this.dp2RestartTimer) {
+      clearTimeout(this.dp2RestartTimer);
+    }
+    this.dp2RestartTimer = setTimeout(() => {
+      this.dp2RestartTimer = null;
       startDp2();
     }, 7000 * payload.length);
   },
