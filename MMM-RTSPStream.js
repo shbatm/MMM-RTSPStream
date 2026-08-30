@@ -1,4 +1,3 @@
-/* eslint-disable complexity */
 /* eslint-disable no-negated-condition */
 /* eslint-disable func-style */
 /* eslint-disable no-param-reassign */
@@ -807,53 +806,104 @@ Module.register("MMM-RTSPStream", {
     return [`${this.name}.css`, "font-awesome.css"];
   },
 
-  notificationReceived (notification, payload) {
-    let ps = [];
-
-    if (notification === "DOM_OBJECTS_CREATED") {
-      // Register Key Handler
-      if (
-        this.config.keyBindings.enabled &&
-        MM.getModules().filter((kb) => kb.name === "MMM-KeyBindings").length > 0
-      ) {
-        this.keyBindings = {
-          ...this.keyBindings,
-          ...this.config.keyBindings
-        };
-        KeyHandler.register(this.name, {
-          sendNotification: (n, p) => {
-            this.sendNotification(n, p);
-          },
-          validKeyPress: (kp) => {
-            this.validKeyPress(kp);
-          }
-        });
-        this.keyHandler = KeyHandler.create(this.name, this.keyBindings);
-      }
-
-      const api = {
-        module: this.name,
-        path: "stream",
-        actions: {
-          play: {
-            notification: "RTSP-PLAY",
-            prettyName: "Play Stream(s)"
-          },
-          stop: {
-            notification: "RTSP-STOP",
-            prettyName: "Stop Stream(s)"
-          },
-          fullscreen: {
-            notification: "RTSP-PLAY-FULLSCREEN",
-            prettyName: "Play Fullscreen"
-          },
-          window: {
-            notification: "RSTP-PLAY-WINDOW",
-            prettyName: "Play in Window"
-          }
-        }
+  // Registers the MagicMirror key-binding handler for this module, if MMM-KeyBindings is present.
+  setupKeyHandler () {
+    if (
+      this.config.keyBindings.enabled &&
+      MM.getModules().filter((kb) => kb.name === "MMM-KeyBindings").length > 0
+    ) {
+      this.keyBindings = {
+        ...this.keyBindings,
+        ...this.config.keyBindings
       };
-      this.sendNotification("REGISTER_API", api);
+      KeyHandler.register(this.name, {
+        sendNotification: (n, p) => {
+          this.sendNotification(n, p);
+        },
+        validKeyPress: (kp) => {
+          this.validKeyPress(kp);
+        }
+      });
+      this.keyHandler = KeyHandler.create(this.name, this.keyBindings);
+    }
+  },
+
+  registerApi () {
+    const api = {
+      module: this.name,
+      path: "stream",
+      actions: {
+        play: {
+          notification: "RTSP-PLAY",
+          prettyName: "Play Stream(s)"
+        },
+        stop: {
+          notification: "RTSP-STOP",
+          prettyName: "Stop Stream(s)"
+        },
+        fullscreen: {
+          notification: "RTSP-PLAY-FULLSCREEN",
+          prettyName: "Play Fullscreen"
+        },
+        window: {
+          notification: "RSTP-PLAY-WINDOW",
+          prettyName: "Play in Window"
+        }
+      }
+    };
+    this.sendNotification("REGISTER_API", api);
+  },
+
+  handleUserPresence (payload) {
+    if (payload) {
+      if (this.suspended && this.suspendedForUserPresence) {
+        this.resumed();
+      }
+      this.suspendedForUserPresence = false;
+    } else {
+      this.suspend();
+      this.suspendedForUserPresence = true;
+    }
+  },
+
+  handleRtspPlay (payload) {
+    if (!payload || JSON.stringify(payload) === "{}" || payload === "all") {
+      if (this.config.rotateStreams) {
+        this.playing = true;
+        this.manualTransition(undefined, 1);
+        this.restartTimer();
+      } else {
+        this.playAll();
+      }
+      return;
+    }
+    if (this.config.rotateStreams) {
+      this.playing = true;
+      this.manualTransition(payload);
+      this.restartTimer();
+      return;
+    }
+    this.sendVlcPayload(this.playStream(payload));
+  },
+
+  handleRtspStop (payload) {
+    if (!payload || JSON.stringify(payload) === "{}" || payload === "all") {
+      this.stopAllStreams();
+    } else {
+      this.stopStream(payload);
+    }
+  },
+
+  sendVlcPayload (ps) {
+    if (ps.length > 0 && this.config.localPlayer === "vlc") {
+      this.sendSocketNotification("PLAY_VLCSTREAM", ps);
+    }
+  },
+
+  notificationReceived (notification, payload) {
+    if (notification === "DOM_OBJECTS_CREATED") {
+      this.setupKeyHandler();
+      this.registerApi();
     }
     if (this.keyHandler && this.keyHandler.validate(notification, payload)) {
       return;
@@ -861,51 +911,19 @@ Module.register("MMM-RTSPStream", {
 
     // Handle USER_PRESENCE events from the MMM-PIR-sensor Module
     if (notification === "USER_PRESENCE") {
-      if (payload) {
-        if (this.suspended && this.suspendedForUserPresence) {
-          this.resumed();
-        }
-        this.suspendedForUserPresence = false;
-      } else {
-        this.suspend();
-        this.suspendedForUserPresence = true;
-      }
+      this.handleUserPresence(payload);
     }
     if (notification === "RTSP-PLAY" && this.instance === "SERVER") {
-      if (!payload || JSON.stringify(payload) === "{}" || payload === "all") {
-        if (this.config.rotateStreams) {
-          this.playing = true;
-          this.manualTransition(undefined, 1);
-          this.restartTimer();
-        } else {
-          this.playAll();
-        }
-      } else if (this.config.rotateStreams) {
-        this.playing = true;
-        this.manualTransition(payload);
-        this.restartTimer();
-      } else {
-        ps = this.playStream(payload);
-      }
+      this.handleRtspPlay(payload);
     }
     if (notification === "RTSP-PLAY-FULLSCREEN" && this.instance === "SERVER") {
-      ps = this.playStream(payload, true);
+      this.sendVlcPayload(this.playStream(payload, true));
     }
     if (notification === "RSTP-PLAY-WINDOW" && this.instance === "SERVER") {
-      ps = this.playStream(payload.name, false, payload.box);
+      this.sendVlcPayload(this.playStream(payload.name, false, payload.box));
     }
     if (notification === "RTSP-STOP" && this.instance === "SERVER") {
-      if (!payload || JSON.stringify(payload) === "{}" || payload === "all") {
-        this.stopAllStreams();
-      } else {
-        this.stopStream(payload);
-      }
-    }
-
-    if (ps.length > 0) {
-      if (this.config.localPlayer === "vlc") {
-        this.sendSocketNotification("PLAY_VLCSTREAM", ps);
-      }
+      this.handleRtspStop(payload);
     }
   },
 
