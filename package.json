@@ -34,5 +34,8 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/shbatm/MMM-RTSPStream.git"
+  },
+  "allowScripts": {
+    "unrs-resolver@1.12.2": true
   }
 }
