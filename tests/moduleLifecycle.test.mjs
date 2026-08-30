@@ -43,7 +43,6 @@ const createSandbox = () => {
     setTimeout
   };
 
-  sandbox.global = sandbox;
   sandbox.window = sandbox;
 
   return sandbox;

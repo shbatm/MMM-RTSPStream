@@ -30,7 +30,6 @@ export default defineConfig([
       "@stylistic/padded-blocks": ["error", "never"],
       "@stylistic/quote-props": ["error", "as-needed"],
       "capitalized-comments": "off",
-      "consistent-this": "off",
       "id-length": "off",
       "init-declarations": "off",
       "max-lines-per-function": ["warn", 500],

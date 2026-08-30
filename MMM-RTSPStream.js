@@ -8,7 +8,6 @@
  * By shbatm
  * MIT Licensed.
  */
-const global = this;
 
 Module.register("MMM-RTSPStream", {
   defaults: {
@@ -80,7 +79,7 @@ Module.register("MMM-RTSPStream", {
 
   // Allow for control on muliple instances
   instance:
-    global.location &&
+    location &&
     [
       "localhost",
       "127.0.0.1",
@@ -88,13 +87,11 @@ Module.register("MMM-RTSPStream", {
       "::ffff:127.0.0.1",
       undefined,
       "0.0.0.0"
-    ].indexOf(global.location.hostname) > -1
+    ].indexOf(location.hostname) > -1
       ? "SERVER"
       : "LOCAL",
 
   start () {
-    const self = this;
-
     // Methods extracted to scripts/whep-status.js, loaded via getScripts().
     Object.assign(this, window.MMMRTSPStreamWhepStatus);
 
@@ -107,7 +104,7 @@ Module.register("MMM-RTSPStream", {
       Object.keys(this.config)
         .filter((key) => key.startsWith("stream"))
         .forEach((key) => {
-          self.streams[key] = {playing: false, status: {message: "", level: "info"}};
+          this.streams[key] = {playing: false, status: {message: "", level: "info"}};
         });
     }
   },
@@ -274,7 +271,7 @@ Module.register("MMM-RTSPStream", {
     const wrapper = document.createElement("div");
 
     if (this.config.initialSetup) {
-      const configUrl = `http://${global.location.hostname}:${global.location.port}/${this.name}/config.html`;
+      const configUrl = `http://${location.hostname}:${location.port}/${this.name}/config.html`;
       const outputString = `Use config wizard at <a href="${configUrl}" target="_blank">${configUrl}</a><br>to generate a configuration for this module.`;
       wrapper.innerHTML = outputString;
       Log.log(outputString);

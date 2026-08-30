@@ -55,7 +55,6 @@ const createSandbox = () => {
     }
   };
 
-  sandbox.global = sandbox;
   sandbox.window = sandbox;
 
   return sandbox;

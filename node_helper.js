@@ -81,8 +81,6 @@ module.exports = NodeHelper.create({
 
   async getData (name) {
     // Log.log("Getting data for "+name);
-    const self = this;
-
     const snapUrl = this.config[name].snapshotUrl;
 
     if (!snapUrl) {
@@ -98,13 +96,13 @@ module.exports = NodeHelper.create({
       try {
         const buffer = await fs.promises.readFile(snapUrl);
         const content = `data:${mimeType};base64,${buffer.toString("base64")}`;
-        self.sendSocketNotification("SNAPSHOT", {
+        this.sendSocketNotification("SNAPSHOT", {
           name,
           image: true,
           buffer: content
         });
       } catch (error) {
-        Log.error(self.name, `ERROR: Could not load snapshot file for ${name}.`, error);
+        Log.error(this.name, `ERROR: Could not load snapshot file for ${name}.`, error);
       }
     } else {
       try {
@@ -114,28 +112,28 @@ module.exports = NodeHelper.create({
 
         if (response.status === 200) {
           const buffer = await response.buffer();
-          self.sendSocketNotification("SNAPSHOT", {
+          this.sendSocketNotification("SNAPSHOT", {
             name,
             image: true,
             buffer: `data:image/jpeg;base64,${buffer.toString("base64")}`
           });
         } else if (response.status === 401) {
-          self.sendSocketNotification(`DATA_ERROR_${name}`, "401 Error");
-          Log.error(self.name, "401 Error");
+          this.sendSocketNotification(`DATA_ERROR_${name}`, "401 Error");
+          Log.error(this.name, "401 Error");
         } else {
           Log.error(
-            self.name,
+            this.name,
             "Could not load data.",
             response.statusText
           );
         }
       } catch (error) {
-        Log.error(self.name, "ERROR: Could not load data.", error);
+        Log.error(this.name, "ERROR: Could not load data.", error);
       }
       return;
     }
     this.snapshots[name] = setTimeout(() => {
-      self.getData(name);
+      this.getData(name);
     }, this.config[name].snapshotRefresh * 1000);
   },
 
