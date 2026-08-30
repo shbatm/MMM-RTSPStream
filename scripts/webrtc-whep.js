@@ -3,7 +3,6 @@
  * Connects to a WHEP endpoint and attaches the remote MediaStream to a <video> element.
  * No external deps; uses browser WebRTC APIs.
  */
-/* eslint-disable no-plusplus */
 (() => {
   const DEFAULT_RECONNECT_DELAY_MS = 3000;
   const MAX_RECONNECT_ATTEMPTS = 5;
@@ -92,7 +91,7 @@
         if (connectionState === "failed" || connectionState === "disconnected") {
           onError(`WebRTC connection ${connectionState}`);
           if (autoReconnect && reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
-            reconnectAttempts++;
+            reconnectAttempts += 1;
             setTimeout(() => {
               if (!stopped) {
                 connect().catch(onError);
