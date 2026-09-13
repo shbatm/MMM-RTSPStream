@@ -189,6 +189,20 @@ describe("module lifecycle and UI helpers", () => {
     assert.deepEqual(calls[2], {fn: "setupStreamRotation"});
   });
 
+  it("suspend clears the stream rotation timer", () => {
+    const {definition} = loadDefinition();
+    const instance = createInstance(definition, {
+      props: {
+        transitionTimer: setInterval(() => undefined, 10000),
+        stopAllStreams: () => undefined
+      }
+    });
+
+    instance.suspend();
+
+    assert.equal(instance.transitionTimer, undefined);
+  });
+
   it("setWhepStatus toggles overlay visibility and level", () => {
     const {definition, sandbox} = loadDefinition();
     const rotateOverlayId = "status_";

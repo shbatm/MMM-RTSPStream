@@ -154,15 +154,15 @@ Module.register("MMM-RTSPStream", {
   },
 
   restartTimer () {
+    if (this.transitionTimer) {
+      clearInterval(this.transitionTimer);
+      this.transitionTimer = undefined;
+    }
     if (
       this.config.rotateStreams &&
       Object.keys(this.streams).length > 1 &&
       this.config.rotateStreamTimeout > 0
     ) {
-      // Restart the timer
-      if (this.transitionTimer) {
-        clearInterval(this.transitionTimer);
-      }
       this.transitionTimer = setInterval(
         this.manualTransition,
         this.config.rotateStreamTimeout * 1000
@@ -177,6 +177,10 @@ Module.register("MMM-RTSPStream", {
   suspend () {
     Log.log(`${this.name} is suspended...`);
     this.suspended = true;
+    if (this.transitionTimer) {
+      clearInterval(this.transitionTimer);
+      this.transitionTimer = undefined;
+    }
     this.stopAllStreams(false);
     if (this.selectedStream) {
       this.selectStream(undefined, true);
