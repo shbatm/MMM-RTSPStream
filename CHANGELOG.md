@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.3.1](https://github.com/shbatm/MMM-RTSPStream/compare/v4.3.0...v4.3.1) (2026-09-13)
+
+### Fixed
+
+* correct WebRTC mute handling ([ec9c844](https://github.com/shbatm/MMM-RTSPStream/commit/ec9c84457e544aeeb07b4b5f5fbf356bb87f728a))
+* **rotation:** stop timer when suspended ([9799e05](https://github.com/shbatm/MMM-RTSPStream/commit/9799e05d7d767e7838f3ada22c0b23eba4d01f70))
+* **snapshot:** schedule refresh for URL snapshots ([b95ff03](https://github.com/shbatm/MMM-RTSPStream/commit/b95ff03439e3aed625e841c0308048689f70fe9d))
+* support MPlayer playback payloads ([5b87f35](https://github.com/shbatm/MMM-RTSPStream/commit/5b87f359e918c72ec0d21b2e6366f8d93563e7d1))
+* **ui:** limit play/pause button retries ([7e6668e](https://github.com/shbatm/MMM-RTSPStream/commit/7e6668e4ed3eb0a4500af565071bb83d08e46c90))
+
+### Documentation
+
+* restructure configuration documentation ([5eb35d0](https://github.com/shbatm/MMM-RTSPStream/commit/5eb35d0b12ee14a5ccf8c09a181cc25e870b0b1a))
+
+### Chores
+
+* update devDependencies ([c256ce4](https://github.com/shbatm/MMM-RTSPStream/commit/c256ce46f2429c903544068936da75ea27934fbf))
+
+### Code Refactoring
+
+* simplify show callback flow ([1548f22](https://github.com/shbatm/MMM-RTSPStream/commit/1548f22e76e8edb5015cf7908c0ea330f2d2845b))
 ## [4.3.0](https://github.com/shbatm/MMM-RTSPStream/compare/v4.2.0...v4.3.0) (2026-08-30)
 
 ### Fixed
