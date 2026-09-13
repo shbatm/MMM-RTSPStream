@@ -199,7 +199,7 @@ Module.register("MMM-RTSPStream", {
   },
 
   // Overwrite the module show method to force a callback.
-  async show (speed, callback, options) {
+  show (speed, callback, options) {
     const isOptionsArg = typeof callback === "object";
     const resumeCallback = isOptionsArg
       ? undefined
@@ -208,13 +208,12 @@ Module.register("MMM-RTSPStream", {
       ? callback
       : options) || {};
 
-    await new Promise((resolve) => {
-      MM.showModule(this, speed, resolve, showOptions);
-    });
-    this.resumed();
-    if (typeof resumeCallback === "function") {
-      resumeCallback();
-    }
+    MM.showModule(this, speed, () => {
+      this.resumed();
+      if (typeof resumeCallback === "function") {
+        resumeCallback();
+      }
+    }, showOptions);
   },
 
   playBtnCallback (streamName) {
