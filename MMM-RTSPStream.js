@@ -381,14 +381,18 @@ Module.register("MMM-RTSPStream", {
     return playBtnWrapper;
   },
 
-  updatePlayPauseBtn (stream, forceVisible = false) {
+  updatePlayPauseBtn (stream, forceVisible = false, retryAttempts = 0) {
     const buttonId = this.config.rotateStreams
       ? "playBtnLabel_"
       : `playBtnLabel_${stream}`;
     const button = document.getElementById(buttonId);
     if (!button) {
-      // If not ready yet, retry in 1 second.
-      setTimeout(() => this.updatePlayPauseBtn(stream, forceVisible), 1000);
+      if (retryAttempts < 10) {
+        setTimeout(
+          () => this.updatePlayPauseBtn(stream, forceVisible, retryAttempts + 1),
+          1000
+        );
+      }
       return;
     }
     if (stream !== "" && this.streams[stream].playing) {
