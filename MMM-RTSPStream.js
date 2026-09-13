@@ -456,7 +456,8 @@ Module.register("MMM-RTSPStream", {
       // WebRTC (WHEP) playback path (server or remote browser)
       const {whepUrl} = this.config[stream];
       if (whepUrl && typeof WHEPClient !== "undefined") {
-        surface.muted = this.config[stream].muted !== false; // Default muted for autoplay
+        surface.muted = this.config[stream].muted === true;
+
         /*
          * Start WHEP playback and monitoring via helper method; rejection is already
          * logged and turned into a restart attempt inside startWhepSession itself.
