@@ -126,6 +126,36 @@ describe("module lifecycle and UI helpers", () => {
     assert.deepEqual(notifications[0], {payload: "stream3", type: "SNAPSHOT_STOP"});
   });
 
+  it("creates and dispatches a player payload for MPlayer", () => {
+    const {definition, sandbox} = loadDefinition();
+    const notifications = [];
+    sandbox.document.getElementById = () => ({
+      getBoundingClientRect: () => ({
+        top: 10,
+        right: 330,
+        bottom: 250,
+        left: 10
+      })
+    });
+
+    const instance = createInstance(definition, {
+      config: {localPlayer: "mplayer"},
+      props: {
+        instance: "SERVER",
+        sendSocketNotification: (type, payload) => {
+          notifications.push({payload, type});
+        },
+        updatePlayPauseBtn: () => undefined
+      }
+    });
+
+    const payload = instance.playStream("stream1");
+    instance.sendVlcPayload(payload);
+
+    assert.equal(payload.length, 1);
+    assert.deepEqual(notifications, [{payload, type: "PLAY_VLCSTREAM"}]);
+  });
+
   it("suspend stops streams and resumed restarts rotation", () => {
     const {definition} = loadDefinition();
     const calls = [];

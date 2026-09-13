@@ -415,7 +415,10 @@ Module.register("MMM-RTSPStream", {
 
     const webrtcActive = this.isWebRTCActive();
 
-    if (this.instance === "SERVER" && this.config.localPlayer === "vlc") {
+    if (
+      this.instance === "SERVER" &&
+      ["vlc", "mplayer"].includes(this.config.localPlayer)
+    ) {
       const rect = surface.getBoundingClientRect();
       const offset = {};
       const payload = {name: stream};
@@ -841,7 +844,10 @@ Module.register("MMM-RTSPStream", {
   },
 
   sendVlcPayload (vlcPayloads) {
-    if (vlcPayloads.length > 0 && this.config.localPlayer === "vlc") {
+    if (
+      vlcPayloads.length > 0 &&
+      ["vlc", "mplayer"].includes(this.config.localPlayer)
+    ) {
       this.sendSocketNotification("PLAY_VLCSTREAM", vlcPayloads);
     }
   },
