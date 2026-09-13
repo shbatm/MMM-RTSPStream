@@ -120,7 +120,6 @@ module.exports = NodeHelper.create({
       } catch (error) {
         Log.error(this.name, "ERROR: Could not load data.", error);
       }
-      return;
     }
     this.snapshots[name] = setTimeout(() => {
       this.getData(name);
